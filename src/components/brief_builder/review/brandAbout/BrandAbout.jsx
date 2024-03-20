@@ -1,7 +1,36 @@
 import React from "react";
 import Image from "next/image";
 import { Box, Typography } from "@mui/material";
-const BrandAbout = () => {
+const BrandAbout = ({ brandDeatils }) => {
+  if (!brandDeatils) {
+    return <div>No brand details available</div>;
+  }
+
+  const { name, website, socialMediaLinks, info } = brandDeatils;
+
+  const extractContentBetweenTags = (htmlString, tagName) => {
+    const regex = new RegExp(`<${tagName}>(.*?)<\/${tagName}>`, "g");
+    const matches = htmlString.match(regex);
+    return matches
+      ? matches.map((match) =>
+          match.replace(`<${tagName}>`, "").replace(`</${tagName}>`, "")
+        )
+      : [];
+  };
+  const paragraphs = extractContentBetweenTags(info, "p");
+
+  const ulContentMatch = info.match(/<ul>(.*?)<\/ul>/s);
+  const ulContent = ulContentMatch ? ulContentMatch[1] : "";
+
+  // Extract list items from <ul> content
+  const listItems = ulContent ? ulContent.match(/<li>(.*?)<\/li>/gs) : [];
+
+  const instagramLinkObj = socialMediaLinks.find(
+    (link) => link.platForm.toLowerCase() === "instagram"
+  );
+  const instagramLink = instagramLinkObj
+    ? instagramLinkObj.link
+    : "Not available";
   return (
     <>
       <Box
@@ -11,8 +40,9 @@ const BrandAbout = () => {
           padding: "1.8rem",
           borderRadius: "1.8rem",
           display: "flex",
-          justifyContent: "space-between",
+          justifyContent: "start",
           gap: "1.8rem",
+          minWidth: "100%",
         }}
       >
         <Image
@@ -26,40 +56,30 @@ const BrandAbout = () => {
           as="div"
           sx={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}
         >
-          <Typography variant="h2">Info about the brand</Typography>
+          <Typography variant="h2">{name}</Typography>
           <Box>
-            <p style={{ color: "#777777" }}>
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industry. Lorem Ipsum has been the industry's standard dummy text
-              ever since the 1500s, when an unknown printer took a galley of
-              type and scrambled it to make
-            </p>
-            <ul
-              style={{
-                padding: "1.5rem",
-                display: "flex",
-                flexDirection: "column",
-                gap: "1.8rem",
-              }}
-            >
-              <li style={{ color: "#777777" }}>
-                <p>
-                  It is a long established fact that a reader will be distracted
-                  by the readable content of a page when looking at its layout.
-                  The point of using Lorem Ipsum is that it has a more-or-less
-                  normal distribution of letters, as opposed to using 'Content
-                  here, content here', making it look like readable English.
-                </p>
-              </li>
-              <li style={{ color: "#777777" }}>
-                <p>
-                  There are many variations of passages of Lorem Ipsum
-                  available, but the majority have suffered alteration in some
-                  form, by injected humour, or randomised words which don't look
-                  even slightly believable. If you
-                </p>
-              </li>
-            </ul>
+            {paragraphs.map((paragraph, index) => (
+              <p key={`paragraph-${index}`} style={{ color: "#777777" }}>
+                {paragraph}
+              </p>
+            ))}
+
+            {listItems && listItems.length > 0 && (
+              <ul
+                style={{
+                  padding: "1.5rem",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "1.8rem",
+                }}
+              >
+                {listItems.map((item, index) => (
+                  <li key={`list-item-${index}`} style={{ color: "#777777" }}>
+                    {item.replace(/<\/?li>/g, "")}
+                  </li>
+                ))}
+              </ul>
+            )}
           </Box>
 
           <Box
@@ -77,7 +97,7 @@ const BrandAbout = () => {
                 borderRadius: "10px",
               }}
             >
-              <label>Website : brandwebsite.com</label>
+              <label>{`Website : ${website}`}</label>
             </Box>
             <Box
               as="div"
@@ -87,7 +107,7 @@ const BrandAbout = () => {
                 borderRadius: "10px",
               }}
             >
-              <label>Instagram : @brand</label>
+              <label>Instagram : {instagramLink}</label>
             </Box>
           </Box>
         </Box>

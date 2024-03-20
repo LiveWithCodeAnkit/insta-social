@@ -1,26 +1,56 @@
 import { offerFormSchema } from "../schema";
+import { useDispatch, useSelector } from "react-redux";
+import { createCampaign } from "../../../../store/brief_builder/campaign/campaign.slice";
 
-export const useOfferForm = () => {
-  const generateInitialVariant = () => ({
-    variant: "",
-    variantValue: "",
-  });
-
-  const initialVariantValues = Array.from(
-    { length: 1 },
-    generateInitialVariant
+export const useOfferForm = ({ handleTab }) => {
+  const infoCam = useSelector(
+    (state) => state.Campaign.addCampaignDetails?.campaign
   );
+  const dispatch = useDispatch();
 
   const initialValues = {
-    productName: "qqqq",
-    productDes: "",
-    productUrl: "",
-    unitsPerCreator: "",
-    variants: [...initialVariantValues],
+    gifts: [
+      {
+        productName: "",
+        description: "",
+        productLink: "",
+        unitsPerCreator: "0",
+        variants: [
+          {
+            variantType: "",
+            variantDes: "",
+          },
+        ],
+      },
+    ],
   };
 
-  const handleOfferForm = (values) => {
-    console.log("offerFormSchema values -:", values);
+  const handleOfferForm = async (values) => {
+    const formData = new FormData();
+    const offerDetails = {
+      offerDetails: {
+        campaignId: infoCam._id,
+        offers: values.gifts.map((gift) => ({
+          productName: gift.productName,
+          description: gift.description,
+          productLink: gift.productLink,
+          unitsPerCreator: gift.unitsPerCreator,
+          variants: gift.variants.map((variant) => ({
+            variantType: variant.variantType,
+            variantDes: variant.variantDes,
+          })),
+        })),
+      },
+    };
+
+    formData.append("data", JSON.stringify(offerDetails));
+    values.gifts.map((abc, index) =>
+      formData.append(`offerImage[${index}]`, abc.offerImage[0])
+    );
+    const res = await dispatch(createCampaign(formData));
+    if (res.payload?.success) {
+      handleTab(3);
+    }
   };
 
   return {

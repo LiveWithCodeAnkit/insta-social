@@ -8,9 +8,12 @@ import { useForm, Controller } from "react-hook-form";
 import { useBrandForm } from "../hook";
 import { CgArrowLongRight } from "react-icons/cg";
 import FileUpload from "@/components/common/fileupload/FileUpload";
+import QuillMinimal from "@/components/common/editer/Editor";
 
-const BrandForm = ({handleTab}) => {
-  const { initialValues, schema, submit } = useBrandForm({handleTab});
+const BrandForm = ({ handleTab }) => {
+  const { initialValues, loading, schema, submit } = useBrandForm({
+    handleTab,
+  });
   const [files, setFiles] = useState([]);
 
   const updateFilesState = (newFiles) => {
@@ -21,7 +24,6 @@ const BrandForm = ({handleTab}) => {
     reset,
     control,
     handleSubmit,
-    isSubmitting ,
     formState: { errors },
   } = useForm({
     defaultValues: initialValues,
@@ -45,6 +47,9 @@ const BrandForm = ({handleTab}) => {
             sx={{
               padding: "1.8rem",
               borderRadius: "1.8rem",
+              display: "flex",
+              flexDirection: "column",
+              gap: "1.8rem",
             }}
           >
             <Box sx={{ width: "auto", display: "flex", gap: "1.8rem" }}>
@@ -56,7 +61,6 @@ const BrandForm = ({handleTab}) => {
                   <CustomTextField
                     fullWidth
                     value={value}
-                    sx={{ mb: 4 }}
                     label="Brand Name"
                     onChange={onChange}
                     placeholder="Brand Name"
@@ -76,7 +80,6 @@ const BrandForm = ({handleTab}) => {
                   <CustomTextField
                     fullWidth
                     value={value}
-                    sx={{ mb: 4 }}
                     label="Brand Website"
                     onChange={onChange}
                     placeholder="Brand Website"
@@ -97,7 +100,6 @@ const BrandForm = ({handleTab}) => {
                   <CustomTextField
                     fullWidth
                     value={value}
-                    sx={{ mb: 4 }}
                     label="Brand Instagram"
                     onChange={onChange}
                     placeholder="Brand Instagram"
@@ -117,7 +119,6 @@ const BrandForm = ({handleTab}) => {
                   <CustomTextField
                     fullWidth
                     value={value}
-                    sx={{ mb: 4 }}
                     label="Brand Tiktok"
                     onChange={onChange}
                     placeholder="Brand Tiktok"
@@ -129,37 +130,59 @@ const BrandForm = ({handleTab}) => {
                 )}
               />
             </Box>
-            <Controller
-              name="brandDescription"
-              control={control}
-              rules={{ required: true }}
-              render={({ field: { value, onChange } }) => (
-                <CustomTextField
-                  rows={5}
-                  fullWidth
-                  multiline
-                  sx={{ mb: 5 }}
-                  label="Brand Description"
-                  onChange={onChange}
-                  placeholder="Brand Description"
-                  error={Boolean(errors.brandDescription)}
-                  {...(errors.brandDescription && {
-                    helperText: errors.brandDescription.message,
-                  })}
-                />
+
+            <Box
+              as="div"
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "start",
+                gap: "0.5rem",
+              }}
+            >
+              <Typography
+                variant="label"
+                sx={{
+                  fontSize: "14px",
+                  fontWeight: "600",
+                }}
+              >
+                Brand Description
+              </Typography>
+              <Controller
+                name="brandDescription"
+                control={control}
+                rules={{ required: true }}
+                render={({ field: { value, onChange } }) => (
+                  <>
+                    <QuillMinimal
+                      value={value}
+                      onChange={onChange}
+                      label="Brand Description"
+                    />
+                  </>
+                )}
+              />
+              {errors.brandDescription && (
+                <Typography variant="caption" color="error">
+                  {errors.brandDescription.message}
+                </Typography>
               )}
-            />
+            </Box>
 
             <Box
               sx={{
                 border: "2px dotted #FFCC33",
                 borderRadius: "15px",
-                width: "46.8rem",
-                height: "12.5rem",
+                maxWidth: "100%",
+                minHeight: "12.5rem",
+                height: "auto",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
                 backgroundColor: "#FEFAED",
+                padding: "1rem",
+                boxSizing: "border-box",
               }}
             >
               <Controller
@@ -182,7 +205,6 @@ const BrandForm = ({handleTab}) => {
             <Box sx={{ display: "flex", justifyContent: "end" }}>
               <Button
                 type="submit"
-                disabled={isSubmitting} 
                 sx={{
                   background: "#FFCC33",
                   color: "#212121",

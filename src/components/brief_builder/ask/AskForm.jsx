@@ -6,7 +6,7 @@ import { Box, Tab, Tabs, Typography, Card } from "@mui/material";
 import { CgArrowLongLeft, CgArrowLongRight } from "react-icons/cg";
 import { useForm, Controller } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { crateCampaign } from "../../../../store/brief_builder/campaign/campaign.slice";
+import { createCampaign } from "../../../../store/brief_builder/campaign/campaign.slice";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -34,7 +34,7 @@ function a11yProps(index) {
     "aria-controls": `full-width-tabpanel-${index}`,
   };
 }
-const AskForm = () => {
+const AskForm = ({ handleTab }) => {
   const dispatch = useDispatch();
   const [value, setValue] = useState(0);
   const { control, handleSubmit } = useForm();
@@ -42,12 +42,12 @@ const AskForm = () => {
     setValue(newValue);
   };
   const infoCam = useSelector(
-    (state) => state.Campaign.getCampaignDetails?.campaign
+    (state) => state.Campaign.addCampaignDetails?.campaign
   );
-  const onSubmit = (values) => {
+  console.log(infoCam?._id);
+  const onSubmit = async (values) => {
     const { feedPost, reel, story } = values;
     const formData = new FormData();
-    console.log(infoCam?._id);
 
     const campaignDetails = {
       campaignDetails: {
@@ -58,8 +58,12 @@ const AskForm = () => {
         },
       },
     };
+    console.log("campaignDetails:-", campaignDetails);
     formData.append("data", JSON.stringify(campaignDetails));
-    dispatch(crateCampaign(formData));
+    const res = await dispatch(createCampaign(formData));
+    if (res.payload?.success) {
+      handleTab(4);
+    }
   };
 
   return (

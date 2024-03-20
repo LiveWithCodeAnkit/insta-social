@@ -7,8 +7,8 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
-import CommonTable from "../../CommonTable";
+import React, { useEffect, useState } from "react";
+import CommonTable from "../../../common/commonTable/CommonTable";
 import StarIcon from "@mui/icons-material/Star";
 import HandleBriefModal from "../modal/HandleBriefModal";
 
@@ -22,6 +22,13 @@ const imageSmallUrls = [
 
 const ApproveCreators = () => {
   const [open, setOpen] = useState(false);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  // useEffect(() => {
+    
+  // }, []);
+
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   function createData(id, handle, favorites, product, action, status) {
@@ -50,6 +57,20 @@ const ApproveCreators = () => {
     createData(12, "Nougat", 360, 19.0, 9),
     createData(13, "Oreo", 437, 18.0, 63),
   ];
+
+  const handleChangePage = (event, newPage) => {
+    console.log("newPage", newPage);
+    setPage(newPage);
+  };
+  const handleChangePageForPagination = (event, newPage) => {
+    console.log("newPage", newPage);
+    setPage(newPage - 1);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   const headCells = [
     {
@@ -200,6 +221,12 @@ const ApproveCreators = () => {
         rows={rows}
         headCells={headCells}
         onclickHandler={onRowClickHandler}
+        // page={page}
+        // rowsPerPage={rowsPerPage}
+        // onChangePage={handleChangePage}
+        // onChangeRowsPerPage={handleChangeRowsPerPage}
+        // pagination={capmpaignsData.campaigns.pagination}
+        // onChangePagePagination={handleChangePageForPagination}
       />
 
       <HandleBriefModal

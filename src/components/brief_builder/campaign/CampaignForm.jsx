@@ -31,7 +31,7 @@ function a11yProps(index) {
     "aria-controls": `full-width-tabpanel-${index}`,
   };
 }
-const CampaignForm = () => {
+const CampaignForm = ({ handleTab }) => {
   const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
@@ -125,6 +125,9 @@ const CampaignForm = () => {
               Previous
             </Button>
             <Button
+              onClick={() => {
+                handleTab(2);
+              }}
               sx={{
                 background: "#FFCC33",
                 color: "#212121",

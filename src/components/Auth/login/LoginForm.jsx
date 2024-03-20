@@ -21,7 +21,7 @@ import { useState } from "react";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { signIn } from "next-auth/react";
-
+import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -35,6 +35,7 @@ const schema = yup.object().shape({
   password: yup.string().required("Password is required"),
 });
 const LoginForm = () => {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
 
   const TextInput = styled(InputBase)(({ theme }) => ({
@@ -78,13 +79,12 @@ const LoginForm = () => {
       };
       const signInRes = await signIn("credentials", {
         ...values,
-        redirect: true,
-        callbackUrl: "/brief-builder",
+        redirect: false,
       });
       if (signInRes.error) {
-        console.error("Login error:", signInRes.error);
+        router.push("/");
       } else {
-        console.log("Login successful:", signInRes);
+        router.push("/brief-builder");
       }
     } catch (error) {
       console.error("Error during login:", error);

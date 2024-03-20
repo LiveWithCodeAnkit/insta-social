@@ -1,6 +1,6 @@
 import { Box, Button, Stack, Typography } from "@mui/material";
 import React, { useState } from "react";
-import CommonTable from "../../CommonTable";
+import CommonTable from "../../../common/commonTable/CommonTable";
 import AwaitingContentModal from "../modal/AwaitingContentModal";
 
 const imageSmallUrls = [

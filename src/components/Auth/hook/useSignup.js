@@ -22,7 +22,6 @@ export const useSignup = () => {
         role: "BRAND",
       };
 
-      console.log("payload  ;;;;-", payload);
       await dispatch(signUpUser(payload));
     } catch (error) {
       console.error("Signup error:", error);

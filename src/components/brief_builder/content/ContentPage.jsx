@@ -1,27 +1,46 @@
 "use client";
-import React from "react";
-import { Box, Typography, Card } from "@mui/material";
+import React, { useState } from "react";
+import { Box, Tab, Tabs, Typography, Card } from "@mui/material";
 import Button from "@mui/material/Button";
-import CustomTextField from "../../common/text-field";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm, Controller } from "react-hook-form";
-import { useContentForm } from "../hook";
 import { CgArrowLongLeft, CgArrowLongRight } from "react-icons/cg";
+import ContentForm from "./ContentForm";
+import ProductDetailsForm from "./ProductDetailsForm";
 
-const ContentPage = () => {
-  const { initialValues, schema, submit } = useContentForm();
-  const {
-    reset,
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    defaultValues: initialValues,
-    mode: "onChange",
-    resolver: yupResolver(schema),
-  });
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
   return (
-    <form onSubmit={handleSubmit(submit)}>
+    <div
+      role="tabpanel"
+      style={{ width: "100%" }}
+      hidden={value !== index}
+      id={`full-width-tabpanel-${index}`}
+      aria-labelledby={`full-width-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box>
+          <>{children}</>
+        </Box>
+      )}
+    </div>
+  );
+}
+function a11yProps(index) {
+  return {
+    id: `full-width-tab-${index}`,
+    "aria-controls": `full-width-tabpanel-${index}`,
+  };
+}
+const ContentPage = ({ handleTab }) => {
+  const [value, setValue] = useState(0);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
+  return (
+    <>
       <Box
         sx={{
           display: "flex",
@@ -35,138 +54,57 @@ const ContentPage = () => {
           sx={{
             padding: "1.8rem",
             borderRadius: "1.8rem",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: "2.18rem",
           }}
         >
-          <Box sx={{ width: "auto", display: "flex", gap: "1.8rem" }}>
-            <Controller
-              name="messaging"
-              control={control}
-              rules={{ required: true }}
-              render={({ field: { value, onChange } }) => (
-                <CustomTextField
-                  fullWidth
-                  rows={5}
-                  multiline
-                  value={value}
-                  sx={{ mb: 4 }}
-                  label="Messaging"
-                  onChange={onChange}
-                  placeholder="Messaging"
-                  error={Boolean(errors.messaging)}
-                  {...(errors.messaging && {
-                    helperText: errors.messaging.message,
-                  })}
-                />
-              )}
-            />
-
-            <Controller
-              name="hooks"
-              control={control}
-              rules={{ required: true }}
-              render={({ field: { value, onChange } }) => (
-                <CustomTextField
-                  rows={5}
-                  multiline
-                  fullWidth
-                  value={value}
-                  sx={{ mb: 4 }}
-                  label="Hooks"
-                  onChange={onChange}
-                  placeholder="Hooks"
-                  error={Boolean(errors.hooks)}
-                  {...(errors.hooks && {
-                    helperText: errors.hooks.message,
-                  })}
-                />
-              )}
-            />
-            <Controller
-              name="doDes"
-              control={control}
-              rules={{ required: true }}
-              render={({ field: { value, onChange } }) => (
-                <CustomTextField
-                  rows={5}
-                  multiline
-                  fullWidth
-                  value={value}
-                  sx={{ mb: 4 }}
-                  label="Do"
-                  onChange={onChange}
-                  placeholder="Brand Website"
-                  error={Boolean(errors.doDes)}
-                  {...(errors.doDes && {
-                    helperText: errors.doDes.message,
-                  })}
-                />
-              )}
-            />
-          </Box>
-          <Box sx={{ width: "34.3rem", display: "flex", gap: "1.8rem" }}>
-            <Controller
-              name="doNotDes"
-              control={control}
-              rules={{ required: true }}
-              render={({ field: { value, onChange } }) => (
-                <CustomTextField
-                  rows={5}
-                  multiline
-                  fullWidth
-                  value={value}
-                  sx={{ mb: 4 }}
-                  label="Don’t"
-                  onChange={onChange}
-                  placeholder="Don`t"
-                  error={Boolean(errors.doNotDes)}
-                  {...(errors.doNotDes && {
-                    helperText: errors.doNotDes.message,
-                  })}
-                />
-              )}
-            />
-          </Box>
-
-          <Box sx={{ display: "flex", justifyContent: "end", gap: "0.5rem" }}>
-            <Button
-              variant="outlined"
-              startIcon={<CgArrowLongLeft />}
+          <Box
+            sx={{
+              display: "flex",
+              boxShadow: "0px 5px 30px 0px rgba(0, 0, 0, 0.1)",
+              width: "20rem",
+              height: "5rem",
+              justifyContent: "center",
+              alignItems: "center",
+              borderRadius: "3rem",
+            }}
+          >
+            <Tabs
+              value={value}
+              onChange={handleChange}
+              indicatorColor="secondary"
+              textColor="secondary"
               sx={{
-                height: "50px",
-                width: "147px",
-                color: "#212121",
-                borderRadius: "50px",
-                fontWeight: 600,
-                textTransform: "none",
-                borderColor: "black",
-              }}
-            >
-              Previous
-            </Button>
-            <Button
-              type="submit"
-              sx={{
-                background: "#FFCC33",
-                color: "#212121",
-                height: "50px",
-                width: "117px",
-                borderRadius: "50px",
-                fontWeight: 600,
-                textTransform: "none",
-
-                "&:hover": {
-                  background: "#FFCC33",
+                "& .MuiTab-root": {
+                  color: "text.primary",
+                  margin: "0 8px",
+                },
+                "& .Mui-selected": {
+                  backgroundColor: "#FFCC33",
+                  borderRadius: "50px",
+                },
+                "& .MuiTabs-indicator": {
+                  display: "none",
                 },
               }}
-              variant="contained"
-              endIcon={<CgArrowLongRight />}
             >
-              Next
-            </Button>
+              <Tab label="Mood Board" {...a11yProps(0)} />
+              <Tab label="Product Details" {...a11yProps(1)} />
+            </Tabs>
           </Box>
+
+          <TabPanel value={value} index={0}>
+            <ContentForm handleTab={handleTab} />
+          </TabPanel>
+          <TabPanel value={value} index={1}>
+            <ProductDetailsForm handleTab={handleTab} />
+          </TabPanel>
         </Card>
       </Box>
-    </form>
+    </>
   );
 };
 

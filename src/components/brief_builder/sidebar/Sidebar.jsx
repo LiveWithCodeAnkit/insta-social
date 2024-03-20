@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import Image from "next/image";
 import NavSection from "@/components/brandDashboard/NavSection";
-
+import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { navConfigBriefBuilder } from "../constants";
 import { signOut } from "next-auth/react";
@@ -31,6 +31,7 @@ const RootStyle = styled("div")(({ theme }) => ({
 }));
 
 const Sidebar = ({ isOpenSidebar, onCloseSidebar }) => {
+  const router = useRouter();
   const pathname = usePathname();
 
   //   const isDesktop = useResponsive("up", "lg");
@@ -42,9 +43,15 @@ const Sidebar = ({ isOpenSidebar, onCloseSidebar }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("accessToken");
-    signOut();
+  const handleLogout = async () => {
+    try {
+      await signOut({ callbackUrl: "/" });
+      localStorage.removeItem("sessionId");
+      localStorage.removeItem("accessToken");
+      router.push("/");
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
   };
 
   const renderContent = (

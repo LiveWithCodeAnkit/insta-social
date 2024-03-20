@@ -1,9 +1,13 @@
-import { crateCampaign } from "../../../../store/brief_builder/campaign/campaign.slice";
+import { useEffect } from "react";
+import { createCampaign } from "../../../../store/brief_builder/campaign/campaign.slice";
 import { brandFormSchema } from "../schema";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
-export const useBrandForm = ({handleTab}) => {
+export const useBrandForm = ({ handleTab }) => {
   const dispatch = useDispatch();
+  const loading = useSelector(
+    (state) => state.Campaign.addCampaignDetails?.campaign.loading
+  );
 
   const initialValues = {
     brandName: "",
@@ -14,8 +18,7 @@ export const useBrandForm = ({handleTab}) => {
     fileUpload: "",
   };
 
-  const handleBrandForm =async (values) => {
-    console.log("brand form:-", values);
+  const handleBrandForm = async (values) => {
     const {
       brandName,
       brandDescription,
@@ -25,33 +28,35 @@ export const useBrandForm = ({handleTab}) => {
       brandInstagram,
     } = values;
 
+    console.log("values:-",values);
     const formData = new FormData();
     const brandDetails = {
-      brandDetails:{name: brandName,
-      type: "xyz",
-      info: brandDescription,
-      website: brandWebsite,
-      socialMediaLinks: [
-        { platForm: "Instagram", link: brandInstagram },
-        { platForm: "Tiktok", link: brandTiktok },
-      ],}
+      brandDetails: {
+        name: brandName,
+        type: "xyz",
+        info: brandDescription,
+        website: brandWebsite,
+        socialMediaLinks: [
+          { platForm: "Instagram", link: brandInstagram },
+          { platForm: "Tiktok", link: brandTiktok },
+        ],
+      },
     };
 
     formData.append("data", JSON.stringify(brandDetails));
 
     if (fileUpload) {
-      console.log(fileUpload,"fileUpdload");
       formData.append("brandDetails.logo", fileUpload[0]);
-      const res=await dispatch(crateCampaign(formData));
-    
-      console.log(res);
-      handleTab(1)
-     
+      const res = await dispatch(createCampaign(formData));
+      if (res.payload?.success) {
+        handleTab(1);
+      }
     }
   };
 
   return {
     initialValues,
+    loading,
     schema: brandFormSchema,
     submit: handleBrandForm,
   };

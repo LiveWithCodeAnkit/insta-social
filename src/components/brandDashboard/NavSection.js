@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { alpha, useTheme, styled } from '@mui/material/styles';
 import { Box, List, Collapse, ListItemText, ListItemIcon, ListItemButton, Typography } from '@mui/material';
 import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 
 // ----------------------------------------------------------------------
 
@@ -34,10 +35,15 @@ function NavItem({ item, active }) {
   const { title, path } = item;
 
   const [open, setOpen] = useState(isActiveRoot);
+  const [isActive, setIsActive] = useState(false);
 
   const handleOpen = () => {
     setOpen((prev) => !prev);
   };
+
+  const handleLink = () => {
+    setIsActive(true)
+  }
 
   const activeRootStyle = {
     color: 'text.primary',
@@ -46,6 +52,9 @@ function NavItem({ item, active }) {
     '&:hover': {
       bgcolor: 'action.selected',
     },
+    height: 50,
+    py: '10px',
+    textTransform: 'capitalize',
   };
 
   const activeSubStyle = {
@@ -54,16 +63,43 @@ function NavItem({ item, active }) {
   };
 
   return (
-    <ListItemStyle
-      // component={RouterLink}
-      to={path}
+    <Box
       sx={{
+        height: 50,
+        py: '10px',
+        textTransform: 'capitalize',
+        // color: "text.primary",
+        cursor: 'pointer',
+        borderRadius: 50,
         ...(isActiveRoot && activeRootStyle),
+        '&:hover': {
+          bgcolor: !isActiveRoot && 'action.hover',
+        },
       }}
+    // onClick={handleLink}
     >
-      {/* <ListItemIconStyle>{icon && icon}</ListItemIconStyle> */}
-      <ListItemText disableTypography primary={title} sx={{px:"20px"}} />
-    </ListItemStyle>
+      <Link
+        // component={RouterLink}
+        href={path}
+        style={{
+          textDecoration: 'none',
+          ...(isActiveRoot && activeRootStyle),
+          // ...(isActiveRoot),
+          // color: 'text.primary',
+          // fontWeight: 'fontWeightMedium',
+          // bgcolor: "action.active",
+          // '&:hover': {
+          //   bgcolor: 'action.selected',
+          // },
+          // height: 50,
+          // py: '10px',
+          // textTransform: 'capitalize',
+        }}
+      >
+        {/* <ListItemIconStyle>{icon && icon}</ListItemIconStyle> */}
+        <ListItemText disableTypography primary={title} sx={{ px: "20px", color: 'text.primary', fontWeight: 'fontWeightMedium' }} />
+      </Link>
+    </Box>
   );
 }
 
@@ -74,7 +110,7 @@ export default function NavSection({ navConfig, ...other }) {
 
   return (
     <Box {...other}>
-      <List sx={{pt: "25px" }}>
+      <List sx={{ pt: "25px" }}>
         {navConfig.map((item) => (
           <NavItem key={item.title} item={item} active={match} />
         ))}

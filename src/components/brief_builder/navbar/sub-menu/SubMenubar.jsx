@@ -7,16 +7,16 @@ import OfferForm from "../../offer/OfferForm";
 import BrandForm from "../../brand/BrandForm";
 import ReviewPage from "../../review/ReviewPage";
 import TimingForm from "../../timing/TimingForm";
-import ContentPage from "../../content/ContentPage";
+// import ContentPage from "../../content/ContentForm";
 import { subMenuBriefBuilder } from "../../constants";
 import CampaignForm from "../../campaign/CampaignForm";
 import CreatorsForm from "../../creators/CreatorsForm";
+import ContentPage from "../../content/ContentPage";
 
 const SubMenubar = () => {
   const [activeTab, setActiveTab] = useState(0);
 
   const handleTab = (index) => {
-    console.log("Clicked tab at index:", index);
     setActiveTab(index);
   };
 

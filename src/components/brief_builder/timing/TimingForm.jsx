@@ -79,6 +79,9 @@ const TimingForm = () => {
                         onChange={onChange}
                         sx={{
                           width: "30rem",
+                          "& .MuiOutlinedInput-input": {
+                            padding: "10.5px 14px",
+                          },
                           borderColor: errors.creatorsReadyToReview
                             ? "red"
                             : "black",
@@ -117,6 +120,9 @@ const TimingForm = () => {
                         onChange={onChange}
                         sx={{
                           width: "30rem",
+                          "& .MuiOutlinedInput-input": {
+                            padding: "10.5px 14px",
+                          },
                           borderColor: errors.productShipped ? "red" : "black",
                         }}
                       />
@@ -153,6 +159,9 @@ const TimingForm = () => {
                         onChange={onChange}
                         sx={{
                           width: "30rem",
+                          "& .MuiOutlinedInput-input": {
+                            padding: "10.5px 14px",
+                          },
                           borderColor: errors.contentSubmitted
                             ? "red"
                             : "black",
@@ -200,6 +209,9 @@ const TimingForm = () => {
                         onChange={onChange}
                         sx={{
                           width: "30rem",
+                          "& .MuiOutlinedInput-input": {
+                            padding: "10.5px 14px",
+                          },
                           borderColor: errors.fromDate ? "red" : "black",
                         }}
                       />
@@ -234,9 +246,11 @@ const TimingForm = () => {
                       <DatePicker
                         value={value}
                         onChange={onChange}
-                        placeholder="todat"
                         sx={{
                           width: "30rem",
+                          "& .MuiOutlinedInput-input": {
+                            padding: "10.5px 14px",
+                          },
                           borderColor: errors.toDate ? "red" : "black",
                         }}
                       />

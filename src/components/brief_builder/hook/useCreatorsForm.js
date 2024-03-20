@@ -1,10 +1,10 @@
 import { creatorsSchema } from "../schema";
 import { useDispatch, useSelector } from "react-redux";
-import { crateCampaign } from "../../../../store/brief_builder/campaign/campaign.slice";
+import { createCampaign } from "../../../../store/brief_builder/campaign/campaign.slice";
 
-export const useCreatorsForm = () => {
+export const useCreatorsForm = ({ handleTab }) => {
   const infoCam = useSelector(
-    (state) => state.Campaign.getCampaignDetails?.campaign
+    (state) => state.Campaign.addCampaignDetails?.campaign
   );
   const dispatch = useDispatch();
   const initialValues = {
@@ -13,9 +13,7 @@ export const useCreatorsForm = () => {
     age: [20, 32],
   };
 
-  const handleCreatorForm = (values) => {
-    console.log("CreatorForm values -:", values);
-    console.log(infoCam?._id);
+  const handleCreatorForm = async (values) => {
     const { country, gender, age } = values;
     const formData = new FormData();
 
@@ -33,7 +31,10 @@ export const useCreatorsForm = () => {
       },
     };
     formData.append("data", JSON.stringify(campaignDetails));
-    dispatch(crateCampaign(formData));
+    const res = await dispatch(createCampaign(formData));
+    if (res.payload?.success) {
+      handleTab(6);
+    }
   };
 
   return {

@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Button, Stack, Typography } from "@mui/material";
 import NorthEastIcon from "@mui/icons-material/NorthEast";
-import CommonTable from "../../CommonTable";
+import CommonTable from "../../../common/commonTable/CommonTable";
 
 const Ship = () => {
   function createData(

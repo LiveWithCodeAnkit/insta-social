@@ -1,14 +1,9 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
-import { Box, Typography, Card, Tab, Tabs } from "@mui/material";
+import React, { useState } from "react";
+import { Box, Typography, Tab, Tabs } from "@mui/material";
 import GiftPage from "./gift/GiftPage";
-import Button from "@mui/material/Button";
-import { CgArrowRight, CgArrowLeft } from "react-icons/cg";
-import { BiPlus } from "react-icons/bi";
-import { useForm, useFieldArray } from "react-hook-form";
 import PaidForm from "./paid/PaidForm";
-import { useOfferForm } from "../hook";
-import { yupResolver } from "@hookform/resolvers/yup";
+
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -35,46 +30,14 @@ function a11yProps(index) {
     "aria-controls": `full-width-tabpanel-${index}`,
   };
 }
-const OfferForm = () => {
-  const hasAppended = useRef(false);
-  const { initialValues, schema, submit } = useOfferForm();
+const OfferForm = ({ handleTab }) => {
   const [value, setValue] = useState(0);
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
-  const {
-    reset,
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    defaultValues: initialValues,
-    mode: "onChange",
-    resolver: yupResolver(schema),
-  });
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "gifts",
-  });
-
-  const handleAddGiftCard = () => {
-    append({});
-  };
-
-  useEffect(() => {
-    if (!hasAppended.current) {
-      handleAddGiftCard();
-      hasAppended.current = true;
-    }
-  }, [fields, append]);
-
-  const onSubmit = (data) => {
-    console.log(data);
-  };
   return (
     <>
-    <form onSubmit={submit}>
       <Box
         sx={{
           display: "flex",
@@ -142,65 +105,11 @@ const OfferForm = () => {
       </Box>
 
       <TabPanel value={value} index={0}>
-        {/* <form onSubmit={submit}> */}
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "end",
-              padding: "1rem",
-            }}
-          >
-            <Button
-              sx={{
-                background: "#FFCC33",
-                color: "#212121",
-                padding: "0.8rem",
-                borderRadius: "50px",
-                fontWeight: 600,
-                textTransform: "none",
-
-                "&:hover": {
-                  background: "#FFCC33",
-                },
-              }}
-              variant="contained"
-              startIcon={<BiPlus />}
-              onClick={() => handleAddGiftCard()}
-            >
-              Add Another
-            </Button>
-          </Box>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "start",
-              flexWrap: "wrap",
-              gap: "1rem",
-            }}
-          >
-            {fields.map((item, index) => (
-              <div key={index}>
-                <GiftPage />
-              </div>
-            ))}
-          </Box>
-          <Button type="submit">
-            Submit
-          </Button>
-        </Box>
-        {/* </form> */}
+        <GiftPage handleTab={handleTab} />
       </TabPanel>
       <TabPanel value={value} index={1}>
-        <PaidForm />
+        <PaidForm handleTab={handleTab} />
       </TabPanel>
-      </form>
     </>
   );
 };

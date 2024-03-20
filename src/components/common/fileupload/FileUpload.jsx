@@ -27,7 +27,6 @@ function FileUpload({
           preview: URL.createObjectURL(file),
         })
       );
-      console.log("New files:", newFiles);
       onChange(newFiles);
       return newFiles;
     });
