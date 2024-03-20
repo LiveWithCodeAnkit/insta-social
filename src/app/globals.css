@@ -356,3 +356,31 @@ body {
   content: "\e900";
   font-family: "custom-font-family";
 }
+
+.image-item {
+  display: flex;
+  margin: 10px 0;
+  position: relative;
+}
+.image-item__btn-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.5rem;
+  position: absolute;
+  top: 0;
+  right: -1rem;
+
+  height: 100%;
+}
+button {
+  height: 40px;
+}
+
+.dz-messagenew {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}

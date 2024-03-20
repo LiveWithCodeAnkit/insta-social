@@ -4,8 +4,8 @@ import React from "react";
 import { useState } from "react";
 // material
 import { styled } from "@mui/material/styles";
-import Navbar from "@/components/brandDashboard/Navbar";
-import Sidebar from "@/components/brandDashboard/Sidebar";
+import Navbar from "@/components/creatorDashboard/Navbar/Navbar";
+import Sidebar from "@/components/creatorDashboard/Sidebar/Sidebar";
 //
 
 // ----------------------------------------------------------------------
@@ -18,7 +18,8 @@ const RootStyle = styled("div")({
   minHeight: "100%",
   height: "100vh",
   overflow: "hidden",
-  background: "url(/images/main_background.png) no-repeat center center / cover",
+  background:
+    "url(/images/main_background.png) no-repeat center center / cover",
 });
 
 const MainStyle = styled("div")(({ theme }) => ({

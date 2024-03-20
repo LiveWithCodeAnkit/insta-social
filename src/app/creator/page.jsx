@@ -1,4 +1,4 @@
-import CreatorDashboard from "@/components/creator/CreatorDashboard";
+import CreatorDashboard from "@/components/creatorDashboard/CreatorDashboard";
 import React from "react";
 
 const CreatorPage = () => {

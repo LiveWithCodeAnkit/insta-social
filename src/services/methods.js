@@ -7,9 +7,6 @@ export const GET = async (url, options) => {
   try {
     const res = await AxiosCreator.get(url, {
       ...options,
-      headers: {
-        Authorization: `Bearer ${localStorage?.getItem("adminToken")}` || "",
-      },
     });
     return res.data;
   } catch (error) {

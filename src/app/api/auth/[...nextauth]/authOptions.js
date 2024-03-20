@@ -30,16 +30,6 @@ export const authOptions = {
 
       return token;
     },
-    async redirect({ url, baseUrl }) {
-      const parsedUrl = new URL(url, baseUrl);
-      if (parsedUrl.searchParams.has("callbackUrl")) {
-        return `${baseUrl}${parsedUrl.searchParams.get("callbackUrl")}`;
-      }
-      if (parsedUrl.origin === baseUrl) {
-        return url;
-      }
-      return baseUrl;
-    },
   },
   providers: [
     CredentialsProvider({
@@ -61,7 +51,6 @@ export const authOptions = {
             if (response.status === 401) {
               return NextResponse.redirect(new URL("/", request.url));
             } else {
-              // Handle other errors
               console.error(`Authentication error: ${response.status}`);
               return null;
             }
@@ -84,8 +73,4 @@ export const authOptions = {
       },
     }),
   ],
-  pages: {
-    signIn: "/",
-    error: "/",
-  },
 };

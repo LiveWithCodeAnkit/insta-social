@@ -1,27 +1,39 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Typography,
-  Card,
-  Tab,
-  Tabs,
   FormControlLabel,
   Checkbox,
+  Button,
 } from "@mui/material";
-import MenuItem from "@mui/material/MenuItem";
-import { useForm, Controller, useFieldArray } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useForm, Controller } from "react-hook-form";
 import CustomTextField from "@/components/common/text-field";
-const PaidForm = () => {
+import { CgArrowLongRight, CgArrowLongLeft } from "react-icons/cg";
+
+import { usePaidFrom } from "../../hook";
+
+const PaidForm = ({ handleTab }) => {
+  const [isSampleRequired, setIsSampleRequired] = useState(false);
+  const { initialValues, schema, submit } = usePaidFrom({ handleTab });
+
   const {
     reset,
     control,
     handleSubmit,
     formState: { errors },
   } = useForm({
+    defaultValues: initialValues,
     mode: "onChange",
+    resolver: yupResolver(schema),
   });
+
+  const handleCheckboxChange = (event) => {
+    setIsSampleRequired(event.target.checked);
+  };
+
   return (
-    <>
+    <form onSubmit={handleSubmit((data) => submit(data))}>
       <Box
         sx={{
           padding: "1.8rem",
@@ -57,32 +69,52 @@ const PaidForm = () => {
               alignContent: "center",
             }}
           >
-            <FormControlLabel
-              control={
-                <Checkbox
-                  sx={{
-                    color: "#FFCC33",
-                    "&.Mui-checked": {
-                      color: "#FFCC33",
-                    },
-                  }}
-                />
-              }
-              label="Yes"
-            />
-
-            <FormControlLabel
-              control={
-                <Checkbox
-                  sx={{
-                    color: "#FFCC33",
-                    "&.Mui-checked": {
-                      color: "#FFCC33",
-                    },
-                  }}
-                />
-              }
-              label="No"
+            <Controller
+              name="isSampleRequired"
+              control={control}
+              defaultValue={false}
+              render={({ field }) => (
+                <>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        {...field}
+                        checked={field.value}
+                        onChange={(e) => {
+                          field.onChange(e.target.checked);
+                          setIsSampleRequired(e.target.checked);
+                        }}
+                        sx={{
+                          color: "#FFCC33",
+                          "&.Mui-checked": {
+                            color: "#FFCC33",
+                          },
+                        }}
+                      />
+                    }
+                    label="Yes"
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        {...field}
+                        checked={!field.value}
+                        onChange={(e) => {
+                          field.onChange(!e.target.checked);
+                          setIsSampleRequired(!e.target.checked);
+                        }}
+                        sx={{
+                          color: "#FFCC33",
+                          "&.Mui-checked": {
+                            color: "#FFCC33",
+                          },
+                        }}
+                      />
+                    }
+                    label="No"
+                  />
+                </>
+              )}
             />
           </Box>
         </Box>
@@ -102,7 +134,7 @@ const PaidForm = () => {
           </Typography>
 
           <Controller
-            name="Amount"
+            name="offerPrice"
             control={control}
             render={({ field: { value, onChange } }) => (
               <CustomTextField
@@ -110,16 +142,60 @@ const PaidForm = () => {
                 value={value}
                 onChange={onChange}
                 placeholder="Amount"
-                error={Boolean(errors.productName)}
-                {...(errors.productName && {
-                  helperText: errors.productName.message,
+                error={Boolean(errors.offerPrice)}
+                {...(errors.offerPrice && {
+                  helperText: errors.offerPrice.message,
                 })}
               />
             )}
           />
         </Box>
       </Box>
-    </>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "end",
+          gap: "0.5rem",
+          mt: "1rem",
+        }}
+      >
+        <Button
+          variant="outlined"
+          startIcon={<CgArrowLongLeft />}
+          sx={{
+            height: "50px",
+            width: "147px",
+            color: "#212121",
+            borderRadius: "50px",
+            fontWeight: 600,
+            textTransform: "none",
+            borderColor: "black",
+          }}
+        >
+          Previous
+        </Button>
+        <Button
+          type="submit"
+          sx={{
+            background: "#FFCC33",
+            color: "#212121",
+            height: "50px",
+            width: "117px",
+            borderRadius: "50px",
+            fontWeight: 600,
+            textTransform: "none",
+
+            "&:hover": {
+              background: "#FFCC33",
+            },
+          }}
+          variant="contained"
+          endIcon={<CgArrowLongRight />}
+        >
+          Next
+        </Button>
+      </Box>
+    </form>
   );
 };
 

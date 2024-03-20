@@ -1,0 +1,1 @@
+export { navConfigCreator } from "./creator";

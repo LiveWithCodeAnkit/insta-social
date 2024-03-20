@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AppBar, Box, Tab, Tabs, Typography, useTheme } from "@mui/material";
 import All from "./Tabs/All";
+import { useDispatch, useSelector } from "react-redux";
+import { getCampaignsData } from "../../../store/brief_builder/campaign/campaign.slice";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -16,7 +18,7 @@ function TabPanel(props) {
       {...other}
     >
       {value === index && (
-        <Box sx={{mt: "30px" }}>
+        <Box sx={{ mt: "30px" }}>
           <Box>{children}</Box>
         </Box>
       )}
@@ -35,18 +37,18 @@ const AllBrands = () => {
   const theme = useTheme();
   const [value, setValue] = useState(0);
   const [value2, setValue2] = useState(2);
+  const [activeTab, setActiveTab] = useState("All");
 
   const handleChange = (event, newValue) => {
+    // console.log(newValue, "value");
+    // console.log(event.target.textContent, "event");
+    setActiveTab(event.target.textContent);
     setValue(newValue);
     setValue2(4);
   };
   const handleChange2 = (event, newValue) => {
     setValue2(newValue);
     setValue(4);
-  };
-
-  const handleChangeIndex = (index) => {
-    setValue(index);
   };
 
   return (
@@ -91,10 +93,22 @@ const AllBrands = () => {
               },
             }}
           >
-            <Tab label= {<Typography variant="subtitle1">All</Typography>} {...a11yProps(0)} />
-            <Tab label={<Typography variant="subtitle1">Active</Typography>} {...a11yProps(1)} />
-            <Tab label={<Typography variant="subtitle1">Previous</Typography>} {...a11yProps(2)} />
-            <Tab label={<Typography variant="subtitle1">Drafts</Typography>} {...a11yProps(3)} />
+            <Tab
+              label={<Typography variant="subtitle1">All</Typography>}
+              {...a11yProps(0)}
+            />
+            <Tab
+              label={<Typography variant="subtitle1">Active</Typography>}
+              {...a11yProps(1)}
+            />
+            <Tab
+              label={<Typography variant="subtitle1">Previous</Typography>}
+              {...a11yProps(2)}
+            />
+            <Tab
+              label={<Typography variant="subtitle1">Drafts</Typography>}
+              {...a11yProps(3)}
+            />
           </Tabs>
           <Tabs
             value={value2}
@@ -104,7 +118,7 @@ const AllBrands = () => {
             sx={{
               "& .MuiTab-root": {
                 color: "text.primary",
-                fontSize: "16px"
+                fontSize: "16px",
               },
               "& .Mui-selected": {
                 backgroundColor: "#FFCC33",
@@ -115,12 +129,21 @@ const AllBrands = () => {
               },
             }}
           >
-            <Tab label={<Typography variant="subtitle1">Get Help</Typography>} {...a11yProps(4)} />
+            <Tab
+              label={<Typography variant="subtitle1">Get Help</Typography>}
+              {...a11yProps(4)}
+            />
           </Tabs>
           {/* </AppBar> */}
         </Box>
       </Box>
-      <TabPanel value={value} index={0} sx={{ display: "block"}}>
+      {value2 !== 0 && (
+        <Box sx={{ mt: "30px" }}>
+          <All activeTab={activeTab} />
+        </Box>
+      )}
+
+      {/* <TabPanel value={value} index={0} sx={{ display: "block" }}>
         <All />
       </TabPanel>
       <TabPanel value={value} index={1}>
@@ -131,7 +154,7 @@ const AllBrands = () => {
       </TabPanel>
       <TabPanel value={value} index={3}>
         Item Four
-      </TabPanel>
+      </TabPanel> */}
       <TabPanel value={value} index={4}>
         Get Help
       </TabPanel>

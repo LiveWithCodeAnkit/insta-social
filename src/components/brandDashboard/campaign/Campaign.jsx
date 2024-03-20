@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { Box, Stack, Tab, Tabs, Typography } from "@mui/material";
 import Image from "next/image";
@@ -11,6 +11,10 @@ import AwaitingContent from "./Tabs/AwaitingContent";
 import ContentSubmitted from "./Tabs/ContentSubmitted";
 import Complete from "./Tabs/Complete";
 import GetHelp from "./Tabs/GetHelp";
+import { useDispatch, useSelector } from "react-redux";
+import { getCampaignbyId } from "../../../../store/brief_builder/campaign/campaign.slice";
+import { useParams, usePathname } from "next/navigation";
+import dayjs from "dayjs";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -42,6 +46,18 @@ function a11yProps(index) {
 const Campaign = () => {
   const [value, setValue] = useState(0);
   const [value2, setValue2] = useState(2);
+  const dispatch = useDispatch();
+  const params = useParams();
+  const campaignData = useSelector(
+    (state) => state.Campaign.getCampaignbyId.campaignData
+  );
+  console.log(params, "params");
+  console.log(campaignData, "campaignData");
+
+  useEffect(() => {
+    const res = dispatch(getCampaignbyId({ campaignId: params.campaignId }));
+    // console.log(res, "res");
+  }, [params.campaignId]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -66,13 +82,17 @@ const Campaign = () => {
         <Box>
           <Typography variant="h3">Native For moms</Typography>
           <Typography variant="h5" mt="15px">
-            Lives dates: March 24th, 2021 - ASAP
+            Lives dates:{" "}
+            {dayjs(
+              campaignData?.campaignDetails?.contentPostingDate?.minDate
+            ).format("MMMM DD[th] YYYY")}{" "}
+            -{" "}
+            {dayjs(
+              campaignData?.campaignDetails?.contentPostingDate?.maxDate
+            ).format("MMMM DD[th] YYYY")}
           </Typography>
           <Typography variant="subtitle1" mt="20px" color="#777777">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat.{" "}
+            {campaignData?.campaignDetails?.campaignMessage}
           </Typography>
         </Box>
 
@@ -107,12 +127,36 @@ const Campaign = () => {
               },
             }}
           >
-            <Tab label={<Typography variant="subtitle1">Approve Creators</Typography>} {...a11yProps(0)} />
-            <Tab label={<Typography variant="subtitle1">Ship</Typography>} {...a11yProps(1)} />
-            <Tab label={<Typography variant="subtitle1">Issue</Typography>} {...a11yProps(2)} />
-            <Tab label={<Typography variant="subtitle1">Awaiting Content</Typography>} {...a11yProps(3)} />
-            <Tab label={<Typography variant="subtitle1">Content Submitted</Typography>} {...a11yProps(4)} />
-            <Tab label={<Typography variant="subtitle1">Complete</Typography>} {...a11yProps(5)} />
+            <Tab
+              label={
+                <Typography variant="subtitle1">Approve Creators</Typography>
+              }
+              {...a11yProps(0)}
+            />
+            <Tab
+              label={<Typography variant="subtitle1">Ship</Typography>}
+              {...a11yProps(1)}
+            />
+            <Tab
+              label={<Typography variant="subtitle1">Issue</Typography>}
+              {...a11yProps(2)}
+            />
+            <Tab
+              label={
+                <Typography variant="subtitle1">Awaiting Content</Typography>
+              }
+              {...a11yProps(3)}
+            />
+            <Tab
+              label={
+                <Typography variant="subtitle1">Content Submitted</Typography>
+              }
+              {...a11yProps(4)}
+            />
+            <Tab
+              label={<Typography variant="subtitle1">Complete</Typography>}
+              {...a11yProps(5)}
+            />
           </Tabs>
           <Tabs
             value={value2}
@@ -132,7 +176,10 @@ const Campaign = () => {
               },
             }}
           >
-            <Tab label={<Typography variant="subtitle1">Get Help</Typography>} {...a11yProps(6)} />
+            <Tab
+              label={<Typography variant="subtitle1">Get Help</Typography>}
+              {...a11yProps(6)}
+            />
           </Tabs>
         </Box>
 

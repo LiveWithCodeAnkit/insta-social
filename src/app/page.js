@@ -96,8 +96,8 @@ export default function Home() {
     //   </div>
     // </main>
     <div>
-        {/* <CoverPage /> */}
-        <Login />
+      {/* <CoverPage /> */}
+      <Login />
     </div>
   );
 }

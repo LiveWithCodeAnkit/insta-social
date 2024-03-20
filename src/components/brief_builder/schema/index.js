@@ -1,3 +1,5 @@
+export { paidSchema } from "./offerFormSchema";
+
 export { brandFormSchema } from "./brandFormSchema";
 export { contentFormSchema } from "./contentFormSchema";
 export { offerFormSchema } from "./offerFormSchema";

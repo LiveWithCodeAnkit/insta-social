@@ -13,7 +13,7 @@ const navConfig = [
   },
   {
     title: "New Campaigns",
-    path: "/creator",
+    path: "/",
     icon: "",
   },
   {

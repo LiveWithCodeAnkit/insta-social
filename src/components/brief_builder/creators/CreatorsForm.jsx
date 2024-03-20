@@ -10,8 +10,8 @@ import { useForm, Controller } from "react-hook-form";
 import { CgArrowLongRight, CgArrowLongLeft } from "react-icons/cg";
 import { useCreatorsForm } from "../hook";
 
-const CreatorsForm = () => {
-  const { initialValues, schema, submit } = useCreatorsForm();
+const CreatorsForm = ({handleTab}) => {
+  const { initialValues, schema, submit } = useCreatorsForm({handleTab});
   const {
     reset,
     control,
@@ -90,7 +90,7 @@ const CreatorsForm = () => {
                   >
                     <MenuItem value="MALE">Male</MenuItem>
                     <MenuItem value="FEMALE">Female</MenuItem>
-                    <MenuItem value="OTHERS">Others</MenuItem>
+                    <MenuItem value="OTHER">Others</MenuItem>
                   </CustomTextField>
                 )}
               />
@@ -133,7 +133,6 @@ const CreatorsForm = () => {
                   render={({ field: { value, onChange } }) => (
                     <>
                       <Slider
-                        aria-label="age"
                         min={18}
                         max={35}
                         value={value}
