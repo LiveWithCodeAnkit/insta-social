@@ -1,11 +1,12 @@
+"use client";
 import axios from "axios";
 
-export const baseUrl = process.env.NEXT_BASE_URL;
+export const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 let AxiosCreator;
 
 if (typeof window !== "undefined") {
   AxiosCreator = axios.create({
-    baseURL: "http://192.168.1.2:3000/api",
+    baseURL: process.env.NEXT_PUBLIC_API_URL,
   });
 
   AxiosCreator.interceptors.request.use((config) => {
@@ -30,4 +31,3 @@ if (typeof window !== "undefined") {
 }
 
 export default AxiosCreator;
-//192.168.1.2

@@ -45,17 +45,13 @@ const NewCampaigns = () => {
     <Box>
       <Box
         sx={{
+          height: "140px",
           backgroundColor: "background.paper",
           boxShadow: "0px 0px 30px 0px #0000000D",
           borderRadius: "30px",
-          height: "100%",
           p: "30px",
         }}
       >
-        <Box>
-          <Typography variant="h3">Native For moms</Typography>
-        </Box>
-
         <Box
           sx={{
             bgcolor: "primary.light",
@@ -65,7 +61,6 @@ const NewCampaigns = () => {
             justifyContent: "space-between",
             p: "20px",
             borderRadius: "10px",
-            mt: "30px",
           }}
         >
           <Tabs
@@ -97,13 +92,13 @@ const NewCampaigns = () => {
             />
           </Tabs>
         </Box>
-        <TabPanel value={value} index={0} sx={{ display: "block" }}>
-          <AllPage />
-        </TabPanel>
-        <TabPanel value={value} index={1}>
-          <PendingPage />
-        </TabPanel>
       </Box>
+      <TabPanel value={value} index={0} sx={{ display: "block" }}>
+        <AllPage />
+      </TabPanel>
+      <TabPanel value={value} index={1}>
+        <PendingPage />
+      </TabPanel>
     </Box>
   );
 };

@@ -5,6 +5,11 @@ export const navConfigBriefBuilder = [
     icon: "",
   },
   {
+    title: "My Campaigns",
+    path: "/brand/dashboard",
+    icon: "",
+  },
+  {
     title: "Settings",
     path: "",
     icon: "",

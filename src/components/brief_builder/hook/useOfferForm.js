@@ -2,7 +2,7 @@ import { offerFormSchema } from "../schema";
 import { useDispatch, useSelector } from "react-redux";
 import { createCampaign } from "../../../../store/brief_builder/campaign/campaign.slice";
 
-export const useOfferForm = ({ handleTab }) => {
+export const useOfferForm = ({ handleChange }) => {
   const infoCam = useSelector(
     (state) => state.Campaign.addCampaignDetails?.campaign
   );
@@ -14,10 +14,10 @@ export const useOfferForm = ({ handleTab }) => {
         productName: "",
         description: "",
         productLink: "",
-        unitsPerCreator: "0",
+        unitsPerCreator: 0,
         variants: [
           {
-            variantType: "",
+            variantType: [],
             variantDes: "",
           },
         ],
@@ -42,14 +42,17 @@ export const useOfferForm = ({ handleTab }) => {
         })),
       },
     };
+    console.log("Offer Log :-", offerDetails);
 
     formData.append("data", JSON.stringify(offerDetails));
+
     values.gifts.map((abc, index) =>
       formData.append(`offerImage[${index}]`, abc.offerImage[0])
     );
+
     const res = await dispatch(createCampaign(formData));
     if (res.payload?.success) {
-      handleTab(3);
+      handleChange(event, 1);
     }
   };
 

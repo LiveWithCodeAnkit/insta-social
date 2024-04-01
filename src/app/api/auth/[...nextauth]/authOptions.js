@@ -1,9 +1,7 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import { NextResponse } from "next/server";
 
-const API_ENDPOINT =
-  process.env.NEXT_PUBLIC_API_ENDPOINT ||
-  "http://192.168.1.2:3000/api/auth/login";
+const API_ENDPOINT = `${process.env.NEXT_PUBLIC_API_URL}/auth/login`;
 
 export const authOptions = {
   session: {
@@ -15,6 +13,7 @@ export const authOptions = {
       if (token) {
         session.jwt = token.jwt;
         session.sessionId = token.sessionId;
+        session.role = token.role;
       }
 
       return session;
@@ -25,6 +24,7 @@ export const authOptions = {
           ...token,
           jwt: user.jwt,
           sessionId: user.sessionId,
+          role: user.role,
         };
       }
 
@@ -38,6 +38,7 @@ export const authOptions = {
       async authorize(credentials, request) {
         const { email, password, role } = credentials;
 
+        console.log("API_ENDPOINT :-", API_ENDPOINT);
         try {
           const response = await fetch(API_ENDPOINT, {
             method: "POST",
@@ -59,12 +60,16 @@ export const authOptions = {
           const user = await response.json();
           const jwt = user.token;
           const sessionId = user?.data?._id;
+          const userRole = user.data.role;
+
+          console.log("userRole:-", userRole);
 
           return {
             ...credentials,
             jwt,
             sessionId,
             user,
+            role: userRole,
           };
         } catch (error) {
           console.error("Error during authentication:", error);

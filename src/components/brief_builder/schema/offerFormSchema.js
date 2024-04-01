@@ -12,12 +12,12 @@ export const offerFormSchema = Yup.object().shape({
       productLink: Yup.string().required(
         "Please enter a valid URL for the product"
       ),
-      unitsPerCreator: Yup.string().required(
+      unitsPerCreator: Yup.number().required(
         "Number of units per creator is required"
       ),
       variants: Yup.array().of(
         Yup.object().shape({
-          variantType: Yup.string(),
+          variantType: Yup.array(),
           variantDes: Yup.string(),
         })
       ),

@@ -2,7 +2,7 @@ import { timingFormSchema } from "../schema";
 import { useDispatch, useSelector } from "react-redux";
 import { createCampaign } from "../../../../store/brief_builder/campaign/campaign.slice";
 
-export const useTimingForm = () => {
+export const useTimingForm = ({ handleTab }) => {
   const infoCam = useSelector(
     (state) => state.Campaign.addCampaignDetails?.campaign
   );
@@ -22,7 +22,7 @@ export const useTimingForm = () => {
     return null;
   };
 
-  const handleTimingForm = (values) => {
+  const handleTimingForm = async (values) => {
     const valuesInUTC = {
       creatorsReadyToReview: convertToUTC(values.creatorsReadyToReview),
       productShipped: convertToUTC(values.productShipped),
@@ -58,7 +58,11 @@ export const useTimingForm = () => {
       },
     };
     formData.append("data", JSON.stringify(campaignDetails));
-    dispatch(createCampaign(formData));
+    const res = await dispatch(createCampaign(formData));
+
+    if (res.payload?.success) {
+      handleTab(7);
+    }
   };
 
   return {

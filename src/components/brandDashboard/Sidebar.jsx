@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import Image from "next/image";
 import NavSection from "./NavSection";
-import navConfig from "./NavConfig";
+import navConfig from "../common/sidebar/NavConfig";
 import { usePathname } from "next/navigation";
 
 // ----------------------------------------------------------------------

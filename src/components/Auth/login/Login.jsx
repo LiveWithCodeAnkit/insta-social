@@ -15,7 +15,7 @@ import React from "react";
 import AuthSocial from "../AuthSocial";
 import LoginForm from "./LoginForm";
 import Link from "next/link";
-const Login = () => {
+const Login = ({ title, pathLoc, linkTitle, role }) => {
   return (
     <Box style={{ height: "100vh" }}>
       <Box
@@ -53,7 +53,7 @@ const Login = () => {
                       color: "#FFCC33",
                     }}
                   >
-                    Login
+                    Login {title}
                   </Typography>
                   <Typography
                     sx={{
@@ -67,7 +67,7 @@ const Login = () => {
                 </Box>
 
                 <AuthSocial />
-                <LoginForm />
+                <LoginForm role={role} />
 
                 <Box
                   sx={{
@@ -90,6 +90,29 @@ const Login = () => {
                     }}
                   >
                     Signup for free
+                  </Link>
+                </Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    gap: "0.5rem",
+                    paddingTop: "0.5rem",
+                  }}
+                >
+                  <Typography variant="body2" align="center">
+                    Signin as
+                  </Typography>
+                  <Link
+                    href={pathLoc}
+                    style={{
+                      fontSize: "16px",
+                      fontWeight: "400",
+                      color: "#FFCC33",
+                      textDecoration: "none",
+                    }}
+                  >
+                    {linkTitle}
                   </Link>
                 </Box>
               </Container>

@@ -1,32 +1,39 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Box, Button, Paper, Typography } from "@mui/material";
 import CommonTable from "@/components/common/commonTable/CommonTable";
 import { useRouter } from "next/navigation";
 import ReviewPage from "../review/ReviewPage";
+import { useDispatch, useSelector } from "react-redux";
+import { getCampaignRequestByCreator } from "../../../../../store/campaign_request/campaignRequest.slice";
 
 const PendingPage = () => {
   const [open, setOpen] = useState({ showModal: false, id: "" });
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const router = useRouter();
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const dispatch = useDispatch();
 
-  //   const imageSmallUrls = [
-  //     "/images/dummy/small_pic_1.png",
-  //     "/images/dummy/small_pic_2.png",
-  //     "/images/dummy/small_pic_5.png",
-  //     "/images/dummy/small_pic_3.png",
-  //     "/images/dummy/small_pic_4.png",
-  //     "/images/dummy/small_pic_2.png",
-  //     "/images/dummy/small_pic_3.png",
-  //     "/images/dummy/small_pic_4.png",
-  //     "/images/dummy/small_pic_2.png",
-  //     "/images/dummy/small_pic_3.png",
-  //     "/images/dummy/small_pic_4.png",
-  //     "/images/dummy/small_pic_2.png",
-  //     "/images/dummy/small_pic_3.png",
-  //     "/images/dummy/small_pic_4.png",
-  //   ];
+  const campaignByCreator = useSelector(
+    (state) =>
+      state.CampaignRequest?.campaignRequestByCreator
+        ?.campaignRequestByCreatorData
+  );
+
+  console.log("campaignByCreator", campaignByCreator);
+
+  useEffect(() => {
+    dispatch(
+      getCampaignRequestByCreator({
+        page: page + 1,
+        pageSize: rowsPerPage,
+        requestStatus: ["Awaiting_Approval"],
+      })
+    );
+  }, [page, rowsPerPage]);
+
+  const router = useRouter();
 
   function createData(
     id,
@@ -46,41 +53,21 @@ const PendingPage = () => {
     };
   }
 
-  const rows = [
-    createData(1, "neatandsocial", "Tangerine & Citrus Blossom", "25/12/2023"),
-    createData(
-      2,
-      "lovechaosandatkins",
-      "Tangerine & Citrus Blossom",
-      "24/12/2023"
-    ),
-    createData(
-      3,
-      "Threebowsandablonde",
-      "Tangerine & Citrus Blossom",
-      "21/12/2023"
-    ),
-    createData(
-      4,
-      "greeneclecticmama",
-      "Tangerine & Citrus Blossom",
-      "25/11/2023"
-    ),
-    createData(
-      5,
-      "Mumingfrom.itoz",
-      "Tangerine & Citrus Blossom",
-      "20/11/2023"
-    ),
-    createData(6, "neatandsocial", "Tangerine & Citrus Blossom", "18/11/2023"),
-    createData(7, "neatandsocial", "Tangerine & Citrus Blossom", "17/11/2023"),
-    createData(8, "neatandsocial", "Tangerine & Citrus Blossom", "30/10/2023"),
-    createData(9, "neatandsocial", "Tangerine & Citrus Blossom", "29/10/2023"),
-    createData(10, "neatandsocial", "Tangerine & Citrus Blossom", "28/10/2023"),
-    createData(11, "NewSocial", "Tangerine & Citrus Blossom", "28/10/2023"),
-    createData(12, "social", "Tangerine & Citrus Blossom", "28/10/2023"),
-    createData(13, "datasocial", "Tangerine & Citrus Blossom", "28/10/2023"),
-  ];
+  const rows = campaignByCreator?.data?.map((data, index) => {
+    // console.log("data into pendingpage", data);
+    return createData(
+      data._id,
+      data?.campaignId?.campaignDetails?.campaignName,
+      data?.campaignId?.brandDetails?.name,
+      new Date(
+        data?.campaignId?.campaignDetails?.readyToReviewDate
+      ).toLocaleDateString(),
+      data?.campaignId?._id,
+      data?.requestStatus
+    );
+  });
+
+  // console.log("rows", rows);
 
   const headCells = [
     {
@@ -139,24 +126,47 @@ const PendingPage = () => {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              height: "36px",
-              width: "100px",
-              backgroundColor: "#FFCC33",
+              height: "35px",
+              width: "130px",
+              backgroundColor:
+                item.status === "Pending"
+                  ? "#FFCC33"
+                  : item.status === "Awaiting_Approval"
+                  ? "#EEEEEE"
+                  : "#FFCC33",
               borderRadius: "8px",
             }}
           >
-            <Typography variant="body1">Pending</Typography>
+            <Typography variant="body1">
+              {item.status === "Awaiting_Approval" ? "Awaiting Approval" : ""}
+            </Typography>
           </Box>
         );
       },
     },
   ];
 
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangePageForPagination = (event, newPage) => {
+    setPage(newPage - 1);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
   const handleViewClick = (event, item) => {
     event.stopPropagation();
-    // console.log("clicked", item);
-    // setSelectedItemId({ itemDetails: item, id: item.id });
-    router.push(`/creator/campaign/${item.id}`);
+    // console.log("clicked", item.campaignId);
+    // router.push(`/creator/campaign/${item.campaignDetails}`);
+    router.push(
+      `/creator/dashboard/campaign/${item.campaignDetails}?data=${item.id}`
+      // query: { data: item },
+    );
   };
 
   return (
@@ -166,12 +176,24 @@ const PendingPage = () => {
           sx={{
             width: "100%",
             mt: 5,
-            // borderRadius: "30px",
-            // boxShadow: "0px 0px 30px 0px #0000000D",
-            // padding: "30px 30px 00px 30px",
+            boxShadow: "0px 0px 30px 0px #0000000D",
+            padding: "30px 30px 00px 30px",
+            "& .MuiTableContainer-root": { borderRadius: "10px" },
           }}
         >
-          <CommonTable rows={rows} headCells={headCells} />
+          {/* <CommonTable rows={rows} headCells={headCells} /> */}
+          {rows && (
+            <CommonTable
+              rows={rows || []}
+              headCells={headCells}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              onChangePage={handleChangePage}
+              onChangeRowsPerPage={handleChangeRowsPerPage}
+              pagination={campaignByCreator.pagination}
+              onChangePagePagination={handleChangePageForPagination}
+            />
+          )}
         </Paper>
       </Box>
     </>

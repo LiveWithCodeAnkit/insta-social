@@ -172,7 +172,7 @@ const BrandForm = ({ handleTab }) => {
 
             <Box
               sx={{
-                border: "2px dotted #FFCC33",
+                border: "2px dashed #FFCC33",
                 borderRadius: "15px",
                 maxWidth: "100%",
                 minHeight: "12.5rem",

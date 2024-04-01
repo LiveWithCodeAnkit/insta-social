@@ -1,10 +1,14 @@
 import React from "react";
 import Image from "next/image";
-import { Box, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { exampleImages } from "../../../constants/creator";
 
-const MoodBond = () => {
+const MoodBond = ({ campaignCreatorData }) => {
+  const moodBondDetails =
+    campaignCreatorData?.campaignDetails?.moodBoardDocs || {};
+
+  console.log(moodBondDetails, "moodBondDetails");
   return (
     <>
       <Box
@@ -14,6 +18,7 @@ const MoodBond = () => {
           padding: "1.8rem",
           borderRadius: "1.8rem",
           gap: "1.8rem",
+          width: "100%",
         }}
       >
         <Box
@@ -27,17 +32,124 @@ const MoodBond = () => {
         >
           <Typography variant="h2">Mood Board</Typography>
           <Grid container spacing={"30px"} columns={{ sm: 4, md: 6, lg: 8 }}>
-            {exampleImages.map((image) => (
-              <Grid item sm={2} key={image.id}>
+            {moodBondDetails?.contents?.map((image, index) => (
+              <Grid item sm={2} key={index}>
                 <Image
-                  src={image.path}
-                  alt={image.altTitle}
+                  src={`/${image}`}
+                  alt={`Image ${index}`}
                   width={200}
                   height={200}
                   layout="responsive"
                 />
               </Grid>
             ))}
+          </Grid>
+          <Grid
+            container
+            sx={{
+              justifyContent: "center",
+              gap: "1.8rem",
+            }}
+            columns={{ sm: 4, md: 4, lg: 4 }}
+          >
+            {moodBondDetails?.externalLinks?.map((link, index) => (
+              <Grid
+                key={index}
+                item
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  gap: "1.8rem",
+                }}
+              >
+                <Button
+                  sx={{
+                    width: "330px",
+                    height: "50px",
+                    borderRadius: "10px",
+                    background: "#FFF5D6",
+                    color: "common.black",
+                    fontSize: "14px",
+                    fontWeight: "600",
+                  }}
+                >
+                  {link}
+                </Button>
+              </Grid>
+            ))}
+            {/* <Grid
+              item
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "1.8rem",
+              }}
+            >
+              <Button
+                sx={{
+                  width: "330px",
+                  height: "50px",
+                  borderRadius: "10px",
+                  background: "#FFF5D6",
+                  color: "common.black",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                }}
+              >
+                Instagram : Example 3
+              </Button>
+              <Button
+                sx={{
+                  width: "330px",
+                  height: "50px",
+                  borderRadius: "10px",
+                  background: "#FFF5D6",
+                  color: "common.black",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                }}
+              >
+                Instagram : Example 4
+              </Button>
+            </Grid>
+            <Grid
+              item
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "1.8rem",
+              }}
+            >
+              <Button
+                sx={{
+                  width: "330px",
+                  height: "50px",
+                  borderRadius: "10px",
+                  background: "#FFF5D6",
+                  color: "common.black",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                }}
+              >
+                Instagram : Example 5
+              </Button>
+              <Button
+                sx={{
+                  width: "330px",
+                  height: "50px",
+                  borderRadius: "10px",
+                  background: "#FFF5D6",
+                  color: "common.black",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                }}
+              >
+                Instagram : Example 6
+              </Button>
+            </Grid> */}
           </Grid>
         </Box>
       </Box>

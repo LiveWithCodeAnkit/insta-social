@@ -1,80 +1,48 @@
 import { Box, Button, Stack, Typography } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CommonTable from "../../../common/commonTable/CommonTable";
-import AwaitingContentModal from "../modal/AwaitingContentModal";
-
-const imageSmallUrls = [
-  "/images/dummy/small_pic_1.png",
-  "/images/dummy/small_pic_2.png",
-  "/images/dummy/small_pic_5.png",
-  "/images/dummy/small_pic_3.png",
-  "/images/dummy/small_pic_4.png",
-  "/images/dummy/small_pic_2.png",
-  "/images/dummy/small_pic_3.png",
-  "/images/dummy/small_pic_4.png",
-  "/images/dummy/small_pic_2.png",
-  "/images/dummy/small_pic_3.png",
-  "/images/dummy/small_pic_4.png",
-  "/images/dummy/small_pic_2.png",
-  "/images/dummy/small_pic_3.png",
-  "/images/dummy/small_pic_4.png",
-];
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "next/navigation";
+import { useToastMessages } from "@/components/lib/messages/useToastMessages";
+import { getCampaignRequest } from "../../../../../store/campaign_request/campaignRequest.slice";
 
 const AwaitingContent = () => {
-  const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const dispatch = useDispatch();
+  const params = useParams();
+  const awaitingContentData = useSelector(
+    (state) => state.CampaignRequest.campaignRequest.campaignRequestData
+  );
+  const { Success, Warn, Error } = useToastMessages();
+  console.log(awaitingContentData, "awaitingContentData");
+
+  useEffect(() => {
+    dispatch(
+      getCampaignRequest({
+        campaignId: params.campaignId,
+        requestStatus: ["Awaiting_Content"],
+        page: page + 1,
+        pageSize: rowsPerPage,
+      })
+    );
+  }, [page, rowsPerPage]);
 
   function createData(id, handle, campaignName, tracking, action, status) {
     return {
       id,
       handle,
       campaignName,
-      tracking,
-      action,
-      status,
     };
   }
 
-  const rows = [
-    createData(
-      1,
-      "neatandsocial",
-      "Tangerine & Citrus Blossom"
-    ),
-    createData(
-      2,
-      "Our.littlehome",
-      "Classic Pack"
-    ),
-    createData(
-      3,
-      "Mamatoflowers",
-      "Plastic Free Pack"
-    ),
-    createData(
-      4,
-      "liveymonte",
-      "Plastic Free Pack"
-    ),
-    createData(
-      5,
-      "Threebowsandablonde",
-      "Classic Pack"
-    ),
-    createData(
-      6,
-      "Mumingfrom.ito.z",
-      "Plastic Free Pack"
-    ),
-    createData(7, "Ice cream sandwich", "", 237, 9.0, 37),
-    createData(8, "Jelly Bean", 375, 0.0, 94),
-    createData(9, "KitKat", 518, 26.0, 65),
-    createData(10, "Lollipop", 392, 0.2, 98),
-    createData(11, "Marshmallow", 318, 0, 81),
-    createData(12, "Nougat", 360, 19.0, 9),
-    createData(13, "Oreo", 437, 18.0, 63),
-  ];
+  const rows = awaitingContentData?.data?.map((item) => {
+    return createData(
+      item?._id,
+      item.creatorId.firstName + " " + item.creatorId.lastName,
+      item?.campaignId?.campaignDetails?.campaignName
+    );
+  });
 
   const headCells = [
     {
@@ -170,9 +138,22 @@ const AwaitingContent = () => {
     },
   ];
 
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+  const handleChangePageForPagination = (event, newPage) => {
+    setPage(newPage - 1);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
   const onRowClickHandler = (item, id) => {
-    handleOpen()
-  }
+    handleOpen();
+  };
+
   return (
     <Box>
       <Box sx={{ display: "flex", justifyContent: "flex-end", mb: "20px" }}>
@@ -221,7 +202,7 @@ const AwaitingContent = () => {
               fontSize: "14px",
               fontWeight: 600,
               textTransform: "none",
-              boxShadow:"none"
+              boxShadow: "none",
             }}
           >
             Message All Creators
@@ -229,9 +210,19 @@ const AwaitingContent = () => {
         </Stack>
       </Box>
 
-      <CommonTable rows={rows} headCells={headCells} onclickHandler={onRowClickHandler} />
-
-      <AwaitingContentModal open={open} handleClose={handleClose} imageSmallUrls={imageSmallUrls} />
+      {rows && (
+        <CommonTable
+          rows={rows}
+          headCells={headCells}
+          // onclickHandler={onRowClickHandler}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          onChangePage={handleChangePage}
+          onChangeRowsPerPage={handleChangeRowsPerPage}
+          pagination={awaitingContentData.pagination}
+          onChangePagePagination={handleChangePageForPagination}
+        />
+      )}
     </Box>
   );
 };

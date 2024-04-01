@@ -1,8 +1,32 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Box, Button, Paper, Typography } from "@mui/material";
 import CommonTable from "@/components/common/commonTable/CommonTable";
+import { useDispatch, useSelector } from "react-redux";
+import { getCampaignRequestByCreator } from "../../../../store/campaign_request/campaignRequest.slice";
 
 const DeadlineTable = () => {
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const dispatch = useDispatch();
+
+  const campaignByCreator = useSelector(
+    (state) =>
+      state.CampaignRequest?.campaignRequestByCreator
+        ?.campaignRequestByCreatorData
+  );
+
+  console.log("campaignByCreator", campaignByCreator);
+
+  useEffect(() => {
+    dispatch(
+      getCampaignRequestByCreator({
+        page: page + 1,
+        pageSize: rowsPerPage,
+        requestStatus: ["Past_Deadline"],
+      })
+    );
+  }, [page, rowsPerPage]);
+
   function createData(
     id,
     campaignsName,
@@ -21,41 +45,17 @@ const DeadlineTable = () => {
     };
   }
 
-  const rows = [
-    createData(1, "neatandsocial", "Tangerine & Citrus Blossom", "25/12/2023"),
-    createData(
-      2,
-      "lovechaosandatkins",
-      "Tangerine & Citrus Blossom",
-      "24/12/2023"
-    ),
-    createData(
-      3,
-      "Threebowsandablonde",
-      "Tangerine & Citrus Blossom",
-      "21/12/2023"
-    ),
-    createData(
-      4,
-      "greeneclecticmama",
-      "Tangerine & Citrus Blossom",
-      "25/11/2023"
-    ),
-    createData(
-      5,
-      "Mumingfrom.itoz",
-      "Tangerine & Citrus Blossom",
-      "20/11/2023"
-    ),
-    createData(6, "neatandsocial", "Tangerine & Citrus Blossom", "18/11/2023"),
-    createData(7, "neatandsocial", "Tangerine & Citrus Blossom", "17/11/2023"),
-    createData(8, "neatandsocial", "Tangerine & Citrus Blossom", "30/10/2023"),
-    createData(9, "neatandsocial", "Tangerine & Citrus Blossom", "29/10/2023"),
-    createData(10, "neatandsocial", "Tangerine & Citrus Blossom", "28/10/2023"),
-    createData(11, "NewSocial", "Tangerine & Citrus Blossom", "28/10/2023"),
-    createData(12, "social", "Tangerine & Citrus Blossom", "28/10/2023"),
-    createData(13, "datasocial", "Tangerine & Citrus Blossom", "28/10/2023"),
-  ];
+  const rows = campaignByCreator?.data?.map((data, index) => {
+    console.log("data into pendingpage", data);
+    return createData(
+      data._id,
+      "",
+      data.isFavoriteByBrand,
+      "",
+      data.campaignId,
+      data?.requestStatus
+    );
+  });
 
   const headCells = [
     {
@@ -102,63 +102,6 @@ const DeadlineTable = () => {
       },
     },
     {
-      id: "reportIssue",
-      numeric: true,
-      disablePadding: false,
-      label: "Report Issue",
-      renderCell: (item, index) => {
-        return (
-          <Button
-            variant="outlined"
-            type="button"
-            sx={{
-              border: "none",
-              color: "#00B2F7",
-              // height: "35px",
-              // width: "118px",
-              borderRadius: "50px",
-              fontWeight: 500,
-              textTransform: "none",
-              "&:hover": {
-                borderColor: "info.main",
-                backgroundColor: "info.lighter",
-              },
-            }}
-          >
-            Report issue
-          </Button>
-        );
-      },
-    },
-    {
-      id: "action",
-      numeric: true,
-      disablePadding: false,
-      label: "Action",
-      renderCell: (item, index) => {
-        return (
-          <Button
-            variant="contained"
-            type="button"
-            sx={{
-              //   border: "1px solid #212121",
-              "&:hover": { background: "#FFCC33" },
-              background: "#FFCC33",
-              boxShadow: "none",
-              color: "#212121",
-              // height: "35px",
-              // width: "118px",
-              borderRadius: "50px",
-              fontWeight: 500,
-              textTransform: "none",
-            }}
-          >
-            Upload Content
-          </Button>
-        );
-      },
-    },
-    {
       id: "status",
       numeric: true,
       disablePadding: false,
@@ -172,16 +115,34 @@ const DeadlineTable = () => {
               justifyContent: "center",
               height: "36px",
               width: "100px",
-              backgroundColor: "#A4E504",
+              backgroundColor:
+                item?.status === "Past_Deadline" ? "#FFCC33" : "#A4E504",
               borderRadius: "8px",
             }}
           >
-            <Typography variant="body1">Complete</Typography>
+            <Typography variant="body1">
+              {item?.status === "Past_Deadline" ? "Past Deadline" : ""}
+            </Typography>
           </Box>
         );
       },
     },
   ];
+
+  const handleChangePage = (event, newPage) => {
+    console.log("newPage", newPage);
+    setPage(newPage);
+  };
+
+  const handleChangePageForPagination = (event, newPage) => {
+    console.log("newPage", newPage);
+    setPage(newPage - 1);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   return (
     <Box sx={{ width: "100%", display: "block" }}>
@@ -194,7 +155,20 @@ const DeadlineTable = () => {
           padding: "30px 30px 00px 30px",
         }}
       >
-        <CommonTable rows={rows} headCells={headCells} />
+        {/* <CommonTable rows={rows} headCells={headCells} /> */}
+
+        {rows && (
+          <CommonTable
+            rows={rows || []}
+            headCells={headCells}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            onChangePage={handleChangePage}
+            onChangeRowsPerPage={handleChangeRowsPerPage}
+            pagination={campaignByCreator.pagination}
+            onChangePagePagination={handleChangePageForPagination}
+          />
+        )}
       </Paper>
     </Box>
   );

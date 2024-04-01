@@ -7,7 +7,8 @@ const BriefBuilderPage = () => {
   const { data: session, status, update } = useSession();
   if (typeof window !== "undefined") {
     if (session) {
-      console.log("session:-", session);
+      // console.log('User role:', session?.role);
+
       localStorage.setItem("adminToken", session?.jwt);
       localStorage.setItem("sessionId", session?.sessionId);
     } else {

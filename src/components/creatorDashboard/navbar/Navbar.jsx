@@ -1,10 +1,10 @@
+"use client";
 import React from "react";
 
 // material
 import { alpha, styled } from "@mui/material/styles";
 import { Box, Stack, AppBar, Toolbar, IconButton, Button } from "@mui/material";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-
 // components
 
 // ----------------------------------------------------------------------

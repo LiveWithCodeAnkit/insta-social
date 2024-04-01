@@ -1,12 +1,12 @@
-import CreatorDashboard from "@/components/creatorDashboard/CreatorDashboard";
 import React from "react";
+import Login from "@/components/Auth/login/Login";
 
-const CreatorPage = () => {
+const Page = () => {
   return (
-    <>
-      <CreatorDashboard />
-    </>
+    <div>
+      <Login title="Creators" pathLoc="/" linkTitle="Brand" role="CREATOR" />
+    </div>
   );
 };
 
-export default CreatorPage;
+export default Page;

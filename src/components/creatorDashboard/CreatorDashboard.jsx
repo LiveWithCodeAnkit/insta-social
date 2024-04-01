@@ -1,11 +1,16 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { Box, Tab, Tabs, Typography } from "@mui/material";
 import GetHelp from "./Tabs/GetHelp";
 import TodoTable from "./Tabs/TodoTable";
 import DeadlineTable from "./Tabs/DeadlineTable";
 import ContentSubmitted from "./Tabs/ContentSubmitted";
+import { useDispatch, useSelector } from "react-redux";
+import { optionCampaignRequestByCreator } from "../../../store/campaign_request/campaignRequest.slice";
+import Issue from "./Tabs/Issue";
+import Complete from "./Tabs/Complete";
+import All from "./Tabs/All";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -36,8 +41,19 @@ function a11yProps(index) {
 const CreatorDashboard = () => {
   const [value, setValue] = useState(0);
   const [value2, setValue2] = useState(2);
+  const [activeTab, setActiveTab] = useState("To-Do");
+
+  const campaignCreatorbyRequest = useSelector(
+    (state) =>
+      state.CampaignRequest.optionCampaignRequestByCreator
+        .optionCampaignRequestByCreatorData
+  );
+
+  console.log("campaignCreatorbyRequest", campaignCreatorbyRequest);
 
   const handleChange = (event, newValue) => {
+    console.log(event.target.textContent, "value");
+    setActiveTab(event.target.textContent);
     setValue(newValue);
     setValue2(6);
   };
@@ -89,29 +105,25 @@ const CreatorDashboard = () => {
             }}
           >
             <Tab
-              label={<Typography variant="subtitle1">To-Do (8)</Typography>}
+              label={<Typography variant="subtitle1">To-Do</Typography>}
               {...a11yProps(0)}
             />
             <Tab
-              label={
-                <Typography variant="subtitle1">Past Deadline (6)</Typography>
-              }
+              label={<Typography variant="subtitle1">Past Deadline</Typography>}
               {...a11yProps(1)}
             />
             <Tab
               label={
-                <Typography variant="subtitle1">
-                  Content Submitted (10)
-                </Typography>
+                <Typography variant="subtitle1">Content Submitted</Typography>
               }
               {...a11yProps(2)}
             />
             <Tab
-              label={<Typography variant="subtitle1">Issue (12)</Typography>}
+              label={<Typography variant="subtitle1">Issue</Typography>}
               {...a11yProps(3)}
             />
             <Tab
-              label={<Typography variant="subtitle1">Complete (12)</Typography>}
+              label={<Typography variant="subtitle1">Complete</Typography>}
               {...a11yProps(4)}
             />
             <Tab
@@ -145,6 +157,12 @@ const CreatorDashboard = () => {
           </Tabs>
         </Box>
       </Box>
+
+      {/* {value2 !== 0 && (
+        <Box sx={{ mt: "30px" }}>
+          <TodoTable activeTab={activeTab} />
+        </Box>
+      )} */}
       <TabPanel value={value} index={0} sx={{ display: "block" }}>
         <TodoTable />
       </TabPanel>
@@ -155,13 +173,13 @@ const CreatorDashboard = () => {
         <ContentSubmitted />
       </TabPanel>
       <TabPanel value={value} index={3}>
-        <label>4</label>
+        <Issue />
       </TabPanel>
       <TabPanel value={value} index={4}>
-        <label>5</label>
+        <Complete />
       </TabPanel>
       <TabPanel value={value} index={5}>
-        <label>6</label>
+        <All />
       </TabPanel>
       <TabPanel value={value} index={6}>
         <GetHelp />

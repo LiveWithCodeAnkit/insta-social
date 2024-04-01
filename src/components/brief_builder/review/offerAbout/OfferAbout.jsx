@@ -1,9 +1,16 @@
 import React from "react";
 import Image from "next/image";
 import { Box, Typography } from "@mui/material";
-import { aboutOffer } from "../../constants";
 
-const OfferAbout = () => {
+const OfferAbout = ({ offerDetails }) => {
+  if (
+    !offerDetails ||
+    !Array.isArray(offerDetails) ||
+    offerDetails.length === 0
+  ) {
+    return <div>No offer details provided</div>;
+  }
+
   return (
     <>
       <Box
@@ -23,115 +30,130 @@ const OfferAbout = () => {
           sx={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}
         >
           <Typography variant="h2">Info about the offer</Typography>
-          {aboutOffer.map((offer) => (
-            <Box
-              key={offer.id}
-              as="div"
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "start",
-                gap: "1.2rem",
-              }}
-            >
-              <Image
-                src={offer.offerProductImage}
-                alt="infopic"
-                width={300}
-                height={300}
-              />
-              <Box
-                as="div"
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  gap: "1.2rem",
-                }}
-              >
-                <Typography variant="h2">{offer.offerProduct}</Typography>
-                <p style={{ color: "#777777", width: "100%" }}>
-                  {offer.offerProductDes}
-                </p>
+          {offerDetails.map(
+            (offer, index) =>
+              offer.offerType !== "PAID" && (
                 <Box
+                  key={index}
                   as="div"
                   sx={{
                     display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    gap: "1.5rem",
+                    justifyContent: "space-between",
+                    alignItems: "start",
+                    gap: "1.2rem",
                   }}
                 >
+                  <Image
+                    src={"/images/reviewHand.png"}
+                    alt="infopic"
+                    width={300}
+                    height={300}
+                  />
                   <Box
                     as="div"
                     sx={{
                       display: "flex",
-                      gap: "1.8rem",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      gap: "1.2rem",
                     }}
                   >
-                    <Box
-                      as="div"
-                      sx={{
-                        padding: "1rem",
-                        backgroundColor: "#FFF5D6",
-                        borderRadius: "10px",
-                      }}
-                    >
-                      <label>Website : brandwebsite.com</label>
-                    </Box>
-                    <Box
-                      as="div"
-                      sx={{
-                        padding: "1rem",
-                        backgroundColor: "#FFF5D6",
-                        borderRadius: "10px",
-                      }}
-                    >
-                      <label>Instagram : @brand</label>
-                    </Box>
-                  </Box>
-                  <Box
-                    as="div"
-                    sx={{
-                      display: "flex",
-                      gap: "1.8rem",
-                    }}
-                  >
+                    <Typography variant="h2">{offer.productName}</Typography>
+                    <p style={{ color: "#777777", width: "100%" }}>
+                      {offer.description}
+                    </p>
                     <Box
                       as="div"
                       sx={{
                         display: "flex",
-                        justifyContent: "start",
-                        gap: "0.3rem",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        gap: "1.5rem",
                       }}
                     >
-                      <label style={{ fontSize: "18px", color: "#777777" }}>
-                        Color:
-                      </label>
-                      <label style={{ fontSize: "18px", color: "#C1121F" }}>
-                        {offer.offerColor}
-                      </label>
-                    </Box>
-                    <Box
-                      as="div"
-                      sx={{
-                        display: "flex",
-                        justifyContent: "start",
-                        gap: "0.3rem",
-                      }}
-                    >
-                      <label style={{ fontSize: "18px", color: "#777777" }}>
-                        Size:
-                      </label>
-                      <label style={{ fontSize: "18px", color: "#C1121F" }}>
-                        {offer.offerSize}
-                      </label>
+                      <Box
+                        as="div"
+                        sx={{
+                          display: "flex",
+                          gap: "1.8rem",
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        <Box
+                          as="div"
+                          sx={{
+                            padding: "1rem",
+                            backgroundColor: "#FFF5D6",
+                            borderRadius: "10px",
+                          }}
+                        >
+                          <label>{`Website : ${offer.productLink}`}</label>
+                        </Box>
+                        <Box
+                          as="div"
+                          sx={{
+                            padding: "1rem",
+                            backgroundColor: "#FFF5D6",
+                            borderRadius: "10px",
+                          }}
+                        >
+                          <label>Instagram : @brand</label>
+                        </Box>
+                      </Box>
+                      {offer.variants.map((variant, index) => (
+                        <Box
+                          as="div"
+                          sx={{
+                            display: "flex",
+                            gap: "1.8rem",
+                          }}
+                          key={index}
+                        >
+                          <Box
+                            as="div"
+                            sx={{
+                              display: "flex",
+                              justifyContent: "start",
+                              gap: "0.3rem",
+                            }}
+                          >
+                            <label
+                              style={{ fontSize: "18px", color: "#777777" }}
+                            >
+                              Color:
+                            </label>
+                            <label
+                              style={{ fontSize: "18px", color: "#C1121F" }}
+                            >
+                              {variant.variantType}
+                            </label>
+                          </Box>
+                          <Box
+                            as="div"
+                            sx={{
+                              display: "flex",
+                              justifyContent: "start",
+                              gap: "0.3rem",
+                            }}
+                          >
+                            <label
+                              style={{ fontSize: "18px", color: "#777777" }}
+                            >
+                              Size:
+                            </label>
+                            <label
+                              style={{ fontSize: "18px", color: "#C1121F" }}
+                            >
+                              {variant.variantDes}
+                            </label>
+                          </Box>
+                        </Box>
+                      ))}
                     </Box>
                   </Box>
                 </Box>
-              </Box>
-            </Box>
-          ))}
+              )
+          )}
         </Box>
       </Box>
     </>

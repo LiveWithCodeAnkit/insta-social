@@ -97,7 +97,7 @@ const ContentPage = ({ handleTab }) => {
           </Box>
 
           <TabPanel value={value} index={0}>
-            <ContentForm handleTab={handleTab} />
+            <ContentForm handleChange={handleChange} />
           </TabPanel>
           <TabPanel value={value} index={1}>
             <ProductDetailsForm handleTab={handleTab} />

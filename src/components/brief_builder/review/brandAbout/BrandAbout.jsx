@@ -87,6 +87,7 @@ const BrandAbout = ({ brandDeatils }) => {
             sx={{
               display: "flex",
               gap: "1.8rem",
+              flexWrap: "wrap",
             }}
           >
             <Box

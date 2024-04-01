@@ -47,8 +47,8 @@ export default function CommonTable({
   const [selected, setSelected] = useState([]);
   // const [page, setPage] = useState(0);
   // const [rowsPerPage, setRowsPerPage] = useState(5);
-  console.log(rows, "rows");
-  console.log(pagination, "pagination");
+  // console.log(rows, "rows");
+  // console.log(pagination, "pagination");
 
   function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -97,8 +97,6 @@ export default function CommonTable({
           backgroundColor: "#FFF5D6",
           // border: "1px solid #E8E8E8",
           "& .MuiTableCell-root": { borderBottom: "none" },
-          "& .MuiTableHead-root": { borderRadius: "30px !important" },
-          borderRadius: "30px !important",
         }}
       >
         <TableRow>
@@ -226,7 +224,7 @@ export default function CommonTable({
                 return (
                   <TableRow
                     hover
-                    onClick={(row) =>
+                    onClick={(e) =>
                       onclickHandler && onclickHandler(row, row.id)
                     }
                     role="checkbox"
@@ -280,7 +278,7 @@ export default function CommonTable({
         onRowsPerPageChange={onChangeRowsPerPage}
       /> */}
 
-      {pagination && (
+      {pagination && rows.length > 0 && (
         <TablePaginationCutom
           page={page}
           rowsPerPage={rowsPerPage}

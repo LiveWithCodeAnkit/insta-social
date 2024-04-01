@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import dayjs from "dayjs";
 import { Box, Typography, Card } from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import Button from "@mui/material/Button";
@@ -15,8 +14,8 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { DemoItem } from "@mui/x-date-pickers/internals/demo";
 import { useTimingForm } from "../hook";
 
-const TimingForm = () => {
-  const { initialValues, schema, submit } = useTimingForm();
+const TimingForm = ({ handleTab }) => {
+  const { initialValues, schema, submit } = useTimingForm({ handleTab });
   const {
     handleSubmit,
     control,

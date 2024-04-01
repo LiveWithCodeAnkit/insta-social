@@ -9,6 +9,6 @@ export const brandFormSchema = Yup.object().shape({
   brandTiktok: Yup.string().required("Brand tiktok required"),
   brandDescription: Yup.string()
     .required("Brand Description required")
-    .min(2, "Brand Description must be at least 200 characters"),
+    .min(15, "Brand Description must be at least 15 characters"),
   fileUpload: Yup.mixed().required("File is required"),
 });

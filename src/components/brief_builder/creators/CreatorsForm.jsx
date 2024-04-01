@@ -65,9 +65,9 @@ const CreatorsForm = ({handleTab}) => {
                       helperText: errors.country.message,
                     })}
                   >
-                    <MenuItem value="usa">USA</MenuItem>
-                    <MenuItem value="India">India</MenuItem>
-                    <MenuItem value="Itly">Itly</MenuItem>
+                    <MenuItem value="USA">USA</MenuItem>
+                    <MenuItem value="INDIA">India</MenuItem>
+                    <MenuItem value="ITLY">Itly</MenuItem>
                   </CustomTextField>
                 )}
               />

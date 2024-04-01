@@ -51,8 +51,8 @@ const Campaign = () => {
   const campaignData = useSelector(
     (state) => state.Campaign.getCampaignbyId.campaignData
   );
-  console.log(params, "params");
-  console.log(campaignData, "campaignData");
+  // console.log(params, "params");
+  // console.log(campaignData, "campaignData");
 
   useEffect(() => {
     const res = dispatch(getCampaignbyId({ campaignId: params.campaignId }));
@@ -80,8 +80,10 @@ const Campaign = () => {
         }}
       >
         <Box>
-          <Typography variant="h3">Native For moms</Typography>
-          <Typography variant="h5" mt="15px">
+          <Typography variant="h3">
+            {campaignData?.campaignDetails?.campaignName}
+          </Typography>
+          <Typography variant="h6">
             Lives dates:{" "}
             {dayjs(
               campaignData?.campaignDetails?.contentPostingDate?.minDate
@@ -91,9 +93,15 @@ const Campaign = () => {
               campaignData?.campaignDetails?.contentPostingDate?.maxDate
             ).format("MMMM DD[th] YYYY")}
           </Typography>
-          <Typography variant="subtitle1" mt="20px" color="#777777">
+          {/* <Typography variant="subtitle1" mt="20px" color="#777777" >
             {campaignData?.campaignDetails?.campaignMessage}
-          </Typography>
+          </Typography> */}
+          <div
+            style={{ marginTop: "10px", color: "#777777" }}
+            dangerouslySetInnerHTML={{
+              __html: campaignData?.campaignDetails?.campaignMessage,
+            }}
+          ></div>
         </Box>
 
         <Box

@@ -32,6 +32,7 @@ function a11yProps(index) {
 }
 const OfferForm = ({ handleTab }) => {
   const [value, setValue] = useState(0);
+
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
@@ -105,7 +106,7 @@ const OfferForm = ({ handleTab }) => {
       </Box>
 
       <TabPanel value={value} index={0}>
-        <GiftPage handleTab={handleTab} />
+        <GiftPage handleChange={handleChange} />
       </TabPanel>
       <TabPanel value={value} index={1}>
         <PaidForm handleTab={handleTab} />

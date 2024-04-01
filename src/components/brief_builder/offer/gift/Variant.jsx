@@ -3,6 +3,7 @@ import { Box } from "@mui/material";
 import { Controller, useFieldArray } from "react-hook-form";
 import { HiPlus, HiMinus } from "react-icons/hi";
 import CustomTextField from "@/components/common/text-field";
+import { MuiChipsInput } from "mui-chips-input";
 
 const Variant = ({ index, control, errors }) => {
   const { fields, append, remove } = useFieldArray({
@@ -49,7 +50,7 @@ const Variant = ({ index, control, errors }) => {
                 gap: "0.9rem",
               }}
             >
-              <Controller
+              {/* <Controller
                 name={`gifts[${index}].variants[${variantIndex}].variantType`}
                 control={control}
                 rules={{ required: true }}
@@ -67,6 +68,26 @@ const Variant = ({ index, control, errors }) => {
                       errors?.gifts?.[index]?.variants?.[variantIndex]
                         ?.variantType?.message
                     }
+                  />
+                )}
+              /> */}
+              <Controller
+                name={`gifts[${index}].variants[${variantIndex}].variantType`}
+                control={control}
+                render={({ field, fieldState }) => (
+                  <MuiChipsInput
+                    {...field}
+                    helperText={field.value?.length === 3 ? "Max 3 Tags" : ""}
+                    error={fieldState.invalid}
+                    addOnBlur
+                    className="custom-chip-input"
+                    size="small"
+                    inputProps={{
+                      style: {
+                        display: field.value?.length === 3 ? "none" : "block",
+                      },
+                    }}
+                    placeholder="Variants Type"
                   />
                 )}
               />

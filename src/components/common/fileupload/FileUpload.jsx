@@ -1,9 +1,6 @@
+import Image from "next/image";
 import { useState } from "react";
 import Dropzone from "react-dropzone";
-import Button from "@mui/material/Button";
-import Image from "next/image";
-// import { Button } from "react-bootstrap";
-// import Icon from "../Icon/Icon";
 import { FaUpload } from "react-icons/fa";
 
 function FileUpload({

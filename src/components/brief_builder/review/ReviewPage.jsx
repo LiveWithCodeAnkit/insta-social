@@ -15,7 +15,6 @@ const ReviewPage = () => {
   );
   useEffect(() => {
     if (infoCam?._id) {
-      // Ensure that infoCam._id is available before dispatching
       dispatch(getCampaignbyId({ campaignId: infoCam._id }));
     }
   }, [dispatch, infoCam?._id]);
@@ -30,7 +29,7 @@ const ReviewPage = () => {
 
   const isEmptyData = !campaignData;
 
-  console.log("campaignData", campaignData.brandDetails);
+  console.log("campaignData", campaignData);
   return (
     <>
       <Box
@@ -50,10 +49,13 @@ const ReviewPage = () => {
         {!isLoading && !error && !isEmptyData && (
           <>
             <BrandAbout brandDeatils={campaignData?.brandDetails} />
-            <OfferAbout />
+            <OfferAbout offerDetails={campaignData?.offerDetails} />
             <MoodBond />
-            <MessageAbout />
-            <DoPage />
+            <MessageAbout
+              campaignDetails={campaignData?.campaignDetails}
+              productDetails={campaignData?.productDetails}
+            />
+            <DoPage campaignDetails={campaignData?.campaignDetails} />
           </>
         )}
       </Box>

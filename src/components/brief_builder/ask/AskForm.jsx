@@ -47,14 +47,27 @@ const AskForm = ({ handleTab }) => {
   console.log(infoCam?._id);
   const onSubmit = async (values) => {
     const { feedPost, reel, story } = values;
+
+    let postType;
+
+    if (reel) {
+      postType = "REEL";
+    } else if (feedPost) {
+      postType = "FEED";
+    } else if (story) {
+      postType = "STORY";
+    } else {
+      postType = "REEL";
+    }
     const formData = new FormData();
 
+    console.log("values :-", values);
     const campaignDetails = {
       campaignDetails: {
         campaignId: infoCam?._id,
         details: {
           campaigningPlatform: "Instagram",
-          postType: "REEL",
+          postType: postType,
         },
       },
     };

@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 import { alpha, styled } from "@mui/material/styles";
 import { Box, Stack, AppBar, Toolbar, IconButton, Button } from "@mui/material";
@@ -27,7 +28,6 @@ const ToolbarStyle = styled(Toolbar)(({ theme }) => ({
 
 const Navbar = ({ onOpenSidebar }) => {
   const [activeButton, setActiveButton] = useState("Save Draft");
-
   const handleButtonClick = (label) => {
     setActiveButton(label);
   };

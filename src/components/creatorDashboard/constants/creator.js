@@ -1,69 +1,20 @@
 export const navConfigCreator = [
     {
         title: "My Campaigns",
-        path: "/creator",
+        path: "/creator/dashboard",
         icon: "",
     },
     {
         title: "New Campaigns",
-        path: "/creator/campaign",
+        path: "/creator/dashboard/campaign",
         icon: "",
     },
     {
         title: "Settings",
-        path: "",
+        path: "/creator/dashboard/settings",
         icon: "",
     },
-    {
-        title: "Log Out",
-        path: "",
-        icon: "",
-    }
 ];
-
-// export const subMenuBriefBuilder = [
-//     {
-//         id: 1,
-//         title: "Brand",
-//         indexNo: "0",
-//     },
-//     {
-//         id: 2,
-//         title: "Campaign",
-//         indexNo: "1",
-//     },
-//     {
-//         id: 3,
-//         title: "Offer",
-//         indexNo: "2",
-//     },
-//     {
-//         id: 4,
-//         title: "Ask",
-//         indexNo: "3",
-//     },
-//     {
-//         id: 5,
-//         title: "Content",
-//         indexNo: "4",
-//     },
-//     {
-//         id: 6,
-//         title: "Creators",
-//         indexNo: "5",
-//     },
-//     {
-//         id: 7,
-//         title: "Timing",
-//         indexNo: "6",
-//     },
-//     {
-//         id: 8,
-//         title: "Review",
-//         indexNo: "7",
-//     },
-// ];
-
 
 export const exampleImages = [
     {
@@ -132,3 +83,18 @@ export const aboutOffer = [
         offerSize: "0",
     },
 ];
+
+export const brandAboutData = [
+    {
+        type: "Platform",
+        brandContent: "Instagram"
+    },
+    {
+        type: "Post",
+        brandContent: "Reel"
+    },
+    {
+        type: "Tag",
+        brandContent: "@brand"
+    }
+]

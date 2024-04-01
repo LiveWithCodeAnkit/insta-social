@@ -46,7 +46,7 @@ const All = ({ activeTab }) => {
   const rows = capmpaignsData?.campaigns?.data?.map((data, index) => {
     return createData(
       data._id,
-      "",
+      data.campaignDetails.campaignName,
       dayjs(data.campaignDetails.readyToReviewDate).format("DD/MM/YYYY"),
       "",
       data.campaignDetails.campaignStatus
@@ -164,9 +164,9 @@ const All = ({ activeTab }) => {
         sx={{
           width: "100%",
           mb: 2,
-          borderRadius: "30px",
           boxShadow: "0px 0px 30px 0px #0000000D",
           padding: "30px 30px 00px 30px",
+          "& .MuiTableContainer-root": { borderRadius: "10px" },
         }}
       >
         {/* {capmpaignsData.loading ? (

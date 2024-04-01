@@ -34,7 +34,7 @@ const schema = yup.object().shape({
     .required("Email is required"),
   password: yup.string().required("Password is required"),
 });
-const LoginForm = () => {
+const LoginForm = ({ role }) => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
 
@@ -73,9 +73,9 @@ const LoginForm = () => {
   const handleLogin = async (value) => {
     try {
       const values = {
-        email: "prp.opash@gmail.com",
-        password: "123",
-        role: "BRAND",
+        email: value.email,
+        password: value.password,
+        role: role,
       };
       const signInRes = await signIn("credentials", {
         ...values,
@@ -84,7 +84,11 @@ const LoginForm = () => {
       if (signInRes.error) {
         router.push("/");
       } else {
-        router.push("/brief-builder");
+        if (role === "BRAND") {
+          router.push("/brief-builder");
+        } else {
+          router.push("/creator/dashboard");
+        }
       }
     } catch (error) {
       console.error("Error during login:", error);
@@ -98,18 +102,21 @@ const LoginForm = () => {
           <Grid item xs={12}>
             <InputLabel
               shrink
-              htmlFor=""
+              htmlFor="email"
               sx={{ fontSize: "18px", fontWeight: 600, color: "#212121" }}
             >
               Email
             </InputLabel>
             <FormControl variant="standard" fullWidth>
               <Controller
+                control={control}
+                name="email"
+                defaultValue=""
                 render={({ field }) => (
                   <TextField
                     {...field}
                     hiddenLabel
-                    id="input1"
+                    id="email"
                     name="email"
                     variant="filled"
                     placeholder="Email"
@@ -127,8 +134,6 @@ const LoginForm = () => {
                     }}
                   />
                 )}
-                control={control}
-                name="email"
               />
 
               <span style={{ color: "red" }}>{errors.email?.message}</span>
@@ -144,6 +149,9 @@ const LoginForm = () => {
             </InputLabel>
             <FormControl variant="standard" fullWidth>
               <Controller
+                control={control}
+                name="password"
+                defaultValue=""
                 render={({ field }) => (
                   <TextField
                     {...field}
@@ -190,8 +198,6 @@ const LoginForm = () => {
                     }}
                   />
                 )}
-                control={control}
-                name="password"
               />
               <span style={{ color: "red" }}>{errors.password?.message}</span>
             </FormControl>

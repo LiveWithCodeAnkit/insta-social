@@ -11,8 +11,8 @@ import Button from "@mui/material/Button";
 import { BiPlus } from "react-icons/bi";
 import { CgArrowLongRight, CgArrowLongLeft } from "react-icons/cg";
 
-const GiftPage = ({ handleTab }) => {
-  const { initialValues, schema, submit } = useOfferForm({ handleTab });
+const GiftPage = ({ handleChange }) => {
+  const { initialValues, schema, submit } = useOfferForm({ handleChange });
 
   const [files, setFiles] = useState([]);
 
@@ -113,7 +113,7 @@ const GiftPage = ({ handleTab }) => {
             >
               <Box
                 sx={{
-                  border: "2px dotted #FFCC33",
+                  border: "2px dashed #FFCC33",
                   borderRadius: "15px",
                   width: "full",
                   height: "12.5rem",

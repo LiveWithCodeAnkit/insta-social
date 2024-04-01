@@ -43,7 +43,7 @@ export const createCampaign = createAsyncThunk(
       );
 
       if (response.success) {
-        Success("Done");
+        Success(response.message);
         return response;
       } else {
         Warn("Error occurred while creating campaign");

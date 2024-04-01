@@ -3,12 +3,32 @@ import React from "react";
 import { Avatar, Box, Button, Typography } from "@mui/material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 
-const CampaignCard = ({ item, status, onCardClickHandler }) => {
-  // console.log(item, "item");
+const CampaignCard = ({ item, onCardClickHandler }) => {
+  // console.log(item, "CamapignCarditem");
+
+  const campaignCardDetails = item?.campaignId?.campaignDetails || "";
+
+  // console.log("campaignCardDetails", campaignCardDetails);
+
+  const extractContentBetweenTags = (htmlString, tagName) => {
+    const regex = new RegExp(`<${tagName}>(.*?)<\/${tagName}>`, "g");
+    const matches = htmlString?.match(regex);
+    return matches
+      ? matches.map((match) =>
+          match.replace(`<${tagName}>`, "").replace(`</${tagName}>`, "")
+        )
+      : [];
+  };
+
+  const MessageParagraphs = extractContentBetweenTags(
+    campaignCardDetails.campaignMessage,
+    "p"
+  );
+
   return (
     <Box>
       <Box
-        onClick={() => onCardClickHandler(item.id)}
+        onClick={() => onCardClickHandler(item?.campaignId?._id)}
         sx={{
           p: "10px 15px 15px 15px",
           backgroundColor: "#F2F6FC",
@@ -23,7 +43,9 @@ const CampaignCard = ({ item, status, onCardClickHandler }) => {
               src={item.profilephoto}
               sx={{ width: "30px", height: "30px", mr: "10px" }}
             />
-            <Typography variant="subtitle1">{item.handle}</Typography>
+            <Typography variant="subtitle1">
+              {campaignCardDetails.campaignName}
+            </Typography>
           </Box>
         </Box>
         <Box
@@ -43,7 +65,7 @@ const CampaignCard = ({ item, status, onCardClickHandler }) => {
             // fill={true}
           />
         </Box>
-        <Typography variant="body1">{item.campaignName}</Typography>
+        <Typography variant="body1">{MessageParagraphs}</Typography>
         <Box
           sx={{
             display: "flex",
@@ -58,14 +80,28 @@ const CampaignCard = ({ item, status, onCardClickHandler }) => {
               alignItems: "center",
               justifyContent: "center",
               height: "30px",
-              width: status === "Pending Approval" ? "138px" : "100px",
-              backgroundColor:
-                status === "Pending Approval" ? "#00B2F7" : "#5ADA5F",
+              width: "190px",
+              backgroundColor: "#5ADA5F",
               borderRadius: "8px",
-              color: "#fff",
             }}
           >
-            <Typography variant="body1">{status}</Typography>
+            <Typography variant="body1">
+              {item?.requestStatus === "Awaiting_Content_Approval"
+                ? "Awaiting Content Approval"
+                : item?.requestStatus === "Content_Approved"
+                ? "Content Approved"
+                : item?.requestStatus === "Content_Rejected"
+                ? "Content Rejected"
+                : item?.requestStatus === "Issue"
+                ? "Issue"
+                : item?.requestStatus === "Awaiting_Shipment"
+                ? "Awaiting Shipment"
+                : item?.requestStatus === "Awaiting_Content"
+                ? "Awaiting Content"
+                : item?.requestStatus === "Past_Deadline"
+                ? "Past Deadline"
+                : "Completed"}
+            </Typography>
           </Box>
         </Box>
       </Box>

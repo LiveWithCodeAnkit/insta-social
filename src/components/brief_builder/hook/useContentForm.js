@@ -2,13 +2,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { contentFormSchema } from "../schema";
 import { createCampaign } from "../../../../store/brief_builder/campaign/campaign.slice";
 
-export const useContentForm = ({ handleTab }) => {
+export const useContentForm = ({ handleChange }) => {
   const infoCam = useSelector(
     (state) => state.Campaign.addCampaignDetails?.campaign
   );
   const dispatch = useDispatch();
   const initialValues = {
-    campaignName: "abc",
+    campaignName: "",
     messaging: "",
     hooks: "",
     doDes: "",
@@ -60,7 +60,7 @@ export const useContentForm = ({ handleTab }) => {
 
     const res = await dispatch(createCampaign(formData));
     if (res.payload?.success) {
-      handleTab(5);
+      handleChange(event, 1);
     }
   };
 
