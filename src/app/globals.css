@@ -157,8 +157,6 @@ body {
 .dropzone {
   min-height: 160px;
   width: 100%;
-  border-radius: 20px;
-
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -383,4 +381,29 @@ button {
   justify-content: center;
   align-items: center;
   gap: 0.5rem;
+}
+
+.custom-chip-input {
+  width: 100%;
+}
+
+.parent {
+  p {
+    color: #777777;
+    font-size: 1rem;
+  }
+  strong {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #777777;
+  }
+  ul {
+    padding-left: 25px;
+    margin-top: 15px;
+    color: #777777;
+  }
+
+  li {
+    margin-bottom: 20px;
+  }
 }

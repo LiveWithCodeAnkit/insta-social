@@ -1,7 +1,12 @@
 import { signUpUser } from "../../../../store/auth/users.slice";
 import { signupSchema } from "../schema";
 import { useDispatch } from "react-redux";
-export const useSignup = () => {
+import { useRouter } from "next/navigation";
+import { useToastMessages } from "@/components/lib/messages/useToastMessages";
+
+export const useSignup = ({ role }) => {
+  const router = useRouter();
+  const { Success, Error } = useToastMessages();
   const initialValues = {
     firstName: "",
     lastName: "",
@@ -19,12 +24,18 @@ export const useSignup = () => {
         lastName,
         email,
         password,
-        role: "BRAND",
+        role: role,
       };
-
-      await dispatch(signUpUser(payload));
+      const res = await dispatch(signUpUser(payload));
+      if (res.payload && res.payload.success) {
+        Success(res.payload.message);
+        router.push(role === "BRAND" ? "/" : "/creator");
+      } else {
+        Error(res.payload.message);
+      }
     } catch (error) {
       console.error("Signup error:", error);
+      Error("Signup failed!");
     }
   };
 

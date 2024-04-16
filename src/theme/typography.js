@@ -44,10 +44,10 @@ const typography = {
     ...responsiveFontSizes({ sm: 22, md: 24, lg: 26 }), // h3
   },
   h4: {
-    fontWeight: 700,
+    fontWeight: 600,
     lineHeight: 1.5,
     fontSize: pxToRem(20),
-    ...responsiveFontSizes({ sm: 20, md: 24, lg: 24 }),
+    ...responsiveFontSizes({ sm: 20, md: 24, lg: 20 }),
   },
   h5: {
     fontWeight: 700,

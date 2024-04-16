@@ -1,51 +1,41 @@
 "use client";
-
-import React from "react";
-import { useState } from "react";
-// material
-import { styled } from "@mui/material/styles";
+import React, { useEffect } from "react";
+import Sidebar from "@/components/common/sidebar/Sidebar";
+import navConfigBrand from "@/components/common/sidebar/NavConfig";
 import Navbar from "@/components/brandDashboard/Navbar";
-import Sidebar from "@/components/brandDashboard/Sidebar";
-//
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import Loading from "@/components/common/loader/Loading";
 
-// ----------------------------------------------------------------------
-
-const APP_BAR_MOBILE = 64;
-const APP_BAR_DESKTOP = 92;
-
-const RootStyle = styled("div")({
-  display: "flex",
-  minHeight: "100%",
-  height: "100vh",
-  overflow: "hidden",
-  background: "url(/images/main_background.png) no-repeat center center / cover",
-});
-
-const MainStyle = styled("div")(({ theme }) => ({
-  flexGrow: 1,
-  overflow: "auto",
-  minHeight: "100%",
-  paddingTop: APP_BAR_MOBILE,
-  paddingBottom: theme.spacing(4),
-  [theme.breakpoints.up("lg")]: {
-    paddingTop: APP_BAR_DESKTOP,
-    paddingLeft: "30px",
-    paddingRight: "30px",
-  },
-}));
-
-// ----------------------------------------------------------------------
-
-const layout = (props) => {
-  const [open, setOpen] = useState(false);
-
+const Layout = (props) => {
+  const router = useRouter();
+  const { data: session, status, update } = useSession();
+  if (typeof window !== "undefined") {
+    console.log("status:-");
+  }
+  useEffect(() => {
+    if (status === "authenticated") {
+      if (session?.role !== "BRAND") {
+        router.push("/404");
+      }
+    } else if (status === "unauthenticated") {
+      router.push("/");
+    }
+  }, [status, session, router]);
   return (
-    <RootStyle>
-      <Navbar onOpenSidebar={() => setOpen(true)} />
-      <Sidebar isOpenSidebar={open} onCloseSidebar={() => setOpen(false)} />
-      <MainStyle>{props.children}</MainStyle>
-    </RootStyle>
+    <>
+      {status === "loading" && (
+        <div>
+          <Loading />
+        </div>
+      )}
+      {status === "authenticated" && session?.role === "BRAND" && (
+        <Sidebar navConfig={navConfigBrand} NavbarComponent={Navbar}>
+          {props.children}
+        </Sidebar>
+      )}
+    </>
   );
 };
 
-export default layout;
+export default Layout;

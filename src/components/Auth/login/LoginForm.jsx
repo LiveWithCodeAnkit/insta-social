@@ -26,6 +26,7 @@ import { useForm, Controller } from "react-hook-form";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { useToastMessages } from "@/components/lib/messages/useToastMessages";
 
 const schema = yup.object().shape({
   email: yup
@@ -34,9 +35,11 @@ const schema = yup.object().shape({
     .required("Email is required"),
   password: yup.string().required("Password is required"),
 });
-const LoginForm = () => {
+const LoginForm = ({ role }) => {
   const router = useRouter();
+  const { Success, Error } = useToastMessages();
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const TextInput = styled(InputBase)(({ theme }) => ({
     "label + &": {
@@ -72,25 +75,34 @@ const LoginForm = () => {
 
   const handleLogin = async (value) => {
     try {
+      setLoading(true);
       const values = {
-        email: "prp.opash@gmail.com",
-        password: "123",
-        role: "BRAND",
+        email: value.email,
+        password: value.password,
+        role: role,
       };
       const signInRes = await signIn("credentials", {
         ...values,
         redirect: false,
       });
+
       if (signInRes.error) {
+        Error("We are not aware of this user.");
         router.push("/");
       } else {
-        router.push("/brief-builder");
+        Success("Successfully logged in!");
+        if (role === "BRAND") {
+          router.push("/brief-builder");
+        } else {
+          router.push("/creator/dashboard/my-campaign");
+        }
       }
     } catch (error) {
       console.error("Error during login:", error);
+    } finally {
+      setLoading(false);
     }
   };
-
   return (
     <form onSubmit={handleSubmit(handleLogin)}>
       <Box>
@@ -98,18 +110,21 @@ const LoginForm = () => {
           <Grid item xs={12}>
             <InputLabel
               shrink
-              htmlFor=""
+              htmlFor="email"
               sx={{ fontSize: "18px", fontWeight: 600, color: "#212121" }}
             >
               Email
             </InputLabel>
             <FormControl variant="standard" fullWidth>
               <Controller
+                control={control}
+                name="email"
+                defaultValue=""
                 render={({ field }) => (
                   <TextField
                     {...field}
                     hiddenLabel
-                    id="input1"
+                    id="email"
                     name="email"
                     variant="filled"
                     placeholder="Email"
@@ -127,8 +142,6 @@ const LoginForm = () => {
                     }}
                   />
                 )}
-                control={control}
-                name="email"
               />
 
               <span style={{ color: "red" }}>{errors.email?.message}</span>
@@ -144,6 +157,9 @@ const LoginForm = () => {
             </InputLabel>
             <FormControl variant="standard" fullWidth>
               <Controller
+                control={control}
+                name="password"
+                defaultValue=""
                 render={({ field }) => (
                   <TextField
                     {...field}
@@ -190,8 +206,6 @@ const LoginForm = () => {
                     }}
                   />
                 )}
-                control={control}
-                name="password"
               />
               <span style={{ color: "red" }}>{errors.password?.message}</span>
             </FormControl>
@@ -214,6 +228,7 @@ const LoginForm = () => {
           variant="contained"
           type="submit"
           fullWidth
+          disabled={loading}
           sx={{
             "&:hover": { background: "#FFCC33" },
             background: "#FFCC33",
@@ -225,7 +240,7 @@ const LoginForm = () => {
             mt: "30px",
           }}
         >
-          Login
+          {loading ? "Loading..." : "Login"}
         </Button>
       </Box>
     </form>

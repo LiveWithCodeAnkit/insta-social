@@ -1,7 +1,10 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
 
-const DoPage = () => {
+const DoPage = ({ campaignCreatorData }) => {
+  const campaignDetails = campaignCreatorData?.campaignDetails || "";
+  // console.log(campaignDetails, "campaignDetails into doPage");
+
   return (
     <>
       <Box
@@ -19,6 +22,7 @@ const DoPage = () => {
             borderRadius: "1.8rem",
             gap: "1.8rem",
             padding: "1.8rem",
+            width: "100%",
           }}
         >
           <Box
@@ -27,24 +31,11 @@ const DoPage = () => {
           >
             <Typography variant="h2">Do</Typography>
 
-            <ul
-              style={{
-                padding: "1.5rem",
-                display: "flex",
-                flexDirection: "column",
-                gap: "1.8rem",
-              }}
-            >
-              {[...Array(4)].map((_, index) => (
-                <li key={index} style={{ color: "#777777" }}>
-                  <p>
-                    Lorem Ipsum is simply dummy text of the printing and
-                    typesetting industry. Lorem Ipsum has been the industry's
-                    standard
-                  </p>
-                </li>
-              ))}
-            </ul>
+            <div className="parent">
+              <div
+                dangerouslySetInnerHTML={{ __html: campaignDetails?.doThings }}
+              ></div>
+            </div>
           </Box>
         </Box>
 
@@ -55,6 +46,7 @@ const DoPage = () => {
             borderRadius: "1.8rem",
             gap: "1.8rem",
             padding: "1.8rem",
+            width: "100%",
           }}
         >
           <Box
@@ -63,24 +55,13 @@ const DoPage = () => {
           >
             <Typography variant="h2">Don’t</Typography>
 
-            <ul
-              style={{
-                padding: "1.5rem",
-                display: "flex",
-                flexDirection: "column",
-                gap: "1.8rem",
-              }}
-            >
-              {[...Array(4)].map((_, index) => (
-                <li key={index} style={{ color: "#777777" }}>
-                  <p>
-                    Lorem Ipsum is simply dummy text of the printing and
-                    typesetting industry. Lorem Ipsum has been the industry's
-                    standard
-                  </p>
-                </li>
-              ))}
-            </ul>
+            <div className="parent">
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: campaignDetails?.doNotThings,
+                }}
+              ></div>
+            </div>
           </Box>
         </Box>
       </Box>

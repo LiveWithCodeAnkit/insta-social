@@ -1,6 +1,9 @@
+"use client";
 import React, { useState } from "react";
 import { alpha, styled } from "@mui/material/styles";
 import { Box, Stack, AppBar, Toolbar, IconButton, Button } from "@mui/material";
+import { addlaunchCampaign } from "../../../../store/brief_builder/campaign/campaign.slice";
+import { useDispatch, useSelector } from "react-redux";
 
 const DRAWER_WIDTH = 280;
 const APPBAR_MOBILE = 64;
@@ -26,10 +29,22 @@ const ToolbarStyle = styled(Toolbar)(({ theme }) => ({
 }));
 
 const Navbar = ({ onOpenSidebar }) => {
+  const dispatch = useDispatch();
+
   const [activeButton, setActiveButton] = useState("Save Draft");
 
-  const handleButtonClick = (label) => {
+  const infoCam = useSelector(
+    (state) => state.Campaign.addCampaignDetails?.campaign
+  );
+
+  const handleButtonClick = async (label) => {
     setActiveButton(label);
+
+    if (label === "Launch Campaign") {
+      const res = await dispatch(addlaunchCampaign(infoCam?._id));
+    } else {
+      console.log("not call");
+    }
   };
 
   return (

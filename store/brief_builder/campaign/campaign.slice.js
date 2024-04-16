@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { useToastMessages } from "@/components/lib/messages/useToastMessages";
-import { FORM_DATA_POST, GET } from "@/services/methods";
+import { FORM_DATA_POST, GET, POST } from "@/services/methods";
 
 const { Success, Warn } = useToastMessages();
 
@@ -35,7 +35,6 @@ export const getCampaignbyId = createAsyncThunk(
 export const createCampaign = createAsyncThunk(
   "create-campaign",
   async (payload) => {
-    console.log("payload createCampaign :-", payload);
     try {
       const response = await FORM_DATA_POST(
         "campaign/create-campaign",
@@ -43,13 +42,37 @@ export const createCampaign = createAsyncThunk(
       );
 
       if (response.success) {
-        Success("Done");
+        Success(response.message);
         return response;
       } else {
-        Warn("Error occurred while creating campaign");
+        Warn(response.message);
         return response;
       }
     } catch (error) {
+      Warn(error);
+      throw error;
+    }
+  }
+);
+
+//launch camp
+export const addlaunchCampaign = createAsyncThunk(
+  "add-launchCampaign",
+  async (payload) => {
+    try {
+      const response = await POST("campaign/launch-campaign", {
+        campaignId: payload,
+      });
+
+      if (response.success) {
+        Success(response.message);
+        return response;
+      } else {
+        Warn(response.message);
+        return response;
+      }
+    } catch (error) {
+      console.log("error:", error);
       Warn(error);
       throw error;
     }
@@ -112,7 +135,7 @@ export const campaignSlice = createSlice({
         state.getCampaignbyId.loading = false;
         state.getCampaignbyId.campaignData = action.payload;
       })
-      .addCase(getCampaignbyId.rejected, (state) => {
+      .addCase(getCampaignbyId.rejected, (state, action) => {
         state.getCampaignbyId.loading = false;
         state.getCampaignbyId.error = action.payload.error;
       });

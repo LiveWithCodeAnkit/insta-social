@@ -6,6 +6,7 @@ import { Box, Stack, Tab, Tabs, Typography } from "@mui/material";
 import Image from "next/image";
 import AllPage from "./Tabs/AllPage";
 import PendingPage from "./Tabs/PendingPage";
+import DeadlineTable from "./Tabs/DeadlineTable";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -45,17 +46,16 @@ const NewCampaigns = () => {
     <Box>
       <Box
         sx={{
+          height: "140px",
           backgroundColor: "background.paper",
           boxShadow: "0px 0px 30px 0px #0000000D",
           borderRadius: "30px",
-          height: "100%",
           p: "30px",
+          // position: "sticky",
+          // top: "0",
+          // zIndex: 1,
         }}
       >
-        <Box>
-          <Typography variant="h3">Native For moms</Typography>
-        </Box>
-
         <Box
           sx={{
             bgcolor: "primary.light",
@@ -65,7 +65,6 @@ const NewCampaigns = () => {
             justifyContent: "space-between",
             p: "20px",
             borderRadius: "10px",
-            mt: "30px",
           }}
         >
           <Tabs
@@ -88,22 +87,29 @@ const NewCampaigns = () => {
             }}
           >
             <Tab
-              label={<Typography variant="subtitle1">All (15)</Typography>}
+              label={<Typography variant="subtitle1">All</Typography>}
               {...a11yProps(0)}
             />
             <Tab
-              label={<Typography variant="subtitle1">Pending (10)</Typography>}
+              label={<Typography variant="subtitle1">Pending</Typography>}
+              {...a11yProps(1)}
+            />
+            <Tab
+              label={<Typography variant="subtitle1">Past Deadline</Typography>}
               {...a11yProps(1)}
             />
           </Tabs>
         </Box>
-        <TabPanel value={value} index={0} sx={{ display: "block" }}>
-          <AllPage />
-        </TabPanel>
-        <TabPanel value={value} index={1}>
-          <PendingPage />
-        </TabPanel>
       </Box>
+      <TabPanel value={value} index={0} sx={{ display: "block" }}>
+        <AllPage />
+      </TabPanel>
+      <TabPanel value={value} index={1}>
+        <PendingPage />
+      </TabPanel>
+      <TabPanel value={value} index={2}>
+        <DeadlineTable />
+      </TabPanel>
     </Box>
   );
 };

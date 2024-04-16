@@ -1,7 +1,6 @@
 import axios from "axios";
-import AxiosCreator from "./httpServices";
+import AxiosCreator, { baseUrl } from "./httpServices";
 
-const baseURL = "http://192.168.1.2:3000/api/";
 
 export const GET = async (url, options) => {
   try {
@@ -19,7 +18,7 @@ export const POST = async (url, payload) => {
     const res = await AxiosCreator.post(url, payload);
     return res.data;
   } catch (error) {
-    throw error;
+    return error.data;
   }
 };
 
@@ -27,12 +26,12 @@ export const FORM_DATA_POST = async (url, payload) => {
   try {
     const res = await AxiosCreator({
       method: "post",
-      url: `${baseURL}${url}`,
+      url: `${url}`,
       data: payload,
     });
     return res.data;
   } catch (error) {
-    throw error;
+    return error.data;
   }
 };
 

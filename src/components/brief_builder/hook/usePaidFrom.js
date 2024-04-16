@@ -1,25 +1,27 @@
 import { paidSchema } from "../schema";
 import { useDispatch, useSelector } from "react-redux";
 import { createCampaign } from "../../../../store/brief_builder/campaign/campaign.slice";
+import { useState } from "react";
 
 export const usePaidFrom = ({ handleTab }) => {
   const infoCam = useSelector(
     (state) => state.Campaign.addCampaignDetails?.campaign
   );
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const initialValues = {
     offerType: "PAID",
-    offerPrice: "",
+    offerPrice: "100",
     isSampleRequired: false,
   };
-  console.log("PaidFormSchema values -:", infoCam);
+
   const handlePaidForm = async (values) => {
-    // console.log("PaidFormSchema values -:", infoCam._id);
     const formData = new FormData();
+    setLoading(true);
 
     const offerDetails = {
       offerDetails: {
-        campaignId: infoCam._id,
+        campaignId: infoCam?._id,
         offers: [
           {
             offerType: "PAID",
@@ -28,7 +30,7 @@ export const usePaidFrom = ({ handleTab }) => {
         ],
       },
       campaignDetails: {
-        campaignId: infoCam._id,
+        campaignId: infoCam?._id,
         details: {
           permissionRequired: values.isSampleRequired,
         },
@@ -41,10 +43,12 @@ export const usePaidFrom = ({ handleTab }) => {
     if (res.payload?.success) {
       handleTab(3);
     }
+    setLoading(false);
   };
 
   return {
     initialValues,
+    loading,
     schema: paidSchema,
     submit: handlePaidForm,
   };

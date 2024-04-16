@@ -7,17 +7,38 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm, Controller } from "react-hook-form";
 import { useBrandForm } from "../hook";
 import { CgArrowLongRight } from "react-icons/cg";
-import FileUpload from "@/components/common/fileupload/FileUpload";
 import QuillMinimal from "@/components/common/editer/Editor";
+import { FaUpload } from "react-icons/fa";
+import { MdOutlineModeEdit } from "react-icons/md";
+import { IoClose } from "react-icons/io5";
+import { MdAddAPhoto } from "react-icons/md";
+import ImageUploading from "react-images-uploading";
+import Image from "next/image";
+import FileUpload from "@/components/common/fileupload/FileUpload";
+
+const buttonStyle = {
+  background: "none",
+  border: "none",
+  color: "#FFCC33",
+  textDecoration: "none",
+  cursor: "pointer",
+  padding: 0,
+  fontSize: "16px",
+  fontWeight: "bold",
+  height: "20px",
+};
 
 const BrandForm = ({ handleTab }) => {
   const { initialValues, loading, schema, submit } = useBrandForm({
     handleTab,
   });
-  const [files, setFiles] = useState([]);
 
-  const updateFilesState = (newFiles) => {
-    setFiles(newFiles);
+  const [images, setImages] = React.useState([]);
+  const maxNumber = 1;
+  const onImageChange = (imageList, addUpdateIndex) => {
+    // data for submit
+
+    setImages(imageList);
   };
 
   const {
@@ -164,42 +185,77 @@ const BrandForm = ({ handleTab }) => {
                 )}
               />
               {errors.brandDescription && (
-                <Typography variant="caption" color="error">
+                <Typography
+                  variant="caption"
+                  color="error"
+                  sx={{
+                    fontSize: "0.875rem",
+                  }}
+                >
                   {errors.brandDescription.message}
                 </Typography>
               )}
             </Box>
 
             <Box
+              as="div"
               sx={{
-                border: "2px dotted #FFCC33",
-                borderRadius: "15px",
-                maxWidth: "100%",
-                minHeight: "12.5rem",
-                height: "auto",
+                width: "100%",
                 display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                backgroundColor: "#FEFAED",
-                padding: "1rem",
-                boxSizing: "border-box",
+                flexDirection: "column",
+                gap: "0.5rem",
               }}
             >
-              <Controller
-                name="fileUpload"
-                control={control}
-                render={({ field: { onChange } }) => (
-                  <FileUpload
-                    iconName="img"
-                    maxSize={12582912}
-                    errorText="File size is too large, please upload file size within (12MB)"
-                    onChange={(file) => {
-                      onChange(file);
-                      updateFilesState([file]);
-                    }}
-                  />
-                )}
-              />
+              <Typography
+                variant="label"
+                sx={{
+                  fontSize: "14px",
+                  fontWeight: "600",
+                }}
+              >
+                Upload Cover Picture
+              </Typography>
+              <Box
+                sx={{
+                  border: "2px dashed #FFCC33",
+                  borderRadius: "15px",
+                  width: "100%",
+                  minHeight: "12.5rem",
+                  height: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: "#FEFAED",
+                  position: "relative",
+                }}
+              >
+                <Controller
+                  name="fileUpload"
+                  control={control}
+                  render={({ field: { onChange }, fieldState: { error } }) => (
+                    <FileUpload
+                      iconName="img"
+                      maxSize={12582912}
+                      errorText="File size is too large, please upload file size within (12MB)"
+                      onChange={(file) => {
+                        onChange(file);
+                      }}
+                      error={!!error}
+                    />
+                  )}
+                />
+              </Box>
+              {errors.fileUpload && (
+                <Typography
+                  variant="caption"
+                  color="error"
+                  sx={{
+                    fontSize: "0.875rem",
+                  }}
+                >
+                  {errors.fileUpload.message}
+                </Typography>
+              )}
             </Box>
 
             <Box sx={{ display: "flex", justifyContent: "end" }}>
@@ -213,15 +269,15 @@ const BrandForm = ({ handleTab }) => {
                   borderRadius: "50px",
                   fontWeight: 600,
                   textTransform: "none",
-
                   "&:hover": {
                     background: "#FFCC33",
                   },
                 }}
                 variant="contained"
                 endIcon={<CgArrowLongRight />}
+                disabled={loading}
               >
-                Next
+                {loading ? "Loading..." : "Next"}
               </Button>
             </Box>
           </Card>

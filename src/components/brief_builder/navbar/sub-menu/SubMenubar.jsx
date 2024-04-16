@@ -46,6 +46,11 @@ const SubMenubar = () => {
           flexDirection: "row",
           justifyContent: "space-around",
           alignItems: "center",
+          position: "sticky", // Change position to sticky
+          top: 0,
+          backdropFilter: "blur(8px)",
+          backgroundColor: "rgba(255, 255, 255, 0.8)",
+          zIndex: 100,
         }}
       >
         {subMenuBriefBuilder.map((item, index) => (

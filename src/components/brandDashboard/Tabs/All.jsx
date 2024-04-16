@@ -1,5 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Box, Button, CircularProgress, LinearProgress, Paper, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  LinearProgress,
+  Paper,
+  Typography,
+} from "@mui/material";
 import CommonTable from "../../common/commonTable/CommonTable";
 import { useDispatch, useSelector } from "react-redux";
 import { getCampaignsData } from "../../../../store/brief_builder/campaign/campaign.slice";
@@ -46,7 +53,7 @@ const All = ({ activeTab }) => {
   const rows = capmpaignsData?.campaigns?.data?.map((data, index) => {
     return createData(
       data._id,
-      "",
+      data.campaignDetails.campaignName,
       dayjs(data.campaignDetails.readyToReviewDate).format("DD/MM/YYYY"),
       "",
       data.campaignDetails.campaignStatus
@@ -155,8 +162,8 @@ const All = ({ activeTab }) => {
 
   const onClickBrief = (item) => {
     console.log(item, "item");
-    router.push(`/brand/dashboard/${item.id}`)
-  }
+    router.push(`/brand/dashboard/${item.id}`);
+  };
 
   return (
     <Box sx={{ width: "100%", display: "block" }}>
@@ -164,9 +171,9 @@ const All = ({ activeTab }) => {
         sx={{
           width: "100%",
           mb: 2,
-          borderRadius: "30px",
           boxShadow: "0px 0px 30px 0px #0000000D",
           padding: "30px 30px 00px 30px",
+          "& .MuiTableContainer-root": { borderRadius: "10px" },
         }}
       >
         {/* {capmpaignsData.loading ? (
@@ -181,18 +188,19 @@ const All = ({ activeTab }) => {
             <CircularProgress  color="primary" variant="indeterminate" />
           </Box>
         ) : ( */}
-          {rows && (
-            <CommonTable
-              rows={rows || []}
-              headCells={headCells}
-              page={page}
-              rowsPerPage={rowsPerPage}
-              onChangePage={handleChangePage}
-              onChangeRowsPerPage={handleChangeRowsPerPage}
-              pagination={capmpaignsData.campaigns.pagination}
-              onChangePagePagination={handleChangePageForPagination}
-            />
-          )}
+        {rows && (
+          <CommonTable
+            rows={rows || []}
+            headCells={headCells}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            onChangePage={handleChangePage}
+            onChangeRowsPerPage={handleChangeRowsPerPage}
+            pagination={capmpaignsData.campaigns.pagination}
+            onChangePagePagination={handleChangePageForPagination}
+            isCheckbox={true}
+          />
+        )}
         {/* )} */}
       </Paper>
     </Box>

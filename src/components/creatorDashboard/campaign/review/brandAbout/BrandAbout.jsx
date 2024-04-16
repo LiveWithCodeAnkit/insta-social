@@ -1,9 +1,21 @@
 import React from "react";
 import Image from "next/image";
-import { Box, Typography } from "@mui/material";
-const BrandAbout = () => {
+import { Box, Grid, Typography } from "@mui/material";
+import { brandAboutData } from "../../../constants/creator";
+import BriefDetails from "./BriefDetails";
+
+const BrandAbout = ({ campaignCreatorData }) => {
+  // console.log(campaignCreatorData, "campaignDetails into BrandAbout");
+
+  const brandDetails = campaignCreatorData?.brandDetails || "";
+  const campaignDetails = campaignCreatorData?.campaignDetails || "";
+
+  // console.log(brandDetails, "brandDetails into brandAbout");
+  // console.log(campaignDetails, "campaignDetails into brandAbout");
+
   return (
     <>
+      <BriefDetails />
       <Box
         sx={{
           backgroundColor: "white",
@@ -13,62 +25,123 @@ const BrandAbout = () => {
           display: "flex",
           justifyContent: "space-between",
           gap: "1.8rem",
+          width: "100%",
         }}
       >
-        {/* <Image
-          src={"/images/reviewone.png"}
-          alt="infopic"
-          width={400}
-          height={400}
-        /> */}
-
-        <Box
-          as="div"
-          sx={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}
-        >
-          <Typography variant="h2">About the brand</Typography>
-          <Box>
-            <p style={{ color: "#777777" }}>
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industry. Lorem Ipsum has been the industry's standard dummy text
-              ever since the 1500s, when an unknown printer took a galley of
-              type and scrambled it to make a type specimen book. It has
-              survived not only five centuries, but also the leap into
-              electronic typesetting, remaining essentially unchanged. It was
-              popularised when an unknown printer took a galley of type and
-              scrambled it to make a type specimen book.
-            </p>
-          </Box>
-
-          <Box
-            as="div"
-            sx={{
-              display: "flex",
-              gap: "1.8rem",
-            }}
-          >
+        <Grid container>
+          <Grid item xs={4}>
             <Box
-              as="div"
               sx={{
-                padding: "1rem",
-                backgroundColor: "#FFF5D6",
-                borderRadius: "10px",
+                display: "flex",
+                flexDirection: "column",
+                // mt: "0",
+                gap: "0.8rem",
               }}
             >
-              <label>Website : brandwebsite.com</label>
+              <Box>
+                <Typography variant="h3">Platform</Typography>
+                <Box>
+                  <p style={{ color: "#777777" }}>
+                    {campaignDetails?.campaigningPlatform}
+                  </p>
+                </Box>
+              </Box>
+
+              <Box>
+                <Typography variant="h3">Post</Typography>
+                <Box>
+                  <p style={{ color: "#777777" }}>
+                    {campaignDetails?.postType &&
+                      campaignDetails?.postType?.map((post) => {
+                        return `${post},`;
+                      })}
+                  </p>
+                </Box>
+              </Box>
+
+              <Box>
+                <Typography variant="h3">Tags</Typography>
+                <Box>
+                  <p style={{ color: "#777777" }}>
+                    {`#${campaignDetails?.tags?.[0] || ""}`}
+                  </p>
+                </Box>
+              </Box>
+
+              <Typography variant="subtitle1" sx={{ color: "#777777" }}>
+                {/* {`#${campaignDetails?.tags[0]}`} */}
+              </Typography>
             </Box>
+          </Grid>
+
+          <Grid item xs={8}>
             <Box
               as="div"
-              sx={{
-                padding: "1rem",
-                backgroundColor: "#FFF5D6",
-                borderRadius: "10px",
-              }}
+              sx={{ display: "flex", flexDirection: "column", gap: "1.8rem" }}
             >
-              <label>Instagram : @brand</label>
+              <Typography variant="h2">{brandDetails.name}</Typography>
+              <Box>
+                {/* <p
+                  style={{
+                    color: "#777777",
+                    fontSize: "1rem",
+                    lineHeight: "1.8rem",
+                  }}
+                >
+                  {MessageParagraphs}
+                </p> */}
+                <div className="parent">
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: brandDetails?.info,
+                    }}
+                  ></div>
+                </div>
+              </Box>
+
+              <Box
+                as="div"
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: "1.8rem",
+                  "@media screen and (max-width: 768px)": {
+                    gridTemplateColumns: "1fr",
+                  },
+                }}
+              >
+                <Box
+                  as="div"
+                  sx={{
+                    padding: "1rem",
+                    backgroundColor: "#FFF5D6",
+                    borderRadius: "10px",
+                  }}
+                >
+                  <label>Website : {brandDetails.website}</label>
+                </Box>
+                {brandDetails?.socialMediaLinks?.map((media, index) => {
+                  return (
+                    <Box
+                      as="div"
+                      key={index}
+                      sx={{
+                        padding: "1rem",
+                        backgroundColor: "#FFF5D6",
+                        borderRadius: "10px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <label>
+                        {media.platForm} : {media.link}
+                      </label>
+                    </Box>
+                  );
+                })}
+              </Box>
             </Box>
-          </Box>
-        </Box>
+          </Grid>
+        </Grid>
       </Box>
     </>
   );

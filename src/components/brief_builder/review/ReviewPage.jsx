@@ -7,15 +7,16 @@ import MoodBond from "./moodBond/MoodBond";
 import MessageAbout from "./messageAbout/MessageAbout";
 import DoPage from "./do_not_do/DoPage";
 import { getCampaignbyId } from "../../../../store/brief_builder/campaign/campaign.slice";
+import Loading from "@/components/common/loader/Loading";
 
 const ReviewPage = () => {
   const dispatch = useDispatch();
   const infoCam = useSelector(
     (state) => state.Campaign.addCampaignDetails?.campaign
   );
+
   useEffect(() => {
     if (infoCam?._id) {
-      // Ensure that infoCam._id is available before dispatching
       dispatch(getCampaignbyId({ campaignId: infoCam._id }));
     }
   }, [dispatch, infoCam?._id]);
@@ -30,7 +31,6 @@ const ReviewPage = () => {
 
   const isEmptyData = !campaignData;
 
-  console.log("campaignData", campaignData.brandDetails);
   return (
     <>
       <Box
@@ -44,16 +44,25 @@ const ReviewPage = () => {
           padding: "1.8rem",
         }}
       >
-        {isLoading && <p>Loading...</p>}
+        {isLoading && (
+          <div>
+            <Loading />
+          </div>
+        )}
         {error && <p>Error: {error}</p>}
 
         {!isLoading && !error && !isEmptyData && (
           <>
             <BrandAbout brandDeatils={campaignData?.brandDetails} />
-            <OfferAbout />
-            <MoodBond />
-            <MessageAbout />
-            <DoPage />
+            <OfferAbout offerDetails={campaignData?.offerDetails} />
+            <MoodBond
+              moodDeatils={campaignData?.campaignDetails?.moodBoardDocs}
+            />
+            <MessageAbout
+              campaignDetails={campaignData?.campaignDetails}
+              productDetails={campaignData?.productDetails}
+            />
+            <DoPage campaignDetails={campaignData?.campaignDetails} />
           </>
         )}
       </Box>

@@ -7,6 +7,8 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import CloseIcon from "@mui/icons-material/Close";
 import Carousel from "react-grid-carousel";
+import { useDispatch } from "react-redux";
+import { campaignApproveReject, getCampaignRequest } from "../../../../../store/campaign_request/campaignRequest.slice";
 
 const style = {
   position: "absolute",
@@ -63,7 +65,27 @@ const arrowRight = () => {
   );
 };
 
-const HandleBriefModal = ({ imageSmallUrls, open, handleClose }) => {
+const HandleBriefModal = ({ imageSmallUrls, open, handleClose, data, campaignId, page, rowsPerPage }) => {
+  console.log(data, "data in >>");
+  const dispatch = useDispatch();
+
+  const approveRejectHandler = (status, e) => {
+    e.stopPropagation();
+    dispatch(
+      campaignApproveReject({ campaignId: data.id, status: status })
+    ).then(() => {
+      dispatch(
+        getCampaignRequest({
+          campaignId: campaignId,
+          requestStatus: ["Request_Approved"],
+          page: page + 1,
+          pageSize: rowsPerPage,
+        })
+      );
+      handleClose();
+    });
+  };
+
   return (
     <Box>
       <Modal
@@ -84,13 +106,10 @@ const HandleBriefModal = ({ imageSmallUrls, open, handleClose }) => {
             }}
           >
             <Box>
-              <Avatar
-                src={""}
-                sx={{ width: 150, height: 150, mb: "5px" }}
-              />
+              <Avatar src={""} sx={{ width: 150, height: 150, mb: "5px" }} />
             </Box>
             <Typography id="modal-modal-title" variant="h4">
-              neatandsocial
+              {data.handle}
             </Typography>
             <Box
               sx={{
@@ -123,7 +142,10 @@ const HandleBriefModal = ({ imageSmallUrls, open, handleClose }) => {
             >
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 <Typography variant="h4">30K</Typography>
-                <Typography variant="subtitle1" sx={{ ml: "5px", color: "#777777" }}>
+                <Typography
+                  variant="subtitle1"
+                  sx={{ ml: "5px", color: "#777777" }}
+                >
                   Followers
                 </Typography>
               </Box>
@@ -134,7 +156,10 @@ const HandleBriefModal = ({ imageSmallUrls, open, handleClose }) => {
               />
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 <Typography variant="h4">16K</Typography>
-                <Typography variant="subtitle1" sx={{ ml: "5px", color: "#777777" }}>
+                <Typography
+                  variant="subtitle1"
+                  sx={{ ml: "5px", color: "#777777" }}
+                >
                   Following
                 </Typography>
               </Box>
@@ -202,6 +227,7 @@ const HandleBriefModal = ({ imageSmallUrls, open, handleClose }) => {
               <Button
                 variant="contained"
                 type="button"
+                onClick={(e) => approveRejectHandler("approve", e)}
                 sx={{
                   "&:hover": { background: "#FFCC33" },
                   background: "#FFCC33",
@@ -220,6 +246,7 @@ const HandleBriefModal = ({ imageSmallUrls, open, handleClose }) => {
               <Button
                 variant="outlined"
                 type="button"
+                onClick={(e) => approveRejectHandler("reject", e)}
                 sx={{
                   "&:hover": {
                     borderColor: "info.main",

@@ -15,7 +15,7 @@ import { usePaidFrom } from "../../hook";
 
 const PaidForm = ({ handleTab }) => {
   const [isSampleRequired, setIsSampleRequired] = useState(false);
-  const { initialValues, schema, submit } = usePaidFrom({ handleTab });
+  const { initialValues, loading, schema, submit } = usePaidFrom({ handleTab });
 
   const {
     reset,
@@ -189,10 +189,11 @@ const PaidForm = ({ handleTab }) => {
               background: "#FFCC33",
             },
           }}
+          disabled={loading}
           variant="contained"
           endIcon={<CgArrowLongRight />}
         >
-          Next
+          {loading ? "Loading..." : "Next"}
         </Button>
       </Box>
     </form>

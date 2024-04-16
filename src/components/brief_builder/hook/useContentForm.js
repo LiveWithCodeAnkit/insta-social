@@ -1,14 +1,17 @@
 import { useDispatch, useSelector } from "react-redux";
 import { contentFormSchema } from "../schema";
 import { createCampaign } from "../../../../store/brief_builder/campaign/campaign.slice";
+import { useState } from "react";
 
-export const useContentForm = ({ handleTab }) => {
+export const useContentForm = ({ handleChange }) => {
   const infoCam = useSelector(
     (state) => state.Campaign.addCampaignDetails?.campaign
   );
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
+
   const initialValues = {
-    campaignName: "abc",
+    campaignName: "",
     messaging: "",
     hooks: "",
     doDes: "",
@@ -18,6 +21,8 @@ export const useContentForm = ({ handleTab }) => {
   };
 
   const handleContentForm = async (values) => {
+    setLoading(true);
+
     const {
       messaging,
       hooks,
@@ -27,8 +32,6 @@ export const useContentForm = ({ handleTab }) => {
       externalLinks,
       campaignName,
     } = values;
-
-    const modifiedArray = images ? images.map((obj) => obj.file) : [];
 
     const formData = new FormData();
 
@@ -48,23 +51,20 @@ export const useContentForm = ({ handleTab }) => {
       },
     };
 
-    console.log("values", campaignDetails);
     formData.append("data", JSON.stringify(campaignDetails));
     images?.map((img) => {
-      formData.append(`moodBoardDocs.contents`, img.file);
+      formData.append(`moodBoardDocs.contents`, img);
     });
-
-    formData.append(`moodBoardDocs.contents`, modifiedArray);
-
-    console.log("modifiedArray:-", modifiedArray);
 
     const res = await dispatch(createCampaign(formData));
     if (res.payload?.success) {
-      handleTab(5);
+      handleChange(event, 1);
     }
+    setLoading(false);
   };
 
   return {
+    loading,
     initialValues,
     schema: contentFormSchema,
     submit: handleContentForm,

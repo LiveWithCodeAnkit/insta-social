@@ -1,10 +1,10 @@
+"use client";
 import React from "react";
 
 // material
 import { alpha, styled } from "@mui/material/styles";
 import { Box, Stack, AppBar, Toolbar, IconButton, Button } from "@mui/material";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-
 // components
 
 // ----------------------------------------------------------------------
@@ -64,22 +64,6 @@ const Navbar = ({ onOpenSidebar }) => {
               fontWeight: 600,
               textTransform: "none",
               boxShadow: "0px 4px 20px 0px #FFD24B80",
-            }}
-          >
-            New Campaign
-          </Button>
-          <Button
-            variant="outlined"
-            type="button"
-            sx={{
-              // "&:hover": { background: "#FFCC33" },
-              border: "1px solid #212121",
-              color: "#212121",
-              height: "50px",
-              width: "118px",
-              borderRadius: "50px",
-              fontWeight: 600,
-              textTransform: "none",
             }}
           >
             Messages

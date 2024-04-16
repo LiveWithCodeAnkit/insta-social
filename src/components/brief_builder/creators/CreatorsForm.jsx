@@ -9,9 +9,15 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm, Controller } from "react-hook-form";
 import { CgArrowLongRight, CgArrowLongLeft } from "react-icons/cg";
 import { useCreatorsForm } from "../hook";
+import makeAnimated from "react-select/animated";
+import Select from "react-select";
+import countryList from "../../../assets/Contries.json";
 
-const CreatorsForm = ({handleTab}) => {
-  const { initialValues, schema, submit } = useCreatorsForm({handleTab});
+const CreatorsForm = ({ handleTab }) => {
+  const animatedComponents = makeAnimated();
+  const { initialValues, loading, schema, submit } = useCreatorsForm({
+    handleTab,
+  });
   const {
     reset,
     control,
@@ -49,28 +55,79 @@ const CreatorsForm = ({handleTab}) => {
                 width: "68%",
               }}
             >
-              <Controller
-                name="country"
-                control={control}
-                render={({ field: { value, onChange } }) => (
-                  <CustomTextField
-                    select
-                    fullWidth
-                    value={value}
-                    sx={{ mb: 4 }}
-                    label="Select Country"
-                    onChange={onChange}
-                    error={Boolean(errors.country)}
-                    {...(errors.country && {
-                      helperText: errors.country.message,
-                    })}
+              <Box
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.2rem",
+                }}
+              >
+                <Typography
+                  variant="label"
+                  sx={{ fontSize: "14px", fontWeight: "600" }}
+                >
+                  Select Country
+                </Typography>
+                <Controller
+                  name="country"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      isMulti
+                      closeMenuOnSelect={true}
+                      components={animatedComponents}
+                      options={countryList.map((item) => ({
+                        value: item.name,
+                        label: item.name,
+                      }))}
+                      placeholder="Select country..."
+                      classNamePrefix="select"
+                      className="basic-multi-select"
+                      theme={(theme) => ({
+                        ...theme,
+                        colors: {
+                          ...theme.colors,
+                          primary25: "#FFCC33",
+                          primary: "#FFCC33",
+                        },
+                      })}
+                      styles={{
+                        control: (baseStyles, state) => ({
+                          ...baseStyles,
+                          borderColor: state.isFocused ? "#FFCC33" : "#D9D9D9",
+                        }),
+                        indicatorSeparator: (base) => ({
+                          ...base,
+                          backgroundColor: "#FFCC33", // Change the indicator color here
+                        }),
+                        dropdownIndicator: (base, state) => ({
+                          ...base,
+                          color: "#FFCC33", // Change the dropdown indicator color here
+                        }),
+                        multiValueRemove: (base, state) => ({
+                          ...base,
+                          color: "#FFCC33", // Change the color of the close icon here
+                          "&:hover": {
+                            backgroundColor: "#FFCC33", // Change the background color on hover if needed
+                            color: "white", // Change the color on hover if needed
+                          },
+                        }),
+                      }}
+                    />
+                  )}
+                />
+                {errors.country && (
+                  <Typography
+                    variant="caption"
+                    color="error"
+                    sx={{ marginTop: "0.3rem", fontSize: "0.875rem" }}
                   >
-                    <MenuItem value="usa">USA</MenuItem>
-                    <MenuItem value="India">India</MenuItem>
-                    <MenuItem value="Itly">Itly</MenuItem>
-                  </CustomTextField>
+                    {errors.country.message}
+                  </Typography>
                 )}
-              />
+              </Box>
 
               <Controller
                 name="gender"
@@ -88,6 +145,7 @@ const CreatorsForm = ({handleTab}) => {
                       helperText: errors.gender.message,
                     })}
                   >
+                    <MenuItem value=" ">Select Gender</MenuItem>
                     <MenuItem value="MALE">Male</MenuItem>
                     <MenuItem value="FEMALE">Female</MenuItem>
                     <MenuItem value="OTHER">Others</MenuItem>
@@ -209,10 +267,11 @@ const CreatorsForm = ({handleTab}) => {
                     background: "#FFCC33",
                   },
                 }}
+                disabled={loading}
                 variant="contained"
                 endIcon={<CgArrowLongRight />}
               >
-                Next
+                {loading ? "Loading..." : "Next"}
               </Button>
             </Box>
           </Card>

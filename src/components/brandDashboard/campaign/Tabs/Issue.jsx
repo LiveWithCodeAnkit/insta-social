@@ -1,7 +1,14 @@
 import { Box, Button, Stack, Typography } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CommonTable from "../../../common/commonTable/CommonTable";
 import IssueBriefModal from "../modal/IssueBriefModal";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "next/navigation";
+import {
+  getCampaignIssuesbyId,
+  getCampaignRequest,
+} from "../../../../../store/campaign_request/campaignRequest.slice";
+import { useToastMessages } from "@/components/lib/messages/useToastMessages";
 
 const imageSmallUrls = [
   "/images/dummy/small_pic_1.png",
@@ -20,9 +27,45 @@ const imageSmallUrls = [
 ];
 
 const Issue = () => {
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const dispatch = useDispatch();
+  const params = useParams();
   const [open, setOpen] = useState(false);
+  const issueData = useSelector(
+    (state) => state.CampaignRequest.campaignRequest.campaignRequestData
+  );
+  const { Success, Warn, Error } = useToastMessages();
+  console.log(issueData, "issueData");
+
+  useEffect(() => {
+    dispatch(
+      getCampaignIssuesbyId({
+        campaignId: params.campaignId,
+        page: page + 1,
+        pageSize: rowsPerPage,
+      })
+    );
+  }, [page, rowsPerPage]);
+
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+  const handleChangePageForPagination = (event, newPage) => {
+    setPage(newPage - 1);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const onRowClickHandler = () => {
+    handleOpen();
+  };
 
   function createData(id, handle, product, tracking, action, notes, status) {
     return {
@@ -36,63 +79,17 @@ const Issue = () => {
     };
   }
 
-  const rows = [
-    createData(
-      1,
-      "neatandsocial",
-      "John Doe, 1216 Broadway, Fl 2, New York, NY 10001 United States",
+  const rows = issueData?.data?.map((item) => {
+    return createData(
+      item._id,
+      item.creatorId?.firstName + " " + item.creatorId?.lastName,
+      item.product,
       "",
       "",
-      "Lorem Ipsum is simply dummy text of "
-    ),
-    createData(
-      2,
-      "Our.littlehome",
-      "John Doe, 1216 Broadway, Fl 2, New York, NY 10001 United States",
-      "",
-      "",
-      "Lorem Ipsum is simply dummy text of "
-    ),
-    createData(
-      3,
-      "Mamatoflowers",
-      "John Doe, 1216 Broadway, Fl 2, New York, NY 10001 United States",
-      "",
-      "",
-      "Lorem Ipsum is simply dummy text of "
-    ),
-    createData(
-      4,
-      "liveymonte",
-      "John Doe, 1216 Broadway, Fl 2, New York, NY 10001 United States",
-      "",
-      "",
-      "Lorem Ipsum is simply dummy text of "
-    ),
-    createData(
-      5,
-      "Threebowsandablonde",
-      "John Doe, 1216 Broadway, Fl 2, New York, NY 10001 United States",
-      "",
-      "",
-      "Lorem Ipsum is simply dummy text of "
-    ),
-    createData(
-      6,
-      "Mumingfrom.ito.z",
-      "John Doe, 1216 Broadway, Fl 2, New York, NY 10001 United States",
-      "",
-      "",
-      "Lorem Ipsum is simply dummy text of "
-    ),
-    createData(7, "Ice cream sandwich", "", 237, 9.0, 37),
-    createData(8, "Jelly Bean", 375, 0.0, 94),
-    createData(9, "KitKat", 518, 26.0, 65),
-    createData(10, "Lollipop", 392, 0.2, 98),
-    createData(11, "Marshmallow", 318, 0, 81),
-    createData(12, "Nougat", 360, 19.0, 9),
-    createData(13, "Oreo", 437, 18.0, 63),
-  ];
+      item.issueInfo,
+      item.issueType
+    );
+  });
 
   const headCells = [
     {
@@ -221,20 +218,22 @@ const Issue = () => {
               justifyContent: "center",
               height: "36px",
               width: "127px",
-              backgroundColor: "#D9F4DA",
+              backgroundColor:
+                item.status === "PRODUCT_ISSUE" ? "#D9F4DA" : "#D8F4FF",
               borderRadius: "8px",
             }}
           >
-            <Typography variant="body1">Product Issue</Typography>
+            <Typography variant="body1">
+              {item.status === "PRODUCT_ISSUE"
+                ? "Product Issue"
+                : "Shipping Issue"}
+            </Typography>
           </Box>
         );
       },
     },
   ];
 
-  const onRowClickHandler = () => {
-    handleOpen();
-  };
   return (
     <Box>
       <Box sx={{ display: "flex", justifyContent: "flex-end", mb: "20px" }}>
@@ -275,11 +274,22 @@ const Issue = () => {
         </Stack>
       </Box>
 
-      <CommonTable
-        rows={rows}
-        headCells={headCells}
-        onclickHandler={onRowClickHandler}
-      />
+      {rows && (
+        <Box sx={{ "& .MuiTableContainer-root": { borderRadius: "10px" } }}>
+          <CommonTable
+            rows={rows}
+            headCells={headCells}
+            onclickHandler={onRowClickHandler}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            onChangePage={handleChangePage}
+            onChangeRowsPerPage={handleChangeRowsPerPage}
+            pagination={issueData.pagination}
+            onChangePagePagination={handleChangePageForPagination}
+            isCheckbox={true}
+          />
+        </Box>
+      )}
 
       <IssueBriefModal
         imageSmallUrls={imageSmallUrls}

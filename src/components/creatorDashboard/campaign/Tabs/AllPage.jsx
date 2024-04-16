@@ -8,68 +8,11 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ViewCampaignCreator from "../modal/ViewCampaignCreator";
 import CampaignCard from "../Cards/CampaignCard";
-
-const data = [
-  {
-    id: 1,
-    handle: "Native",
-    profilephoto: "/images/dummy/profilephoto.png",
-    contentPhoto: "/images/dummy/neatandsocial.png",
-    campaignName: "Tangerine & Citrus Blossom",
-  },
-  {
-    id: 2,
-    handle: "Bespoke Post",
-    profilephoto: "/images/dummy/profilephoto.png",
-    contentPhoto: "/images/dummy/Our.littlehome.png",
-    campaignName: "Classic Pack",
-  },
-  {
-    id: 3,
-    handle: "Ollipop",
-    profilephoto: "/images/dummy/profilephoto.png",
-    contentPhoto: "/images/dummy/Mamatoflowers.png",
-    campaignName: "Tangerine & Citrus Blossom",
-  },
-  {
-    id: 4,
-    handle: "Native",
-    profilephoto: "/images/dummy/profilephoto.png",
-    contentPhoto: "/images/dummy/liveymonte.png",
-    campaignName: "Tangerine & Citrus Blossom",
-  },
-  {
-    id: 5,
-    handle: "Bespoke Post",
-    profilephoto: "/images/dummy/profilephoto.png",
-    contentPhoto: "/images/dummy/Threebowsandablonde.png",
-    campaignName: "Tangerine & Citrus Blossom",
-  },
-  {
-    id: 6,
-    handle: "Ollipop",
-    profilephoto: "/images/dummy/profilephoto.png",
-    contentPhoto: "/images/dummy/An.olive.grove.png",
-    campaignName: "Tangerine & Citrus Blossom",
-  },
-  {
-    id: 7,
-    handle: "Native",
-    profilephoto: "/images/dummy/profilephoto.png",
-    contentPhoto: "/images/dummy/melissafutagaki.png",
-    campaignName: "Tangerine & Citrus Blossom",
-  },
-  {
-    id: 8,
-    handle: "Bespoke Post",
-    profilephoto: "/images/dummy/profilephoto.png",
-    contentPhoto: "/images/dummy/greeneclecticmama.png",
-    campaignName: "Tangerine & Citrus Blossom",
-  },
-];
+import { getCampaignRequestByCreator } from "../../../../../store/campaign_request/campaignRequest.slice";
+import { useDispatch, useSelector } from "react-redux";
 
 const imageSmallUrls = [
   "/images/dummy/small_pic_1.png",
@@ -92,13 +35,45 @@ const AllPage = () => {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(8);
 
-  const onRowClickHandler = () => {
+  const dispatch = useDispatch();
+
+  const onRowClickHandler = (item) => {
     handleOpen();
+    setSelectedItem(item);
   };
 
+  const campaignByCreator = useSelector(
+    (state) =>
+      state.CampaignRequest?.campaignRequestByCreator
+        ?.campaignRequestByCreatorData
+  );
+
+  // console.log("selectedItem", selectedItem);
+  // console.log("campaignByCreator", campaignByCreator);
+
+  useEffect(() => {
+    dispatch(
+      getCampaignRequestByCreator({
+        page: page + 1,
+        pageSize: rowsPerPage,
+        requestStatus: [],
+      })
+    );
+  }, [page, rowsPerPage]);
+
   return (
-    <Box>
+    <Box
+      sx={{
+        backgroundColor: "background.paper",
+        boxShadow: "0px 0px 30px 0px #0000000D",
+        borderRadius: "30px",
+        p: "30px",
+      }}
+    >
       <Box sx={{ display: "flex", justifyContent: "flex-end", mb: "20px" }}>
         <Stack direction={"row"} spacing={"30px"} sx={{ alignItems: "center" }}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -152,43 +127,46 @@ const AllPage = () => {
         </Stack>
       </Box>
 
-      <Grid container spacing={"30px"}>
-        {data.map((item) => (
+      <Grid container spacing={4}>
+        {campaignByCreator?.data?.map((item) => (
           <Grid item xs={3}>
             <CampaignCard
               item={item}
-              status={"Completed"}
-              onCardClickHandler={onRowClickHandler}
+              onCardClickHandler={() => onRowClickHandler(item)}
             />
           </Grid>
         ))}
       </Grid>
 
-      <Box sx={{ display: "flex", justifyContent: "center" }}>
-        <Button
-          variant="contained"
-          type="button"
-          sx={{
-            background: "#FFCC33",
-            color: "#212121",
-            height: "50px",
-            width: "123px",
-            borderRadius: "50px",
-            fontSize: "14px",
-            fontWeight: 600,
-            textTransform: "none",
-            boxShadow: "none",
-            mt: "30px",
-          }}
-        >
-          Load More
-        </Button>
-      </Box>
+      {campaignByCreator?.data?.length > 0 && (
+        <Box sx={{ display: "flex", justifyContent: "center" }}>
+          <Button
+            variant="contained"
+            type="button"
+            onClick={() => setRowsPerPage(rowsPerPage + 4)}
+            sx={{
+              background: "#FFCC33",
+              color: "#212121",
+              height: "50px",
+              width: "123px",
+              borderRadius: "50px",
+              fontSize: "14px",
+              fontWeight: 600,
+              textTransform: "none",
+              boxShadow: "none",
+              mt: "30px",
+            }}
+          >
+            Load More
+          </Button>
+        </Box>
+      )}
 
       <ViewCampaignCreator
         open={open}
         handleClose={handleClose}
         imageSmallUrls={imageSmallUrls}
+        campaignData={selectedItem}
       />
     </Box>
   );

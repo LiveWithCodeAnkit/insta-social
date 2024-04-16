@@ -33,11 +33,46 @@ const style = {
   borderRadius: "50px",
 };
 
-const ViewCampaignCreator = ({ open, handleClose, imageSmallUrls }) => {
+const ViewCampaignCreator = ({
+  open,
+  handleClose,
+  imageSmallUrls,
+  campaignData,
+}) => {
   const [bigImageIdx, setBigImageIdx] = useState(0);
   const [openBigImage, setOpenBigImage] = useState(false);
   const handleOpenBigImage = () => setOpenBigImage(true);
   const handleCloseBigImage = () => setOpenBigImage(false);
+
+  // console.log(campaignData, "campaignData");
+
+  const campaignModalDetails = campaignData?.campaignId?.campaignDetails || "";
+
+  const campaignModalImages =
+    campaignData?.campaignId?.campaignDetails?.moodBoardDocs || [];
+  // console.log(campaignModalDetails, "campaignModalDetails");
+  //
+  // console.log(campaignModalImages, "campaignModalImages");
+
+  // const extractContentBetweenTags = (htmlString, tagName) => {
+  //   const regex = new RegExp(`<${tagName}>(.*?)<\/${tagName}>`, "g");
+  //   const matches = htmlString?.match(regex);
+  //   return matches
+  //     ? matches.map((match) =>
+  //         match.replace(`<${tagName}>`, "").replace(`</${tagName}>`, "")
+  //       )
+  //     : [];
+  // };
+  // const { campaignMessage } = campaignModalDetails;
+
+  // const MessageParagraphs = extractContentBetweenTags(campaignMessage, "p");
+
+  // // Extract list items from campaignMessage
+  // const ulContentMatch = campaignMessage?.match(/<ul>(.*?)<\/ul>/s);
+  // const ulMessageContent = ulContentMatch ? ulContentMatch[1] : "";
+  // const listItemsOfMessage = ulMessageContent
+  //   ? ulMessageContent.match(/<li>(.*?)<\/li>/gs)
+  //   : [];
 
   return (
     <Box>
@@ -55,15 +90,6 @@ const ViewCampaignCreator = ({ open, handleClose, imageSmallUrls }) => {
               alignItems: "center",
             }}
           >
-            {/* <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Avatar
-                src="/images/dummy/profilephoto.png"
-                sx={{ width: 35, height: 35 }}
-              />
-              <Typography variant="h6" sx={{ ml: 2, fontWeight: "bold" }}>
-                neatandsocial
-              </Typography>
-            </Box> */}
             <CloseIcon sx={{ cursor: "pointer" }} onClick={handleClose} />
           </Box>
           <Box>
@@ -77,13 +103,15 @@ const ViewCampaignCreator = ({ open, handleClose, imageSmallUrls }) => {
                 width: "500px",
               }}
             >
-              <Image
-                src={imageSmallUrls[bigImageIdx]}
-                alt="image"
-                // width={500}
-                // height={500}
-                fill={true}
-              />
+              {campaignModalImages?.contents?.length > 0 && (
+                <Image
+                  src={campaignModalImages?.contents[0]}
+                  alt="image"
+                  // width={400}
+                  // height={400}
+                  fill={true}
+                />
+              )}
             </Box>
             <Typography
               sx={{
@@ -93,10 +121,32 @@ const ViewCampaignCreator = ({ open, handleClose, imageSmallUrls }) => {
                 width: "500px",
               }}
             >
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industry. John Doe, 1216 Broadway, Fl 2, New York, NY 10001 United
-              States
+              {/* {MessageParagraphs} */}
+              <div className="parent">
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: campaignModalDetails?.campaignMessage,
+                  }}
+                ></div>
+              </div>
             </Typography>
+
+            {/* {listItemsOfMessage && listItemsOfMessage?.length > 0 && (
+              <ul
+                style={{
+                  padding: "1.5rem",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "1.8rem",
+                }}
+              >
+                {listItemsOfMessage?.map((item, index) => (
+                  <li key={`list-item-${index}`} style={{ color: "#777777" }}>
+                    {item.replace(/<\/?li>/g, "")}
+                  </li>
+                ))}
+              </ul>
+            )} */}
           </Box>
           <Box
             sx={{

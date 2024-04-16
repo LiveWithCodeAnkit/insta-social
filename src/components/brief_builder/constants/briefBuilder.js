@@ -5,6 +5,11 @@ export const navConfigBriefBuilder = [
     icon: "",
   },
   {
+    title: "My Campaigns",
+    path: "/brand/dashboard",
+    icon: "",
+  },
+  {
     title: "Settings",
     path: "",
     icon: "",
@@ -122,3 +127,66 @@ export const aboutOffer = [
     offerSize: "0",
   },
 ];
+
+export const campaignInfoStanderd = [
+  {
+    id: 1,
+    numInfo: "25",
+    amountInfo: "2k",
+  },
+  {
+    id: 2,
+    numInfo: "50",
+    amountInfo: "3.5k",
+  },
+  {
+    id: 3,
+    numInfo: "100",
+    amountInfo: "6k",
+  },
+  {
+    id: 4,
+    numInfo: "200",
+    amountInfo: "10k",
+  },
+  {
+    id: 5,
+    numInfo: "250",
+    amountInfo: "15k",
+  },
+];
+
+export const campaignInfoPro = [
+  {
+    id: 1,
+    numInfo: "10",
+    amountInfo: "3k",
+  },
+  {
+    id: 2,
+    numInfo: "20",
+    amountInfo: "5.5k",
+  },
+  {
+    id: 3,
+    numInfo: "35",
+    amountInfo: "8.7k",
+  },
+  {
+    id: 4,
+    numInfo: "50",
+    amountInfo: "11.2k",
+  },
+  {
+    id: 5,
+    numInfo: "75",
+    amountInfo: "15k",
+  },
+];
+/*
+10 creators at $3,000
+20 creators at $5,500
+35 creators at $8,750
+50 creators $11,250
+75 creators at $15,000
+*/

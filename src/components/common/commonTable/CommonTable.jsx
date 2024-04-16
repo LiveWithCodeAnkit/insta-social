@@ -41,14 +41,15 @@ export default function CommonTable({
   onChangeRowsPerPage,
   onChangePagePagination,
   pagination,
+  isCheckbox = false,
 }) {
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("calories");
   const [selected, setSelected] = useState([]);
   // const [page, setPage] = useState(0);
   // const [rowsPerPage, setRowsPerPage] = useState(5);
-  console.log(rows, "rows");
-  console.log(pagination, "pagination");
+  // console.log(rows, "rows");
+  // console.log(pagination, "pagination");
 
   function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -97,11 +98,22 @@ export default function CommonTable({
           backgroundColor: "#FFF5D6",
           // border: "1px solid #E8E8E8",
           "& .MuiTableCell-root": { borderBottom: "none" },
-          "& .MuiTableHead-root": { borderRadius: "30px !important" },
-          borderRadius: "30px !important",
         }}
       >
         <TableRow>
+          {isCheckbox && rows.length > 0 && (
+            <TableCell padding="checkbox">
+              <Checkbox
+                color="primary"
+                // indeterminate={numSelected > 0 && numSelected < rowCount}
+                // checked={rowCount > 0 && numSelected === rowCount}
+                // onChange={onSelectAllClick}
+                inputProps={{
+                  "aria-label": "select all desserts",
+                }}
+              />
+            </TableCell>
+          )}
           {headCells.map((headCell) => (
             <TableCell
               key={headCell.id}
@@ -226,7 +238,7 @@ export default function CommonTable({
                 return (
                   <TableRow
                     hover
-                    onClick={(row) =>
+                    onClick={(e) =>
                       onclickHandler && onclickHandler(row, row.id)
                     }
                     role="checkbox"
@@ -236,22 +248,37 @@ export default function CommonTable({
                     selected={isItemSelected}
                     sx={{ cursor: "pointer" }}
                   >
+                    {isCheckbox && (
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          color="primary"
+                          // checked={isItemSelected}
+                          inputProps={
+                            {
+                              // "aria-labelledby": labelId,
+                            }
+                          }
+                        />
+                      </TableCell>
+                    )}
                     {headCells.map((headCell) => {
                       return (
-                        <TableCell
-                          key={headCell.id}
-                          // align={headCell.numeric ? "right" : "left"}
-                          // padding={headCell.disablePadding ? "none" : "normal"}
-                          sx={{
-                            color: "secondary.main",
-                            opacity: headCell?.renderCell ? 1 : "0.7",
-                            fontSize: "14px",
-                          }}
-                        >
-                          {headCell?.renderCell
-                            ? headCell.renderCell(row, index)
-                            : row[headCell.id]}
-                        </TableCell>
+                        <>
+                          <TableCell
+                            key={headCell.id}
+                            // align={headCell.numeric ? "right" : "left"}
+                            // padding={headCell.disablePadding ? "none" : "normal"}
+                            sx={{
+                              color: "secondary.main",
+                              opacity: headCell?.renderCell ? 1 : "0.7",
+                              fontSize: "14px",
+                            }}
+                          >
+                            {headCell?.renderCell
+                              ? headCell.renderCell(row, index)
+                              : row[headCell.id]}
+                          </TableCell>
+                        </>
                       );
                     })}
                   </TableRow>
@@ -280,7 +307,7 @@ export default function CommonTable({
         onRowsPerPageChange={onChangeRowsPerPage}
       /> */}
 
-      {pagination && (
+      {pagination && rows.length > 0 && (
         <TablePaginationCutom
           page={page}
           rowsPerPage={rowsPerPage}

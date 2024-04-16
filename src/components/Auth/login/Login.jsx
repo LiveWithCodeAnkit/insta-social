@@ -15,13 +15,18 @@ import React from "react";
 import AuthSocial from "../AuthSocial";
 import LoginForm from "./LoginForm";
 import Link from "next/link";
-const Login = () => {
+import { useRouter } from "next/navigation";
+
+const Login = ({ title, pathLoc, linkTitle, role, signupUrl }) => {
+  const router = useRouter();
   return (
     <Box style={{ height: "100vh" }}>
       <Box
         sx={{
           p: "18px 50px",
+          cursor: "pointer",
         }}
+        onClick={() => router.push("/")}
       >
         <Image
           src="/images/logo.png"
@@ -53,7 +58,7 @@ const Login = () => {
                       color: "#FFCC33",
                     }}
                   >
-                    Login
+                    Login {title}
                   </Typography>
                   <Typography
                     sx={{
@@ -67,7 +72,7 @@ const Login = () => {
                 </Box>
 
                 <AuthSocial />
-                <LoginForm />
+                <LoginForm role={role} />
 
                 <Box
                   sx={{
@@ -81,7 +86,7 @@ const Login = () => {
                     Don’t have an account?
                   </Typography>
                   <Link
-                    href="/signup"
+                    href={signupUrl}
                     style={{
                       fontSize: "16px",
                       fontWeight: "400",
@@ -90,6 +95,29 @@ const Login = () => {
                     }}
                   >
                     Signup for free
+                  </Link>
+                </Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    gap: "0.5rem",
+                    paddingTop: "0.5rem",
+                  }}
+                >
+                  <Typography variant="body2" align="center">
+                    Sign in as
+                  </Typography>
+                  <Link
+                    href={pathLoc}
+                    style={{
+                      fontSize: "14px",
+                      fontWeight: "400",
+                      color: "#FFCC33",
+                      textDecoration: "none",
+                    }}
+                  >
+                    {linkTitle}
                   </Link>
                 </Box>
               </Container>
