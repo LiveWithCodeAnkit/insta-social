@@ -4,7 +4,7 @@ import Button from "@mui/material/Button";
 import { BiPlus } from "react-icons/bi";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
-
+import { RiDeleteBin6Fill } from "react-icons/ri";
 import CustomTextField from "@/components/common/text-field";
 import FileUpload from "@/components/common/fileupload/FileUpload";
 
@@ -14,7 +14,9 @@ import QuillMinimal from "@/components/common/editer/Editor";
 
 const ProductDetailsForm = ({ handleTab }) => {
   const [files, setFiles] = useState([]);
-  const { initialValues, schema, submit } = useProductsForm({ handleTab });
+  const { initialValues, loading, schema, submit } = useProductsForm({
+    handleTab,
+  });
 
   const updateFilesState = (newFiles) => {
     setFiles(newFiles);
@@ -40,6 +42,10 @@ const ProductDetailsForm = ({ handleTab }) => {
     append({
       description: "",
     });
+  };
+
+  const handleRemoveExternalLink = (ExternalLinkIndex) => {
+    remove(ExternalLinkIndex);
   };
   return (
     <>
@@ -99,36 +105,92 @@ const ProductDetailsForm = ({ handleTab }) => {
                 background: "white",
                 borderRadius: "1.8rem",
                 boxShadow: "0px 0px 30px 0px rgba(0, 0, 0, 0.05)",
+                position: "relative",
               }}
-              key={index}
+              key={item.id}
             >
+              {index == 0 ? (
+                ""
+              ) : (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "end",
+                    alignItems: "end",
+                    position: "absolute",
+                    right: "0",
+                    top: "-11px",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: "2rem",
+                      width: "2rem",
+                      background: "#F00E0E",
+                      borderRadius: "10px",
+                      gap: "0.5rem",
+                      cursor: "pointer",
+                      color: "white",
+                      right: 0,
+                    }}
+                    onClick={() => handleRemoveExternalLink(index)}
+                  >
+                    <RiDeleteBin6Fill />
+                  </Box>
+                </Box>
+              )}
+
               <Box
+                as="div"
                 sx={{
-                  border: "2px dashed #FFCC33",
-                  borderRadius: "15px",
-                  width: "full",
-                  height: "12.5rem",
+                  width: "100%",
                   display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  backgroundColor: "#FEFAED",
+                  flexDirection: "column",
+                  gap: "0.5rem",
                 }}
               >
-                <Controller
-                  name={`products[${index}].productImage`}
-                  control={control}
-                  render={({ field: { onChange } }) => (
-                    <FileUpload
-                      iconName="img"
-                      maxSize={12582912}
-                      errorText="File size is too large, please upload file size within (12MB)"
-                      onChange={(file) => {
-                        onChange(file);
-                        updateFilesState([file]);
-                      }}
-                    />
-                  )}
-                />
+                {" "}
+                <Box
+                  sx={{
+                    border: "2px dashed #FFCC33",
+                    borderRadius: "15px",
+                    width: "full",
+                    height: "12.5rem",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "#FEFAED",
+                  }}
+                >
+                  <Controller
+                    name={`products[${index}].productImage`}
+                    control={control}
+                    render={({ field: { onChange } }) => (
+                      <FileUpload
+                        iconName="img"
+                        maxSize={12582912}
+                        errorText="File size is too large, please upload file size within (12MB)"
+                        onChange={(file) => {
+                          onChange(file);
+                        }}
+                      />
+                    )}
+                  />
+                </Box>
+                {errors.products && errors.products[index]?.productImage && (
+                  <Typography
+                    variant="caption"
+                    color="error"
+                    sx={{
+                      fontSize: "0.875rem",
+                    }}
+                  >
+                    {errors.products[index]?.productImage.message}
+                  </Typography>
+                )}
               </Box>
 
               <Box
@@ -215,8 +277,9 @@ const ProductDetailsForm = ({ handleTab }) => {
             }}
             variant="contained"
             endIcon={<CgArrowLongRight />}
+            disabled={loading}
           >
-            Next
+            {loading ? "Loading..." : "Next"}
           </Button>
         </Box>
       </form>

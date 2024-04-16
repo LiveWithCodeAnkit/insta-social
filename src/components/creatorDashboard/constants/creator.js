@@ -1,7 +1,7 @@
 export const navConfigCreator = [
     {
         title: "My Campaigns",
-        path: "/creator/dashboard",
+        path: "/creator/dashboard/my-campaign",
         icon: "",
     },
     {

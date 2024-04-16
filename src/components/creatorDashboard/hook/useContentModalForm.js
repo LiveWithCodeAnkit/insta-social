@@ -1,13 +1,13 @@
 import { useDispatch, useSelector } from "react-redux";
 import { uploadContentFormSchema } from "../schema";
-import { postContentSubmittedByCreator } from "../../../../store/campaign_request/campaignRequest.slice";
+import { getCampaignRequestByCreator, postContentSubmittedByCreator } from "../../../../store/campaign_request/campaignRequest.slice";
 
 
-export const useContentModalForm = ({ allData, handleClose }) => {
-    // const infoCam = useSelector(
-    //     (state) => state.Campaign.addCampaignDetails?.campaign
-    // );
+export const useContentModalForm = ({ allData, handleClose, updatingFunction = () => { } }) => {
     const dispatch = useDispatch();
+    const loading = useSelector(
+        (state) => state?.CampaignRequest?.campaignContentSubmittedByCreator?.loading
+    );
     const initialValues = {
         images: [],
         captionName: "",
@@ -22,10 +22,10 @@ export const useContentModalForm = ({ allData, handleClose }) => {
         const formData = new FormData();
 
         const contentUploadDetails = {
-            campaignId: allData?.campaignDetails,
+            campaignId: allData?.campaignDetails?._id,
             campaignRequestId: allData?.id,
             contentCaption: captionName,
-            uploadedContent: images
+            uploadedContent: []
         };
 
         // console.log("values", contentUploadDetails);
@@ -40,13 +40,15 @@ export const useContentModalForm = ({ allData, handleClose }) => {
             const res = await dispatch(postContentSubmittedByCreator(formData));
             if (res.payload?.success) {
                 handleClose();
+                updatingFunction && updatingFunction();
             }
-            // console.log("res", res);
+            console.log("res", res);
         }
     };
 
     return {
         initialValues,
+        loading,
         schema: uploadContentFormSchema,
         submit: handleContentForm,
     };

@@ -1,3 +1,4 @@
+"use client";
 import Image from "next/image";
 import React, { useState } from "react";
 import {
@@ -24,10 +25,15 @@ import { CgMaximize } from "react-icons/cg";
 import Carousel from "react-grid-carousel";
 import FeedbackFormModal from "./FeedbackFormModal";
 import CustomTextField from "@/components/common/text-field";
-import { contentApprovebyBrand, getUploadedContent } from "../../../../../store/campaign_request/campaignRequest.slice";
+import {
+  contentApprovebyBrand,
+  getUploadedContent,
+} from "../../../../../store/campaign_request/campaignRequest.slice";
 import { useDispatch } from "react-redux";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import JSZip from "jszip";
+// import axios from "axios";
 
 const style = {
   position: "absolute",
@@ -93,18 +99,20 @@ const initialValues = {
 };
 
 const ContentSubmittedModal = ({
-  imageSmallUrls,
   open,
   handleClose,
   infoModel,
   page,
   rowsPerPage,
-  campaignId
+  campaignId,
+  likeDislikeChangeHandler,
 }) => {
   const dispatch = useDispatch();
   const [bigImageIdx, setBigImageIdx] = useState(0);
   const [openFeedback, setOpenFeedback] = useState(false);
   // const handleOpenFeedback = () => setOpenFeedback(true);
+
+  console.log("infoModel", infoModel);
 
   const {
     reset,
@@ -127,12 +135,12 @@ const ContentSubmittedModal = ({
 
   const handleApproveOrNot = async (statusInfo, rejectMessage = "") => {
     const payload = {
-      contentId: infoModel,
+      contentId: infoModel._id,
       status: statusInfo,
       rejectMessage: rejectMessage,
     };
     dispatch(contentApprovebyBrand(payload)).then(() => {
-      handleClose()
+      handleClose();
       dispatch(
         getUploadedContent({
           campaignId: campaignId,
@@ -141,7 +149,7 @@ const ContentSubmittedModal = ({
           pageSize: rowsPerPage,
         })
       );
-    })
+    });
   };
 
   //end of ank date 29 march
@@ -162,6 +170,63 @@ const ContentSubmittedModal = ({
   //   }
   // };
 
+  const handleBigImgDownload = async (e, image) => {
+    e.preventDefault();
+    const link = document.createElement("a");
+    link.href = image;
+    link.download = image.split("/").pop();
+    link.click();
+  };
+
+  // const handleDownloadAll = async (e, images) => {
+  //   // console.log(imageUrls, "imageUrls into modal");
+  //   try {
+  //     const zip = new JSZip();
+
+  //     const imageUrls = images.map((image) => image.content);
+
+  //     const promises = imageUrls.map(async (url, index) => {
+  //       const response = await axios.get(url, { responseType: "arraybuffer" });
+  //       zip.file(`image${index + 1}.jpg`, response.data);
+  //     });
+
+  //     await Promise.all(promises);
+
+  //     const content = await zip.generateAsync({ type: "blob" });
+
+  //     const link = document.createElement("a");
+  //     link.href = URL.createObjectURL(content);
+  //     console.log(link, "link into modal");
+  //     link.download = "images.zip";
+  //     link.click();
+  //   } catch (error) {
+  //     console.error("Error downloading images:", error);
+  //   }
+  // };
+
+  const handleDownloadAll = async (e, images) => {
+    e.preventDefault();
+
+    const zip = new JSZip();
+
+    const addFileToZip = async (url) => {
+      const fileName = url.substring(url.lastIndexOf("/") + 1);
+      const response = await fetch(url);
+
+      const fileContent = await response.blob(); // Get blob data from response
+      zip.file(fileName, fileContent);
+    };
+
+    images.forEach(({ content }) => addFileToZip(content));
+
+    zip.generateAsync({ type: "blob" }).then((zipBlob) => {
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(zipBlob);
+      link.download = "images.zip";
+      link.click();
+    });
+  };
+
   return (
     <Box>
       <Modal
@@ -180,12 +245,11 @@ const ContentSubmittedModal = ({
               }}
             >
               <Box sx={{ display: "flex", alignItems: "center" }}>
-                <Avatar
-                  src="/images/dummy/profilephoto.png"
-                  sx={{ width: 35, height: 35 }}
-                />
+                <Avatar src="" sx={{ width: 35, height: 35 }} />
                 <Typography variant="h6" sx={{ ml: 2, fontWeight: "bold" }}>
-                  neatandsocial
+                  {infoModel?.creatorId?.firstName +
+                    " " +
+                    infoModel?.creatorId?.lastName}
                 </Typography>
               </Box>
               <CloseIcon sx={{ cursor: "pointer" }} onClick={handleClose} />
@@ -208,7 +272,7 @@ const ContentSubmittedModal = ({
                   }}
                 >
                   <Image
-                    src={imageSmallUrls[bigImageIdx]}
+                    src={infoModel?.uploadedContent?.[bigImageIdx]?.content}
                     alt="image"
                     width={400}
                     height={400}
@@ -225,6 +289,12 @@ const ContentSubmittedModal = ({
                       width: 30,
                       cursor: "pointer",
                     }}
+                    onClick={(e) =>
+                      handleBigImgDownload(
+                        e,
+                        infoModel?.uploadedContent?.[bigImageIdx]?.content
+                      )
+                    }
                   >
                     <FaDownload fontSize="14px" />
                   </Avatar>
@@ -242,7 +312,7 @@ const ContentSubmittedModal = ({
                   arrowLeft={arrowLeft}
                   arrowRight={arrowRight}
                 >
-                  {imageSmallUrls.map((imageUrl, idx) => {
+                  {infoModel?.uploadedContent?.map((imageUrl, idx) => {
                     return (
                       <Carousel.Item key={idx}>
                         <Box
@@ -262,7 +332,7 @@ const ContentSubmittedModal = ({
                           }}
                         >
                           <Image
-                            src={imageUrl}
+                            src={imageUrl?.content}
                             onClick={() => {
                               setBigImageIdx(idx);
                               // onClickBigImage();
@@ -280,41 +350,71 @@ const ContentSubmittedModal = ({
               </Grid>
               <Grid item xs={12} md={6}>
                 <Box>
-                  <Typography variant="h3">Classic Pack</Typography>
+                  <Typography variant="h3">
+                    {infoModel?.campaignId?.campaignDetails?.campaignName}
+                  </Typography>
                   <TextField
                     id="outlined-multiline-flexible"
                     //   label="Multiline"
                     fullWidth
                     multiline
                     rows={4}
-                    value={
-                      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. "
-                    }
+                    value={infoModel?.caption}
                     disabled
                   />
                   <Box sx={{ my: "20px" }}>
                     <Grid container spacing={4}>
                       <Grid item xs={6}>
-                        <Button
-                          variant="outlined"
-                          type="button"
-                          startIcon={<FavoriteIcon />}
-                          sx={{
-                            "&:hover": {
+                        {!infoModel?.isLikedByBrand && (
+                          <Button
+                            variant="outlined"
+                            type="button"
+                            startIcon={<FavoriteIcon />}
+                            onClick={(e) =>
+                              likeDislikeChangeHandler(infoModel?._id, e)
+                            }
+                            sx={{
+                              "&:hover": {
+                                border: "1px solid #F00E0E",
+                                backgroundColor: "#eabdbd",
+                              },
                               border: "1px solid #F00E0E",
-                              backgroundColor: "#eabdbd",
-                            },
-                            border: "1px solid #F00E0E",
-                            color: "#F00E0E",
-                            height: "40px",
-                            width: "100%",
-                            borderRadius: "8px",
-                            fontSize: "14px",
-                            fontWeight: 600,
-                          }}
-                        >
-                          Like
-                        </Button>
+                              color: "#F00E0E",
+                              height: "40px",
+                              width: "100%",
+                              borderRadius: "8px",
+                              fontSize: "14px",
+                              fontWeight: 500,
+                            }}
+                          >
+                            Like
+                          </Button>
+                        )}
+                        {infoModel?.isLikedByBrand && (
+                          <Button
+                            variant="outlined"
+                            type="button"
+                            startIcon={<FavoriteIcon />}
+                            onClick={(e) =>
+                              likeDislikeChangeHandler(infoModel?._id, e)
+                            }
+                            sx={{
+                              "&:hover": {
+                                border: "1px solid #F00E0E",
+                                backgroundColor: "#eabdbd",
+                              },
+                              backgroundColor: "#F00E0E",
+                              color: "#fff",
+                              height: "40px",
+                              width: "100%",
+                              borderRadius: "8px",
+                              fontSize: "14px",
+                              fontWeight: 600,
+                            }}
+                          >
+                            Like
+                          </Button>
+                        )}
                       </Grid>
                       <Grid item xs={6}>
                         <Button
@@ -332,6 +432,9 @@ const ContentSubmittedModal = ({
                             textTransform: "none",
                             boxShadow: "none",
                           }}
+                          onClick={(e) =>
+                            handleDownloadAll(e, infoModel?.uploadedContent)
+                          }
                         >
                           Download All
                         </Button>

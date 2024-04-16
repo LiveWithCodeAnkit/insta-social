@@ -45,7 +45,7 @@ function a11yProps(index) {
 
 const Campaign = () => {
   const [value, setValue] = useState(0);
-  const [value2, setValue2] = useState(2);
+  const [value2, setValue2] = useState(0);
   const dispatch = useDispatch();
   const params = useParams();
   const campaignData = useSelector(

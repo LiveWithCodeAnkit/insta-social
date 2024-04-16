@@ -7,7 +7,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { useContentForm } from "../hook";
 import { CgArrowLongLeft, CgArrowLongRight } from "react-icons/cg";
-import FileUpload from "@/components/common/fileupload/FileUpload";
 import ImageUploading from "react-images-uploading";
 import { AiFillDelete, AiFillCamera } from "react-icons/ai";
 import { FaUpload } from "react-icons/fa";
@@ -18,6 +17,7 @@ import { MdAddAPhoto } from "react-icons/md";
 import { HiPlus, HiMinus } from "react-icons/hi";
 import { RiDeleteBin6Fill } from "react-icons/ri";
 import QuillMinimal from "@/components/common/editer/Editor";
+import FileUploaderMultiple from "@/components/common/fileuploader/FileUploaderMultiple";
 
 const buttonStyle = {
   background: "none",
@@ -32,15 +32,9 @@ const buttonStyle = {
 };
 
 const ContentForm = ({ handleChange }) => {
-  const { initialValues, schema, submit } = useContentForm({ handleChange });
-
-  const [images, setImages] = React.useState([]);
-  const maxNumber = 69;
-  const onImageChange = (imageList, addUpdateIndex) => {
-    // data for submit
-    console.log(imageList, addUpdateIndex);
-    setImages(imageList);
-  };
+  const { initialValues, loading, schema, submit } = useContentForm({
+    handleChange,
+  });
 
   const {
     reset,
@@ -70,6 +64,8 @@ const ContentForm = ({ handleChange }) => {
       hasAppended.current = true;
     }
   }, [fields, append]);
+
+  console.log("errors :-", errors);
   return (
     <form onSubmit={handleSubmit(submit)}>
       <Box
@@ -99,162 +95,26 @@ const ContentForm = ({ handleChange }) => {
           )}
         />
         <Box
+          as="div"
           sx={{
-            border: "2px dashed #FFCC33",
-            borderRadius: "15px",
             width: "100%",
-            minHeight: "12.5rem",
-            height: "100%",
             display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "#FEFAED",
-            position: "relative",
+            flexDirection: "column",
           }}
         >
           <Controller
             name="images"
             control={control}
-            render={({ field }) => (
-              <ImageUploading
-                multiple
-                value={field.value}
-                onChange={(imageList, addUpdateIndex) => {
-                  field.onChange(imageList);
-                  setImages(imageList);
-                }}
-                maxNumber={maxNumber}
-                dataURLKey="data_url"
-                acceptType={["jpg", "png"]}
-              >
-                {({
-                  imageList,
-                  onImageUpload,
-                  onImageRemoveAll,
-                  onImageUpdate,
-                  onImageRemove,
-                  isDragging,
-                  dragProps,
-                }) => (
-                  <div className="upload__image-wrapper">
-                    {imageList.length === 0 && (
-                      <div className="dz-messagenew">
-                        <div
-                          style={{
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                          }}
-                        >
-                          <FaUpload
-                            style={{
-                              color: "#FFCC33",
-                              width: "30px",
-                              height: "28px",
-                            }}
-                          />
-                        </div>
-                        <div>
-                          <span className="dz-message-text">
-                            Drag & drop images and videos
-                          </span>
-                          <div
-                            className="dz-message-btn"
-                            style={{
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                              gap: "0.5rem",
-                            }}
-                          >
-                            <span>or</span>
-                            <button
-                              style={buttonStyle}
-                              size="sm"
-                              variant="primary"
-                              type="button"
-                              {...dragProps}
-                              onClick={onImageUpload}
-                            >
-                              Browse Files
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "1.5rem",
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
-                      {imageList.map((image, index) => (
-                        <div key={index} className="image-item">
-                          <Image
-                            src={image.data_url}
-                            width={200}
-                            height={200}
-                            alt="pic"
-                          />
-                          <div className="image-item__btn-wrapper">
-                            <div
-                              style={{
-                                background: "#FFCC33",
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                padding: "0.2rem",
-                                borderRadius: "50%",
-                              }}
-                            >
-                              <MdOutlineModeEdit
-                                onClick={() => onImageUpdate(index)}
-                                style={{
-                                  fontSize: "16px",
-                                  cursor: "pointer",
-                                  color: "white",
-                                }}
-                              />
-                            </div>
-                            <div
-                              style={{
-                                background: "#F00E0E",
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                padding: "0.2rem",
-                                borderRadius: "50%",
-                              }}
-                            >
-                              <IoClose
-                                onClick={() => onImageRemove(index)}
-                                style={{
-                                  fontSize: "16px",
-                                  color: "white",
-                                  cursor: "pointer",
-                                }}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                      <MdAddAPhoto
-                        style={{
-                          fontSize: "30px",
-                          color: "#FFCC33",
-                          cursor: "pointer",
-                        }}
-                        onClick={onImageUpload}
-                      />
-                    </div>
-                  </div>
-                )}
-              </ImageUploading>
+            render={({ field: { value, onChange } }) => (
+              <FileUploaderMultiple
+                value={value}
+                onChange={onChange}
+                errors={errors}
+              />
             )}
           />
         </Box>
+
         {fields.map((item, index) => (
           <Box
             key={item.id}
@@ -333,7 +193,7 @@ const ContentForm = ({ handleChange }) => {
 
         <Box
           sx={{
-            width: "auto",
+            // width: "auto",
             display: "flex",
             gap: "1.8rem",
             flexWrap: ["wrap", "nowrap"],
@@ -364,13 +224,11 @@ const ContentForm = ({ handleChange }) => {
               control={control}
               rules={{ required: true }}
               render={({ field: { value, onChange } }) => (
-                <>
-                  <QuillMinimal
-                    value={value}
-                    onChange={onChange}
-                    label="Messaging"
-                  />
-                </>
+                <QuillMinimal
+                  value={value}
+                  onChange={onChange}
+                  label="Messaging"
+                />
               )}
             />
             {errors.messaging && (
@@ -459,27 +317,6 @@ const ContentForm = ({ handleChange }) => {
         <Box
           sx={{ width: "34.3rem", display: "flex", gap: "1.8rem", mt: "2rem" }}
         >
-          {/* <Controller
-            name="doNotDes"
-            control={control}
-            rules={{ required: true }}
-            render={({ field: { value, onChange } }) => (
-              <CustomTextField
-                rows={5}
-                multiline
-                fullWidth
-                value={value}
-                sx={{ mb: 4 }}
-                label="Don’t"
-                onChange={onChange}
-                placeholder="Don`t"
-                error={Boolean(errors.doNotDes)}
-                {...(errors.doNotDes && {
-                  helperText: errors.doNotDes.message,
-                })}
-              />
-            )}
-          /> */}
           <Box
             as="div"
             sx={{
@@ -555,8 +392,9 @@ const ContentForm = ({ handleChange }) => {
             }}
             variant="contained"
             endIcon={<CgArrowLongRight />}
+            disabled={loading}
           >
-            Next
+            {loading ? "Loading..." : "Next"}
           </Button>
         </Box>
       </Box>

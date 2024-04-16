@@ -5,6 +5,7 @@ import { Box, Button, Drawer } from "@mui/material";
 import Image from "next/image";
 import NavSection from "@/components/brandDashboard/NavSection";
 import { signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const drawerWidth = 260;
 const APP_BAR_MOBILE = 64;
@@ -15,7 +16,8 @@ const RootStyle = styled("div")({
   minHeight: "100%",
   height: "100vh",
   overflow: "hidden",
-  background: "url(/images/main_background.png) no-repeat center center / cover",
+  background:
+    "url(/images/main_background.png) no-repeat center center / cover",
 });
 
 const MainStyle = styled("div")(({ theme }) => ({
@@ -34,8 +36,7 @@ const MainStyle = styled("div")(({ theme }) => ({
 const handleLogout = async () => {
   try {
     await signOut({ callbackUrl: "/" });
-    localStorage.removeItem("sessionId");
-    localStorage.removeItem("accessToken");
+    localStorage.removeItem("adminToken");
     router.push("/");
   } catch (error) {
     console.error("Error during logout:", error);
@@ -45,6 +46,7 @@ const handleLogout = async () => {
 const Sidebar = (props) => {
   const { navConfig, NavbarComponent } = props;
   const [mobileOpen, setMobileOpen] = useState(false);
+  const router = useRouter();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -87,7 +89,10 @@ const Sidebar = (props) => {
           open
         >
           <Box sx={{ p: "15px" }}>
-            <Box sx={{ display: "inline-flex", p: "15px" }}>
+            <Box
+              sx={{ display: "inline-flex", p: "15px", cursor: "pointer" }}
+              onClick={() => router.push("/")}
+            >
               <Image
                 src="/images/logo.png"
                 alt="Mini Store Logo"
@@ -109,7 +114,7 @@ const Sidebar = (props) => {
                   backgroundColor: "action.hover",
                 },
               }}
-              >
+            >
               <Button
                 variant="text"
                 sx={{

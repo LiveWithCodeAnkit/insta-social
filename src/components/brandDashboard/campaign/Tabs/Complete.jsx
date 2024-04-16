@@ -18,88 +18,13 @@ import {
   likeDislikeContent,
 } from "../../../../../store/campaign_request/campaignRequest.slice";
 
-const data = [
-  {
-    id: 1,
-    handle: "neatandsocial",
-    profilephoto: "/images/dummy/profilephoto.png",
-    contentPhoto: "/images/dummy/neatandsocial.png",
-    campaignName: "Tangerine & Citrus Blossom",
-  },
-  {
-    id: 2,
-    handle: "Our.littlehome",
-    profilephoto: "/images/dummy/profilephoto.png",
-    contentPhoto: "/images/dummy/Our.littlehome.png",
-    campaignName: "Classic Pack",
-  },
-  {
-    id: 3,
-    handle: "Mamatoflowers",
-    profilephoto: "/images/dummy/profilephoto.png",
-    contentPhoto: "/images/dummy/Mamatoflowers.png",
-    campaignName: "Tangerine & Citrus Blossom",
-  },
-  {
-    id: 4,
-    handle: "liveymonte",
-    profilephoto: "/images/dummy/profilephoto.png",
-    contentPhoto: "/images/dummy/liveymonte.png",
-    campaignName: "Tangerine & Citrus Blossom",
-  },
-  {
-    id: 5,
-    handle: "Threebowsandablonde",
-    profilephoto: "/images/dummy/profilephoto.png",
-    contentPhoto: "/images/dummy/Threebowsandablonde.png",
-    campaignName: "Tangerine & Citrus Blossom",
-  },
-  {
-    id: 6,
-    handle: "An.olive.grove",
-    profilephoto: "/images/dummy/profilephoto.png",
-    contentPhoto: "/images/dummy/An.olive.grove.png",
-    campaignName: "Tangerine & Citrus Blossom",
-  },
-  {
-    id: 7,
-    handle: "melissafutagaki",
-    profilephoto: "/images/dummy/profilephoto.png",
-    contentPhoto: "/images/dummy/melissafutagaki.png",
-    campaignName: "Tangerine & Citrus Blossom",
-  },
-  {
-    id: 8,
-    handle: "greeneclecticmama",
-    profilephoto: "/images/dummy/profilephoto.png",
-    contentPhoto: "/images/dummy/greeneclecticmama.png",
-    campaignName: "Tangerine & Citrus Blossom",
-  },
-];
-
-const imageSmallUrls = [
-  "/images/dummy/small_pic_1.png",
-  "/images/dummy/small_pic_2.png",
-  "/images/dummy/small_pic_5.png",
-  "/images/dummy/small_pic_3.png",
-  "/images/dummy/small_pic_4.png",
-  "/images/dummy/small_pic_2.png",
-  "/images/dummy/small_pic_3.png",
-  "/images/dummy/small_pic_4.png",
-  "/images/dummy/small_pic_2.png",
-  "/images/dummy/small_pic_3.png",
-  "/images/dummy/small_pic_4.png",
-  "/images/dummy/small_pic_2.png",
-  "/images/dummy/small_pic_3.png",
-  "/images/dummy/small_pic_4.png",
-];
-
 const Complete = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(8);
   const dispatch = useDispatch();
   const params = useParams();
   const [open, setOpen] = useState(false);
+  const [modalData, setModalData] = useState({});
   const completeData = useSelector(
     (state) => state.CampaignRequest.campaignRequest.campaignRequestData
   );
@@ -119,7 +44,8 @@ const Complete = () => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const onRowClickHandler = () => {
+  const onRowClickHandler = (item) => {
+    setModalData(item)
     handleOpen();
   };
 
@@ -143,7 +69,7 @@ const Complete = () => {
 
   return (
     <Box>
-      {completeData.data.length > 0 && (
+      {completeData?.data?.length > 0 && (
         <Box sx={{ display: "flex", justifyContent: "flex-end", mb: "20px" }}>
           <Stack
             direction={"row"}
@@ -243,7 +169,7 @@ const Complete = () => {
       )}
 
       <Grid container spacing={"30px"}>
-        {completeData.data.length > 0 &&
+        {completeData?.data?.length > 0 &&
           completeData.data.map((item) => (
             <Grid item xs={3}>
               <CampaignCard
@@ -256,7 +182,7 @@ const Complete = () => {
           ))}
       </Grid>
 
-      {completeData.data.length > 0 && (
+      {completeData?.data?.length > 0 && (
         <Box sx={{ display: "flex", justifyContent: "center" }}>
           <Button
             variant="contained"
@@ -283,7 +209,10 @@ const Complete = () => {
       <ViewCampaignBriefModal
         open={open}
         handleClose={handleClose}
-        imageSmallUrls={imageSmallUrls}
+        completeModel={modalData}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        campaignId={params.campaignId}
       />
     </Box>
   );

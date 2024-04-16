@@ -29,7 +29,7 @@ const CampaignCard = ({ item, status, onCardClickHandler,likeDislikeChangeHandle
   return (
     <Box>
       <Box
-        onClick={() => onCardClickHandler(item?._id)}
+        onClick={() => onCardClickHandler(item)}
         sx={{
           p: "10px 15px 15px 15px",
           backgroundColor: "#F2F6FC",
@@ -66,7 +66,7 @@ const CampaignCard = ({ item, status, onCardClickHandler,likeDislikeChangeHandle
           }}
         >
           <Image
-            src={"/images/dummy/small_pic_5.png"}
+            src={item?.uploadedContent?.[0]?.content}
             alt=""
             layout="responsive"
             width={330}

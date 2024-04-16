@@ -39,7 +39,7 @@ const AwaitingContent = () => {
   const rows = awaitingContentData?.data?.map((item) => {
     return createData(
       item?._id,
-      item.creatorId.firstName + " " + item.creatorId.lastName,
+      item.creatorId?.firstName + " " + item.creatorId?.lastName,
       item?.campaignId?.campaignDetails?.campaignName
     );
   });
@@ -211,17 +211,20 @@ const AwaitingContent = () => {
       </Box>
 
       {rows && (
-        <CommonTable
-          rows={rows}
-          headCells={headCells}
-          // onclickHandler={onRowClickHandler}
-          page={page}
-          rowsPerPage={rowsPerPage}
-          onChangePage={handleChangePage}
-          onChangeRowsPerPage={handleChangeRowsPerPage}
-          pagination={awaitingContentData.pagination}
-          onChangePagePagination={handleChangePageForPagination}
-        />
+        <Box sx={{ "& .MuiTableContainer-root": { borderRadius: "10px" } }}>
+          <CommonTable
+            rows={rows}
+            headCells={headCells}
+            // onclickHandler={onRowClickHandler}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            onChangePage={handleChangePage}
+            onChangeRowsPerPage={handleChangeRowsPerPage}
+            pagination={awaitingContentData.pagination}
+            onChangePagePagination={handleChangePageForPagination}
+            isCheckbox={true}
+          />
+        </Box>
       )}
     </Box>
   );

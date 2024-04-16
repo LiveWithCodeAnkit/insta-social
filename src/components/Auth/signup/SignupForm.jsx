@@ -25,10 +25,10 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useSignup } from "../hook";
 
-const SignupForm = () => {
+const SignupForm = ({role}) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
-  const { initialValues, schema, submit } = useSignup();
+  const { initialValues, schema, submit } = useSignup({role});
   const {
     control,
     handleSubmit,

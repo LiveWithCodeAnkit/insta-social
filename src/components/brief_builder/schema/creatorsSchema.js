@@ -1,9 +1,12 @@
 import * as Yup from "yup";
 
 export const creatorsSchema = Yup.object().shape({
-  country: Yup.string().required("Country required"),
+  country: Yup.array()
+    .required("At least one country must be selected")
+    .min(1, "At least one country must be selected"),
   gender: Yup.string()
     .required("Gender required")
+    .notOneOf([" "], "Gender required")
     .oneOf(["MALE", "FEMALE", "OTHERS"], "Invalid gender value"),
   age: Yup.array()
     .required("Age required")

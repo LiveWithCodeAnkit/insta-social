@@ -9,6 +9,7 @@ function FileUpload({
   maxSize,
   errorText,
   onChange,
+  error,
   ...props
 }) {
   const [files, setFiles] = useState([]);
@@ -18,6 +19,11 @@ function FileUpload({
 
   // handles ondrop function of dropzone
   const handleDropChange = (acceptedFiles, setFiles) => {
+    if (acceptedFiles.length > 1) {
+      // If more than one file is uploaded, trigger error
+      onChange(null); // Clear any existing file
+      return;
+    }
     setFiles((prevFiles) => {
       const newFiles = acceptedFiles.map((file) =>
         Object.assign(file, {
@@ -56,9 +62,8 @@ function FileUpload({
     <>
       <Dropzone
         onDrop={(acceptedFiles) => handleDropChange(acceptedFiles, setFiles)}
-        maxFiles={maxFiles}
+        maxFiles={1}
         maxSize={maxSize}
-        onDropRejected={() => alert(errorText)}
       >
         {({ getRootProps, getInputProps }) => (
           <div

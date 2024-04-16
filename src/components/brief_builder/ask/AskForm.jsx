@@ -7,6 +7,8 @@ import { CgArrowLongLeft, CgArrowLongRight } from "react-icons/cg";
 import { useForm, Controller } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { createCampaign } from "../../../../store/brief_builder/campaign/campaign.slice";
+import TiktokForm from "./tiktok/TiktokForm";
+import NopostForm from "./nopost/NopostForm";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -37,46 +39,54 @@ function a11yProps(index) {
 const AskForm = ({ handleTab }) => {
   const dispatch = useDispatch();
   const [value, setValue] = useState(0);
+  const [loading, setLoading] = useState(false);
   const { control, handleSubmit } = useForm();
+
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
   const infoCam = useSelector(
     (state) => state.Campaign.addCampaignDetails?.campaign
   );
-  console.log(infoCam?._id);
+
   const onSubmit = async (values) => {
+    setLoading(true);
     const { feedPost, reel, story } = values;
 
-    let postType;
+    let postTypes = [];
 
     if (reel) {
-      postType = "REEL";
-    } else if (feedPost) {
-      postType = "FEED";
-    } else if (story) {
-      postType = "STORY";
-    } else {
-      postType = "REEL";
+      postTypes.push("REEL");
     }
+    if (feedPost) {
+      postTypes.push("FEED");
+    }
+    if (story) {
+      postTypes.push("STORY");
+    }
+    if (postTypes.length === 0) {
+      postTypes.push("REEL");
+    }
+
     const formData = new FormData();
 
-    console.log("values :-", values);
     const campaignDetails = {
       campaignDetails: {
         campaignId: infoCam?._id,
         details: {
           campaigningPlatform: "Instagram",
-          postType: postType,
+          postType: postTypes,
         },
       },
     };
-    console.log("campaignDetails:-", campaignDetails);
+
     formData.append("data", JSON.stringify(campaignDetails));
     const res = await dispatch(createCampaign(formData));
     if (res.payload?.success) {
       handleTab(4);
     }
+    setLoading(false);
   };
 
   return (
@@ -159,7 +169,7 @@ const AskForm = ({ handleTab }) => {
                   <Controller
                     name="feedPost"
                     control={control}
-                    defaultValue={false}
+                    defaultValue={true}
                     render={({ field }) => (
                       <FormControlLabel
                         control={
@@ -171,6 +181,7 @@ const AskForm = ({ handleTab }) => {
                                 color: "#FFCC33",
                               },
                             }}
+                            defaultChecked
                           />
                         }
                         label="Feed Post"
@@ -255,18 +266,19 @@ const AskForm = ({ handleTab }) => {
                     }}
                     variant="contained"
                     endIcon={<CgArrowLongRight />}
+                    disabled={loading}
                   >
-                    Next
+                    {loading ? "Loading..." : "Next"}
                   </Button>
                 </Box>
               </Box>
             </form>
           </TabPanel>
           <TabPanel value={value} index={1}>
-            TikTok
+            <TiktokForm handleTab={handleTab} />
           </TabPanel>
           <TabPanel value={value} index={2}>
-            No post
+            <NopostForm handleTab={handleTab} />
           </TabPanel>
         </Card>
       </Box>

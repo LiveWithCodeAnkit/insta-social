@@ -26,6 +26,7 @@ import { useForm, Controller } from "react-hook-form";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { useToastMessages } from "@/components/lib/messages/useToastMessages";
 
 const schema = yup.object().shape({
   email: yup
@@ -36,7 +37,9 @@ const schema = yup.object().shape({
 });
 const LoginForm = ({ role }) => {
   const router = useRouter();
+  const { Success, Error } = useToastMessages();
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const TextInput = styled(InputBase)(({ theme }) => ({
     "label + &": {
@@ -72,6 +75,7 @@ const LoginForm = ({ role }) => {
 
   const handleLogin = async (value) => {
     try {
+      setLoading(true);
       const values = {
         email: value.email,
         password: value.password,
@@ -81,20 +85,24 @@ const LoginForm = ({ role }) => {
         ...values,
         redirect: false,
       });
+
       if (signInRes.error) {
+        Error("We are not aware of this user.");
         router.push("/");
       } else {
+        Success("Successfully logged in!");
         if (role === "BRAND") {
           router.push("/brief-builder");
         } else {
-          router.push("/creator/dashboard");
+          router.push("/creator/dashboard/my-campaign");
         }
       }
     } catch (error) {
       console.error("Error during login:", error);
+    } finally {
+      setLoading(false);
     }
   };
-
   return (
     <form onSubmit={handleSubmit(handleLogin)}>
       <Box>
@@ -220,6 +228,7 @@ const LoginForm = ({ role }) => {
           variant="contained"
           type="submit"
           fullWidth
+          disabled={loading}
           sx={{
             "&:hover": { background: "#FFCC33" },
             background: "#FFCC33",
@@ -231,7 +240,7 @@ const LoginForm = ({ role }) => {
             mt: "30px",
           }}
         >
-          Login
+          {loading ? "Loading..." : "Login"}
         </Button>
       </Box>
     </form>

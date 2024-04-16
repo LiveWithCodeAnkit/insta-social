@@ -35,7 +35,7 @@ const MoodBond = ({ campaignCreatorData }) => {
             {moodBondDetails?.contents?.map((image, index) => (
               <Grid item sm={2} key={index}>
                 <Image
-                  src={`/${image}`}
+                  src={`${image}`}
                   alt={`Image ${index}`}
                   width={200}
                   height={200}
@@ -63,19 +63,17 @@ const MoodBond = ({ campaignCreatorData }) => {
                   gap: "1.8rem",
                 }}
               >
-                <Button
+                <Box
+                  as="div"
                   sx={{
-                    width: "330px",
-                    height: "50px",
+                    padding: "1rem",
+                    backgroundColor: "#FFF5D6",
                     borderRadius: "10px",
-                    background: "#FFF5D6",
-                    color: "common.black",
-                    fontSize: "14px",
-                    fontWeight: "600",
+                    cursor: "pointer",
                   }}
                 >
                   {link}
-                </Button>
+                </Box>
               </Grid>
             ))}
             {/* <Grid

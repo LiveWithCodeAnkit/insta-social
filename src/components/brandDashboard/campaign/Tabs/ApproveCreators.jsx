@@ -15,6 +15,7 @@ import StarIcon from "@mui/icons-material/Star";
 import HandleBriefModal from "../modal/HandleBriefModal";
 import {
   campaignApproveReject,
+  contentIsFavoritebyBrand,
   getCampaignRequest,
 } from "../../../../../store/campaign_request/campaignRequest.slice";
 
@@ -65,7 +66,7 @@ const ApproveCreators = () => {
   const rows = approveCreatorsData?.data?.map((item, index) => {
     return createData(
       item._id,
-      item.creatorId.firstName + " " + item.creatorId.lastName,
+      item.creatorId?.firstName + " " + item.creatorId?.lastName,
       item.isFavoriteByBrand,
       item.product,
       item.action,
@@ -122,6 +123,28 @@ const ApproveCreators = () => {
     });
   };
 
+  const isFavoriteHandler = (item, e) => {
+    e.stopPropagation();
+    console.log(item, "item");
+    const newFavoriteStatus = !item.favorites;
+    console.log(item, "item");
+    dispatch(
+      contentIsFavoritebyBrand({
+        campaignRequestId: item.id,
+        isFavorite: newFavoriteStatus,
+      })
+    ).then(() => {
+      dispatch(
+        getCampaignRequest({
+          campaignId: params.campaignId,
+          requestStatus: ["Request_Approved"],
+          page: page + 1,
+          pageSize: rowsPerPage,
+        })
+      );
+    });
+  };
+
   const headCells = [
     {
       id: "handle",
@@ -140,10 +163,10 @@ const ApproveCreators = () => {
             variant="outlined"
             type="button"
             startIcon={<StarIcon />}
-            // onClick={() => console.log(item)}
+            onClick={(e) => isFavoriteHandler(item, e)}
             sx={{
               border: item.favorites ? "none" : "1px solid #212121",
-              color: item.favorites ? "#fff" : "#212121",
+              color: item.favorites === true ? "#fff" : "#212121",
               backgroundColor: item.favorites ? "#FFCC33" : "#fff",
               // height: "35px",
               width: "118px",
@@ -271,17 +294,20 @@ const ApproveCreators = () => {
       </Box>
 
       {rows && (
-        <CommonTable
-          rows={rows}
-          headCells={headCells}
-          onclickHandler={onRowClickHandler}
-          page={page}
-          rowsPerPage={rowsPerPage}
-          onChangePage={handleChangePage}
-          onChangeRowsPerPage={handleChangeRowsPerPage}
-          pagination={approveCreatorsData.pagination}
-          onChangePagePagination={handleChangePageForPagination}
-        />
+        <Box sx={{ "& .MuiTableContainer-root": { borderRadius: "10px" } }}>
+          <CommonTable
+            rows={rows}
+            headCells={headCells}
+            onclickHandler={onRowClickHandler}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            onChangePage={handleChangePage}
+            onChangeRowsPerPage={handleChangeRowsPerPage}
+            pagination={approveCreatorsData.pagination}
+            onChangePagePagination={handleChangePageForPagination}
+            isCheckbox={true}
+          />
+        </Box>
       )}
 
       <HandleBriefModal

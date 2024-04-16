@@ -31,7 +31,7 @@ export const FORM_DATA_POST = async (url, payload) => {
     });
     return res.data;
   } catch (error) {
-    throw error;
+    return error.data;
   }
 };
 

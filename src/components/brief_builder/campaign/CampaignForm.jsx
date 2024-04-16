@@ -2,8 +2,7 @@
 import React, { useState } from "react";
 import Standard from "./standard/Standard";
 import { Box, Tab, Tabs, Typography, Card } from "@mui/material";
-import Button from "@mui/material/Button";
-import { CgArrowLongLeft, CgArrowLongRight } from "react-icons/cg";
+import CreatorsCard from "./creators/CreatorsCard";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -37,7 +36,7 @@ const CampaignForm = ({ handleTab }) => {
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
-
+  const [infoTittle, setinfoTittle] = useState("Pro");
   return (
     <>
       <Box
@@ -90,63 +89,20 @@ const CampaignForm = ({ handleTab }) => {
                 },
               }}
             >
-              <Tab label="Standard" {...a11yProps(0)} />
-              <Tab label="Pro" {...a11yProps(1)} />
+              <Tab label="Type" {...a11yProps(0)} />
+              <Tab label="Creators" {...a11yProps(1)} />
             </Tabs>
           </Box>
 
           <TabPanel value={value} index={0}>
-            <Standard />
+            <Standard
+              handleChange={handleChange}
+              setinfoTittle={setinfoTittle}
+            />
           </TabPanel>
           <TabPanel value={value} index={1}>
-            Pro
+            <CreatorsCard handleTab={handleTab} infoTittle={infoTittle} />
           </TabPanel>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "end",
-              gap: "0.5rem",
-              width: "100%",
-            }}
-          >
-            <Button
-              variant="outlined"
-              startIcon={<CgArrowLongLeft />}
-              sx={{
-                height: "50px",
-                width: "147px",
-                color: "#212121",
-                borderRadius: "50px",
-                fontWeight: 600,
-                textTransform: "none",
-                borderColor: "black",
-              }}
-            >
-              Previous
-            </Button>
-            <Button
-              onClick={() => {
-                handleTab(2);
-              }}
-              sx={{
-                background: "#FFCC33",
-                color: "#212121",
-                height: "50px",
-                width: "117px",
-                borderRadius: "50px",
-                fontWeight: 600,
-                textTransform: "none",
-
-                "&:hover": {
-                  background: "#FFCC33",
-                },
-              }}
-              variant="contained"
-              endIcon={<CgArrowLongRight />}
-            >
-              Next
-            </Button>
-          </Box>
         </Card>
       </Box>
     </>

@@ -77,8 +77,8 @@ const JoinCampaign = ({ campaignCreatorData, campaignRequestId }) => {
               <span style={{ fontWeight: "700" }}>
                 {campaignDetails?.campaigningPlatform}
               </span>{" "}
-              between <span style={{ fontWeight: "700" }}> {maxDate}</span> and{" "}
-              <span style={{ fontWeight: "700" }}> {minDate}</span> featuring
+              between <span style={{ fontWeight: "700" }}> {minDate}</span> and{" "}
+              <span style={{ fontWeight: "700" }}> {maxDate}</span> featuring
               the brand consistent with the campaign brif above.
             </Typography>
           </>
@@ -104,11 +104,12 @@ const JoinCampaign = ({ campaignCreatorData, campaignRequestId }) => {
             sx={{
               "&:hover": {
                 border: "1px solid #212121",
-                color: "#212121",
+                backgroundColor: "secondary.main",
+                color: "#FFFFFF",
               },
-              border: "1px solid #212121",
-              color: "#FFFFFF",
-              backgroundColor: "secondary.main",
+              // border: "1px solid #212121",
+              color: "#212121",
+              // backgroundColor: "secondary.main",
               height: "50px",
               width: "160px",
               borderRadius: "50px",

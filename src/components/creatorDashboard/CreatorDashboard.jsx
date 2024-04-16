@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Box, Tab, Tabs, Typography } from "@mui/material";
 import GetHelp from "./Tabs/GetHelp";
 import TodoTable from "./Tabs/TodoTable";
-import DeadlineTable from "./Tabs/DeadlineTable";
+import DeadlineTable from "./campaign/Tabs/DeadlineTable";
 import ContentSubmitted from "./Tabs/ContentSubmitted";
 import { useDispatch, useSelector } from "react-redux";
 import { optionCampaignRequestByCreator } from "../../../store/campaign_request/campaignRequest.slice";
@@ -60,7 +60,7 @@ const CreatorDashboard = () => {
 
   const handleChange2 = (event, newValue) => {
     setValue2(newValue);
-    setValue(6);
+    setValue(5);
   };
 
   return (
@@ -108,27 +108,27 @@ const CreatorDashboard = () => {
               label={<Typography variant="subtitle1">To-Do</Typography>}
               {...a11yProps(0)}
             />
-            <Tab
+            {/* <Tab
               label={<Typography variant="subtitle1">Past Deadline</Typography>}
               {...a11yProps(1)}
-            />
+            /> */}
             <Tab
               label={
                 <Typography variant="subtitle1">Content Submitted</Typography>
               }
-              {...a11yProps(2)}
+              {...a11yProps(1)}
             />
             <Tab
               label={<Typography variant="subtitle1">Issue</Typography>}
-              {...a11yProps(3)}
+              {...a11yProps(2)}
             />
             <Tab
               label={<Typography variant="subtitle1">Complete</Typography>}
-              {...a11yProps(4)}
+              {...a11yProps(3)}
             />
             <Tab
               label={<Typography variant="subtitle1">All</Typography>}
-              {...a11yProps(5)}
+              {...a11yProps(4)}
             />
           </Tabs>
           <Tabs
@@ -166,22 +166,22 @@ const CreatorDashboard = () => {
       <TabPanel value={value} index={0} sx={{ display: "block" }}>
         <TodoTable />
       </TabPanel>
-      <TabPanel value={value} index={1}>
+      {/* <TabPanel value={value} index={1}>
         <DeadlineTable />
-      </TabPanel>
-      <TabPanel value={value} index={2}>
+      </TabPanel> */}
+      <TabPanel value={value} index={1}>
         <ContentSubmitted />
       </TabPanel>
-      <TabPanel value={value} index={3}>
+      <TabPanel value={value} index={2}>
         <Issue />
       </TabPanel>
-      <TabPanel value={value} index={4}>
+      <TabPanel value={value} index={3}>
         <Complete />
       </TabPanel>
-      <TabPanel value={value} index={5}>
+      <TabPanel value={value} index={4}>
         <All />
       </TabPanel>
-      <TabPanel value={value} index={6}>
+      <TabPanel value={value} index={5}>
         <GetHelp />
       </TabPanel>
     </Box>

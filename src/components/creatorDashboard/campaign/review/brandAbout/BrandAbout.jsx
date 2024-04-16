@@ -10,20 +10,8 @@ const BrandAbout = ({ campaignCreatorData }) => {
   const brandDetails = campaignCreatorData?.brandDetails || "";
   const campaignDetails = campaignCreatorData?.campaignDetails || "";
 
-  console.log(brandDetails, "brandDetails into brandAbout");
-  console.log(campaignDetails, "campaignDetails into brandAbout");
-  const { info } = brandDetails;
-  const extractContentBetweenTags = (htmlString, tagName) => {
-    const regex = new RegExp(`<${tagName}>(.*?)<\/${tagName}>`, "g");
-    const matches = htmlString?.match(regex);
-    return matches
-      ? matches.map((match) =>
-          match.replace(`<${tagName}>`, "").replace(`</${tagName}>`, "")
-        )
-      : [];
-  };
-
-  const MessageParagraphs = extractContentBetweenTags(info, "p");
+  // console.log(brandDetails, "brandDetails into brandAbout");
+  // console.log(campaignDetails, "campaignDetails into brandAbout");
 
   return (
     <>
@@ -63,7 +51,10 @@ const BrandAbout = ({ campaignCreatorData }) => {
                 <Typography variant="h3">Post</Typography>
                 <Box>
                   <p style={{ color: "#777777" }}>
-                    {campaignDetails?.postType?.[0]}
+                    {campaignDetails?.postType &&
+                      campaignDetails?.postType?.map((post) => {
+                        return `${post},`;
+                      })}
                   </p>
                 </Box>
               </Box>
@@ -90,7 +81,7 @@ const BrandAbout = ({ campaignCreatorData }) => {
             >
               <Typography variant="h2">{brandDetails.name}</Typography>
               <Box>
-                <p
+                {/* <p
                   style={{
                     color: "#777777",
                     fontSize: "1rem",
@@ -98,7 +89,14 @@ const BrandAbout = ({ campaignCreatorData }) => {
                   }}
                 >
                   {MessageParagraphs}
-                </p>
+                </p> */}
+                <div className="parent">
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: brandDetails?.info,
+                    }}
+                  ></div>
+                </div>
               </Box>
 
               <Box

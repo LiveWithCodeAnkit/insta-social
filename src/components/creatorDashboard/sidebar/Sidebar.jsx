@@ -33,8 +33,7 @@ const MainStyle = styled("div")(({ theme }) => ({
 const handleLogout = async () => {
   try {
     await signOut({ callbackUrl: "/" });
-    localStorage.removeItem("sessionId");
-    localStorage.removeItem("accessToken");
+    localStorage.removeItem("adminToken");
     router.push("/");
   } catch (error) {
     console.error("Error during logout:", error);

@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import CustomTextField from "@/components/common/text-field";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm, Controller } from "react-hook-form";
@@ -16,10 +16,17 @@ import { useSettingForm } from "../hook";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DemoItem } from "@mui/x-date-pickers/internals/demo";
+import { getCreatorProfileByCreator } from "../../../../store/campaign_request/campaignRequest.slice";
+import { useDispatch, useSelector } from "react-redux";
+import makeAnimated from "react-select/animated";
+import Select from "react-select";
+import countryList from "../../../assets/Contries.json";
+import dayjs from "dayjs";
 
 const SettingsForm = () => {
-  const { initialValues, schema, submit } = useSettingForm({});
-  //  loading
+  const { initialValues, loading, schema, submit } = useSettingForm({});
+  const dispatch = useDispatch();
+  const animatedComponents = makeAnimated();
   const {
     reset,
     control,
@@ -31,9 +38,56 @@ const SettingsForm = () => {
     resolver: yupResolver(schema),
   });
 
-  const handleCancel = () => {
-    reset(initialValues);
-  };
+  // const handleCancel = () => {
+  //   const { email, ...fieldsToReset } = initialValues;
+  //   reset({ ...fieldsToReset, email: getCreatorData?.email || "" });
+  // };
+
+  useEffect(() => {
+    dispatch(getCreatorProfileByCreator());
+  }, []);
+
+  const getCreatorData = useSelector(
+    (state) =>
+      state.CampaignRequest?.getCreatorProfileByCreator
+        ?.getCreatorProfileByCreatorData
+  );
+
+  // console.log("getCreatorData", getCreatorData);
+
+  const getDatebyCreator = getCreatorData
+    ? new Date(getCreatorData?.dob)?.toLocaleDateString().substring(0, 10)
+    : null;
+
+  useEffect(() => {
+    if (getCreatorData) {
+      reset({
+        firstName: getCreatorData?.firstName || "",
+        lastName: getCreatorData?.lastName || "",
+        gender: getCreatorData?.gender || " ",
+        language: getCreatorData?.language?.join(", ") || " ",
+        instagramUserName:
+          getCreatorData?.socialMediaLinks?.find(
+            (link) => link?.platForm === "Instagram"
+          )?.userName || "",
+        tiktokUserName:
+          getCreatorData?.socialMediaLinks?.find(
+            (link) => link?.platForm === "Tiktok"
+          )?.userName || "",
+        dob: new Date(getCreatorData?.dob) || null,
+        email: getCreatorData?.email || "",
+        phone: getCreatorData?.phone || "",
+        address1: getCreatorData?.address1 || "",
+        address2: getCreatorData?.address2 || "",
+        cityName: getCreatorData?.city || "",
+        stateName: getCreatorData?.state || "",
+        postalCode: getCreatorData?.postalCode || "",
+        countryName:
+          { value: getCreatorData.country, label: getCreatorData.country } ||
+          " ",
+      });
+    }
+  }, [getCreatorData]);
 
   return (
     <form onSubmit={handleSubmit(submit)}>
@@ -67,6 +121,7 @@ const SettingsForm = () => {
               <Controller
                 name="firstName"
                 control={control}
+                defaultValue={initialValues.firstName}
                 rules={{ required: true }}
                 render={({ field: { value, onChange } }) => (
                   <CustomTextField
@@ -87,6 +142,7 @@ const SettingsForm = () => {
               <Controller
                 name="lastName"
                 control={control}
+                defaultValue={initialValues.lastName}
                 rules={{ required: true }}
                 render={({ field: { value, onChange } }) => (
                   <CustomTextField
@@ -107,13 +163,14 @@ const SettingsForm = () => {
               <Controller
                 name="gender"
                 control={control}
+                defaultValue={initialValues.gender}
                 rules={{ required: true }}
                 render={({ field: { value, onChange } }) => (
                   <CustomTextField
                     select
                     fullWidth
                     value={value}
-                    defaultValue="Male"
+                    defaultValue=""
                     label="Gender"
                     onChange={onChange}
                     error={Boolean(errors.gender)}
@@ -121,6 +178,7 @@ const SettingsForm = () => {
                       helperText: errors.gender.message,
                     })}
                   >
+                    <MenuItem value=" ">Select Gender</MenuItem>
                     <MenuItem value="MALE">Male</MenuItem>
                     <MenuItem value="FEMALE">Female</MenuItem>
                     <MenuItem value="OTHER">Others</MenuItem>
@@ -140,13 +198,14 @@ const SettingsForm = () => {
               <Controller
                 name="language"
                 control={control}
+                defaultValue={initialValues.language}
                 rules={{ required: true }}
                 render={({ field: { value, onChange } }) => (
                   <CustomTextField
                     select
                     fullWidth
                     value={value}
-                    defaultValue="English"
+                    defaultValue=""
                     label="Select language"
                     onChange={onChange}
                     error={Boolean(errors.language)}
@@ -154,9 +213,10 @@ const SettingsForm = () => {
                       helperText: errors.language.message,
                     })}
                   >
-                    <MenuItem value="ENGLISH">English</MenuItem>
-                    <MenuItem value="HINDI">Hindi</MenuItem>
-                    <MenuItem value="OTHER">Others</MenuItem>
+                    <MenuItem value=" ">Select language</MenuItem>
+                    <MenuItem value="English">English</MenuItem>
+                    <MenuItem value="Hindi">Hindi</MenuItem>
+                    <MenuItem value="Other">Others</MenuItem>
                   </CustomTextField>
                 )}
               />
@@ -165,6 +225,7 @@ const SettingsForm = () => {
               <Controller
                 name="instagramUserName"
                 control={control}
+                defaultValue={initialValues.instagramUserName}
                 rules={{ required: true }}
                 render={({ field: { value, onChange } }) => (
                   <CustomTextField
@@ -185,6 +246,7 @@ const SettingsForm = () => {
               <Controller
                 name="tiktokUserName"
                 control={control}
+                defaultValue={initialValues.tiktokUserName}
                 rules={{ required: true }}
                 render={({ field: { value, onChange } }) => (
                   <CustomTextField
@@ -240,7 +302,7 @@ const SettingsForm = () => {
                     defaultValue={initialValues.dob}
                     render={({ field: { value, onChange } }) => (
                       <DatePicker
-                        value={value}
+                        value={dayjs(value)}
                         onChange={onChange}
                         placeholder="dob"
                         sx={{
@@ -268,12 +330,14 @@ const SettingsForm = () => {
               <Controller
                 name="email"
                 control={control}
+                defaultValue={initialValues.email}
                 rules={{ required: true }}
                 render={({ field: { value, onChange } }) => (
                   <CustomTextField
                     fullWidth
                     value={value}
                     label="Email"
+                    disabled
                     onChange={onChange}
                     placeholder="Jackie.Fuentes@gmail.com"
                     error={Boolean(errors.email)}
@@ -288,6 +352,7 @@ const SettingsForm = () => {
               <Controller
                 name="phone"
                 control={control}
+                defaultValue={initialValues.phone}
                 rules={{ required: true }}
                 render={({ field: { value, onChange } }) => (
                   <CustomTextField
@@ -327,6 +392,7 @@ const SettingsForm = () => {
               <Controller
                 name="address1"
                 control={control}
+                defaultValue={initialValues.address1}
                 rules={{ required: true }}
                 render={({ field: { value, onChange } }) => (
                   <TextField
@@ -359,6 +425,7 @@ const SettingsForm = () => {
               <Controller
                 name="address2"
                 control={control}
+                defaultValue={initialValues.address2}
                 rules={{ required: true }}
                 render={({ field: { value, onChange } }) => (
                   <TextField
@@ -388,6 +455,7 @@ const SettingsForm = () => {
               <Controller
                 name="cityName"
                 control={control}
+                defaultValue={initialValues.cityName}
                 rules={{ required: true }}
                 render={({ field: { value, onChange } }) => (
                   <CustomTextField
@@ -408,6 +476,7 @@ const SettingsForm = () => {
               <Controller
                 name="stateName"
                 control={control}
+                defaultValue={initialValues.stateName}
                 rules={{ required: true }}
                 render={({ field: { value, onChange } }) => (
                   <CustomTextField
@@ -428,6 +497,7 @@ const SettingsForm = () => {
               <Controller
                 name="postalCode"
                 control={control}
+                defaultValue={initialValues.postalCode}
                 rules={{ required: true }}
                 render={({ field: { value, onChange } }) => (
                   <CustomTextField
@@ -445,24 +515,104 @@ const SettingsForm = () => {
               />
             </Grid>
             <Grid item xs={3}>
-              <Controller
+              {/* <Controller
                 name="countryName"
                 control={control}
+                defaultValue={initialValues.countryName}
                 rules={{ required: true }}
                 render={({ field: { value, onChange } }) => (
                   <CustomTextField
+                    select
                     fullWidth
                     value={value}
                     label="Country"
                     onChange={onChange}
-                    placeholder="USA"
                     error={Boolean(errors.countryName)}
                     {...(errors.countryName && {
                       helperText: errors.countryName.message,
                     })}
-                  />
+                  >
+                    <MenuItem value=" ">Select Country</MenuItem>
+                    <MenuItem value="USA">USA</MenuItem>
+                    <MenuItem value="INDIA">India</MenuItem>
+                    <MenuItem value="ITLY">Itly</MenuItem>
+                  </CustomTextField>
                 )}
-              />
+              /> */}
+              <Box
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.2rem",
+                }}
+              >
+                <Typography
+                  variant="label"
+                  sx={{ fontSize: "14px", fontWeight: "600" }}
+                >
+                  Country
+                </Typography>
+                <Controller
+                  name="countryName"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      isMulti={false}
+                      closeMenuOnSelect={true}
+                      value={field.value}
+                      components={animatedComponents}
+                      options={countryList.map((item) => ({
+                        value: item.name,
+                        label: item.name,
+                      }))}
+                      onChange={(value) => field.onChange(value)}
+                      placeholder="Select Country"
+                      classNamePrefix="select"
+                      theme={(theme) => ({
+                        ...theme,
+                        colors: {
+                          ...theme.colors,
+                          primary25: "#FFCC33",
+                          primary: "#FFCC33",
+                        },
+                      })}
+                      styles={{
+                        control: (baseStyles, state) => ({
+                          ...baseStyles,
+                          borderColor: state.isFocused ? "#FFCC33" : "#D9D9D9",
+                        }),
+                        indicatorSeparator: (base) => ({
+                          ...base,
+                          backgroundColor: "#FFCC33",
+                        }),
+                        dropdownIndicator: (base, state) => ({
+                          ...base,
+                          color: "#FFCC33",
+                        }),
+                        multiValueRemove: (base, state) => ({
+                          ...base,
+                          color: "#FFCC33",
+                          "&:hover": {
+                            backgroundColor: "#FFCC33",
+                            color: "white",
+                          },
+                        }),
+                      }}
+                    />
+                  )}
+                />
+                {errors.countryName && (
+                  <Typography
+                    variant="caption"
+                    color="error"
+                    sx={{ marginTop: "0.3rem", fontSize: "0.875rem" }}
+                  >
+                    {errors.countryName.message}
+                  </Typography>
+                )}
+              </Box>
             </Grid>
           </Grid>
 
@@ -481,10 +631,11 @@ const SettingsForm = () => {
                 textTransform: "none",
                 boxShadow: "0px 4px 20px 0px #FFD24B80",
               }}
+              disabled={loading}
             >
-              Save
+              {loading ? "Saving..." : "Save"}
             </Button>
-            <Button
+            {/* <Button
               variant="outlined"
               type="button"
               onClick={handleCancel}
@@ -499,7 +650,7 @@ const SettingsForm = () => {
               }}
             >
               Cancel
-            </Button>
+            </Button> */}
           </Box>
         </Box>
       </Box>

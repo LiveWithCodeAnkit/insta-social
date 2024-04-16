@@ -109,7 +109,7 @@ const Variant = ({ index, control, errors }) => {
                     fullWidth
                     value={value}
                     onChange={onChange}
-                    placeholder="Variant Value"
+                    placeholder="Variant Description"
                     error={Boolean(
                       errors?.gifts?.[index]?.variants?.[variantIndex]
                         ?.variantDes

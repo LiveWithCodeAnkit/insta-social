@@ -142,9 +142,9 @@ const Issue = () => {
           sx={{
             width: "100%",
             mb: 2,
-            borderRadius: "30px",
             boxShadow: "0px 0px 30px 0px #0000000D",
             padding: "30px 30px 00px 30px",
+            "& .MuiTableContainer-root": { borderRadius: "10px" },
           }}
         >
           {/* <Stack

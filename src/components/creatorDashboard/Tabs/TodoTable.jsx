@@ -6,9 +6,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { getCampaignRequestByCreator } from "../../../../store/campaign_request/campaignRequest.slice";
 import { useRouter } from "next/navigation";
 import TodoIssueModalForm from "./modal/TodoIssueModalForm";
+import IssueModalForm from "./modal/IssueModalForm";
 
 const TodoTable = ({ activeTab }) => {
-  const [open, setOpen] = useState({ showModal: false, id: "", alldata: "" });
+  const [open, setOpen] = useState({ showModal: false, alldata: "" });
   const [issueOpen, setIssueOpen] = useState({
     showIssueModal: false,
     id: "",
@@ -19,6 +20,11 @@ const TodoTable = ({ activeTab }) => {
   const dispatch = useDispatch();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [issueLinkOpen, setIssueLinkOpen] = useState({
+    showIssueModal: false,
+    id: "",
+    allData: "",
+  });
   // const [filterStatus, setFilterStatus] = useState("To-Do");
 
   const router = useRouter();
@@ -32,6 +38,16 @@ const TodoTable = ({ activeTab }) => {
 
   // console.log("campaignByCreator", campaignByCreator);
 
+  const updatingFunction = () => {
+    dispatch(
+      getCampaignRequestByCreator({
+        page: page + 1,
+        pageSize: rowsPerPage,
+        requestStatus: ["Awaiting_Shipment", "Awaiting_Content"],
+      })
+    );
+  };
+
   useEffect(() => {
     dispatch(
       getCampaignRequestByCreator({
@@ -40,7 +56,7 @@ const TodoTable = ({ activeTab }) => {
         requestStatus: ["Awaiting_Shipment", "Awaiting_Content"],
       })
     );
-  }, [page, rowsPerPage]);
+  }, [page, rowsPerPage, dispatch]);
 
   const imageSmallUrls = [
     "/images/dummy/small_pic_1.png",
@@ -84,7 +100,7 @@ const TodoTable = ({ activeTab }) => {
       new Date(
         item?.campaignId?.campaignDetails?.readyToReviewDate
       ).toLocaleDateString(),
-      item?.campaignId?._id,
+      item?.campaignId,
       item?.requestStatus
     );
   });
@@ -143,32 +159,38 @@ const TodoTable = ({ activeTab }) => {
       label: "Report Issue",
       renderCell: (item, index) => {
         return (
-          <Button
-            variant="outlined"
-            type="button"
-            sx={{
-              border: "none",
-              color: "#00B2F7",
-              // height: "35px",
-              // width: "118px",
-              borderRadius: "50px",
-              fontWeight: 500,
-              textTransform: "none",
-              "&:hover": {
-                borderColor: "info.main",
-                backgroundColor: "info.lighter",
-              },
-            }}
-            onClick={(e) =>
-              setIssueOpen({
-                showIssueModal: true,
-                id: item?.id,
-                allData: item,
-              })
-            }
-          >
-            Report issue
-          </Button>
+          <>
+            {item?.status === "Awaiting_Content" ? (
+              <Button
+                variant="outlined"
+                type="button"
+                sx={{
+                  border: "none",
+                  color: "#00B2F7",
+                  // height: "35px",
+                  // width: "118px",
+                  borderRadius: "50px",
+                  fontWeight: 500,
+                  textTransform: "none",
+                  "&:hover": {
+                    borderColor: "info.main",
+                    backgroundColor: "info.lighter",
+                  },
+                }}
+                onClick={(e) =>
+                  setIssueOpen({
+                    showIssueModal: true,
+                    id: item?.id,
+                    allData: item,
+                  })
+                }
+              >
+                Report issue
+              </Button>
+            ) : (
+              "-"
+            )}
+          </>
         );
       },
     },
@@ -178,30 +200,76 @@ const TodoTable = ({ activeTab }) => {
       disablePadding: false,
       label: "Action",
       renderCell: (item, index) => {
-        const isAwaitingContent = item.status === "Awaiting_Content";
         return (
-          <Button
-            variant="contained"
-            type="button"
-            sx={{
-              //   border: "1px solid #212121",
-              "&:hover": { background: "#FFCC33" },
-              background: "#FFCC33",
-              boxShadow: "none",
-              color: "#212121",
-              // height: "35px",
-              // width: "118px",
-              borderRadius: "50px",
-              fontWeight: 500,
-              textTransform: "none",
-            }}
-            disabled={isAwaitingContent}
-            onClick={(e) =>
-              setOpen({ showModal: true, id: item.id, alldata: item })
-            }
-          >
-            Upload Content
-          </Button>
+          <>
+            {item?.campaignDetails?.campaignDetails?.permissionRequired ===
+              true && item.status === "Awaiting_Content" ? (
+              <Button
+                variant="contained"
+                type="button"
+                sx={{
+                  //   border: "1px solid #212121",
+                  "&:hover": { background: "#FFCC33" },
+                  background: "#FFCC33",
+                  boxShadow: "none",
+                  color: "#212121",
+                  // height: "35px",
+                  // width: "118px",
+                  borderRadius: "50px",
+                  fontWeight: 500,
+                  textTransform: "none",
+                }}
+                onClick={(e) => setOpen({ showModal: true, alldata: item })}
+              >
+                Upload Content
+              </Button>
+            ) : (
+              "-"
+            )}
+          </>
+        );
+      },
+    },
+    {
+      id: "postContent",
+      numeric: true,
+      disablePadding: false,
+      label: "Post Content",
+      renderCell: (item, index) => {
+        return (
+          <>
+            {item?.campaignDetails?.campaignDetails?.permissionRequired ===
+              false && item.status === "Awaiting_Content" ? (
+              <Button
+                variant="outlined"
+                type="button"
+                sx={{
+                  border: "none",
+                  color: "#00B2F7",
+                  // height: "35px",
+                  // width: "118px",
+                  borderRadius: "50px",
+                  fontWeight: 500,
+                  textTransform: "none",
+                  "&:hover": {
+                    borderColor: "info.main",
+                    backgroundColor: "info.lighter",
+                  },
+                }}
+                onClick={(e) =>
+                  setIssueLinkOpen({
+                    showIssueModal: true,
+                    id: item?.id,
+                    allData: item,
+                  })
+                }
+              >
+                Update Link
+              </Button>
+            ) : (
+              "-"
+            )}
+          </>
         );
       },
     },
@@ -252,8 +320,8 @@ const TodoTable = ({ activeTab }) => {
 
   const handleViewClick = (event, item) => {
     event.stopPropagation();
-    // console.log("clicked", item.campaignId);
-    router.push(`/creator/dashboard/campaign/${item.campaignDetails}`);
+    console.log("clicked", item);
+    router.push(`/creator/dashboard/my-campaign/${item?.campaignDetails?._id}`);
   };
 
   return (
@@ -263,12 +331,11 @@ const TodoTable = ({ activeTab }) => {
           sx={{
             width: "100%",
             mb: 2,
-            borderRadius: "30px",
             boxShadow: "0px 0px 30px 0px #0000000D",
             padding: "30px 30px 00px 30px",
+            "& .MuiTableContainer-root": { borderRadius: "10px" },
           }}
         >
-          {/* <CommonTable rows={rows} headCells={headCells} /> */}
           {rows && (
             <CommonTable
               rows={rows || []}
@@ -286,13 +353,22 @@ const TodoTable = ({ activeTab }) => {
       <UploadContentModal
         open={open.showModal}
         allData={open.alldata}
-        handleClose={() => setOpen({ showModal: false, id: "" })}
+        handleClose={() => setOpen({ showModal: false, alldata: "" })}
         imageSmallUrls={imageSmallUrls}
+        updatingFunction={updatingFunction}
       />
       <TodoIssueModalForm
         open={issueOpen.showIssueModal}
         allData={issueOpen.allData}
         handleClose={() => setIssueOpen({ showIssueModal: false, id: "" })}
+        updatingFunction={updatingFunction}
+      />
+      <IssueModalForm
+        open={issueLinkOpen.showIssueModal}
+        allData={issueLinkOpen.allData}
+        handleClose={() => setIssueLinkOpen({ showIssueModal: false, id: "" })}
+        imageSmallUrls={imageSmallUrls}
+        updatingFunction={updatingFunction}
       />
     </>
   );

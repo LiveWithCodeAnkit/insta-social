@@ -62,8 +62,9 @@ function NavItem({ item, active }) {
     "&:hover": {
       bgcolor: "action.selected",
     },
-    height: 50,
+    // height: 50,
     py: "10px",
+    px: "20px",
     textTransform: "capitalize",
   };
 
@@ -73,58 +74,59 @@ function NavItem({ item, active }) {
   };
 
   return (
-    <Box
-      sx={{
-        height: 50,
-        py: "10px",
-        textTransform: "capitalize",
-        // color: "text.primary",
-        cursor: "pointer",
-        borderRadius: 50,
-        ...(isActiveRoot && activeRootStyle),
-        "&:hover": {
-          bgcolor: !isActiveRoot && "action.hover",
-        },
+    <Link
+      // component={RouterLink}
+      href={path}
+      style={{
+        textDecoration: "none",
+        // ...(isActiveRoot && activeRootStyle),
+        // ...(isActiveRoot),
+        // color: 'text.primary',
+        // fontWeight: 'fontWeightMedium',
+        // bgcolor: "action.active",
+        // '&:hover': {
+        //   bgcolor: 'action.selected',
+        // },
+        // height: 50,
+        // py: '10px',
+        // textTransform: 'capitalize',
       }}
-    // onClick={handleLink}
     >
-      <Link
-        // component={RouterLink}
-        href={path}
-        style={{
-          textDecoration: "none",
-          ...(isActiveRoot && activeRootStyle),
-          // ...(isActiveRoot),
-          // color: 'text.primary',
-          // fontWeight: 'fontWeightMedium',
-          // bgcolor: "action.active",
-          // '&:hover': {
-          //   bgcolor: 'action.selected',
-          // },
+      <Box
+        sx={{
           // height: 50,
-          // py: '10px',
-          // textTransform: 'capitalize',
+          py: "10px",
+          px: "20px",
+          textTransform: "capitalize",
+          // color: "text.primary",
+          cursor: "pointer",
+          borderRadius: 50,
+          ...(isActiveRoot && activeRootStyle),
+          "&:hover": {
+            bgcolor: !isActiveRoot && "action.hover",
+          },
         }}
-      >
+        // onClick={handleLink}
+        >
         {/* <ListItemIconStyle>{icon && icon}</ListItemIconStyle> */}
         <ListItemText
           disableTypography
           primary={title}
           sx={{
-            px: "20px",
+            // px: "20px",
             color: "text.primary",
             fontWeight: "fontWeightMedium",
           }}
         />
-      </Link>
-    </Box>
+      </Box>
+    </Link>
   );
 }
 
 export default function NavSection({ navConfig, ...other }) {
   const pathname = usePathname();
 
-  const match = (path) => (path ? pathname === path : false);
+  const match = (path) => (path ? pathname.includes(path) : false);
 
   return (
     <Box {...other}>

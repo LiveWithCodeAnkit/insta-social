@@ -4,33 +4,9 @@ import Grid from "@mui/material/Grid";
 
 const DoPage = ({ campaignDetails }) => {
   if (!campaignDetails) {
-    return <div>No details available</div>;
+    return;
   }
   const { doThings, doNotThings } = campaignDetails;
-
-  //do things
-
-  const ulContentMatchdoThings = doThings.match(/<ul>(.*?)<\/ul>/s);
-  const uldoThingsContent = ulContentMatchdoThings
-    ? ulContentMatchdoThings[1]
-    : "";
-
-  const listItemsOfdoThings = uldoThingsContent
-    ? uldoThingsContent.match(/<li>(.*?)<\/li>/gs)
-    : [];
-
-  //
-
-  //do not thing
-  const ulContentMatchdoNotThings = doNotThings.match(/<ul>(.*?)<\/ul>/s);
-  const uldoNotThingsContent = ulContentMatchdoNotThings
-    ? ulContentMatchdoNotThings[1]
-    : "";
-
-  const listItemsOfdoNotThings = uldoNotThingsContent
-    ? uldoNotThingsContent.match(/<li>(.*?)<\/li>/gs)
-    : [];
-  ///
 
   return (
     <>
@@ -53,23 +29,13 @@ const DoPage = ({ campaignDetails }) => {
               sx={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}
             >
               <Typography variant="h2">Do</Typography>
-
-              {listItemsOfdoThings && listItemsOfdoThings.length > 0 && (
-                <ul
-                  style={{
-                    padding: "1.5rem",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "1.8rem",
+              <div className="parent">
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: doThings,
                   }}
-                >
-                  {listItemsOfdoThings.map((item, index) => (
-                    <li key={`list-item-${index}`} style={{ color: "#777777" }}>
-                      {item.replace(/<\/?li>/g, "")}
-                    </li>
-                  ))}
-                </ul>
-              )}
+                ></div>
+              </div>
             </Box>
           </Box>
         </Grid>
@@ -89,22 +55,13 @@ const DoPage = ({ campaignDetails }) => {
             >
               <Typography variant="h2">Don’t</Typography>
 
-              {listItemsOfdoNotThings && listItemsOfdoNotThings.length > 0 && (
-                <ul
-                  style={{
-                    padding: "1.5rem",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "1.8rem",
+              <div className="parent">
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: doNotThings,
                   }}
-                >
-                  {listItemsOfdoNotThings.map((item, index) => (
-                    <li key={`list-item-${index}`} style={{ color: "#777777" }}>
-                      {item.replace(/<\/?li>/g, "")}
-                    </li>
-                  ))}
-                </ul>
-              )}
+                ></div>
+              </div>
             </Box>
           </Box>
         </Grid>

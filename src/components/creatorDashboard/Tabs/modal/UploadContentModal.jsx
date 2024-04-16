@@ -1,5 +1,5 @@
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Carousel from "react-grid-carousel";
 import {
   Avatar,
@@ -97,14 +97,24 @@ const buttonStyle = {
   height: "20px",
 };
 
-const UploadContentModal = ({ open, allData, handleClose, imageSmallUrls }) => {
+const UploadContentModal = ({
+  open,
+  allData,
+  handleClose,
+  imageSmallUrls,
+  updatingFunction,
+}) => {
   const [bigImageIdx, setBigImageIdx] = useState(0);
   const [openBigImage, setOpenBigImage] = useState(false);
-  const handleOpenBigImage = () => setOpenBigImage(true);
+  const handleOpenBigImage = (index) => {
+    setBigImageIdx(index);
+    setOpenBigImage(true);
+  };
   const handleCloseBigImage = () => setOpenBigImage(false);
-  const { initialValues, schema, submit } = useContentModalForm({
+  const { initialValues, loading, schema, submit } = useContentModalForm({
     allData,
     handleClose,
+    updatingFunction,
   });
 
   const [images, setImages] = React.useState([]);
@@ -116,6 +126,11 @@ const UploadContentModal = ({ open, allData, handleClose, imageSmallUrls }) => {
   };
   // console.log("images:-", images);
 
+  const moodboadImages =
+    allData?.campaignDetails?.campaignDetails?.moodBoardDocs || [];
+
+  // console.log(moodboadImages, "moodboadImages");
+
   const {
     reset,
     control,
@@ -126,6 +141,20 @@ const UploadContentModal = ({ open, allData, handleClose, imageSmallUrls }) => {
     mode: "onChange",
     resolver: yupResolver(schema),
   });
+
+  useEffect(() => {
+    if (allData) {
+      reset();
+    }
+  }, [allData]);
+
+  const handleAllDownload = async (e, image) => {
+    e.preventDefault();
+    const link = document.createElement("a");
+    link.href = image;
+    link.download = image.split("/").pop();
+    link.click();
+  };
 
   return (
     <>
@@ -167,7 +196,7 @@ const UploadContentModal = ({ open, allData, handleClose, imageSmallUrls }) => {
                     }}
                   >
                     <Image
-                      src={imageSmallUrls[bigImageIdx]}
+                      src={moodboadImages?.contents?.[bigImageIdx]}
                       alt="image"
                       width={500}
                       height={500}
@@ -184,11 +213,17 @@ const UploadContentModal = ({ open, allData, handleClose, imageSmallUrls }) => {
                         width: 30,
                         cursor: "pointer",
                       }}
+                      onClick={(e) =>
+                        handleAllDownload(
+                          e,
+                          moodboadImages?.contents?.[bigImageIdx]
+                        )
+                      }
                     >
                       <FaDownload fontSize="14px" />
                     </Avatar>
                     <Box
-                      onClick={handleOpenBigImage}
+                      // onClick={handleOpenBigImage}
                       sx={{
                         position: "absolute",
                         top: 15,
@@ -219,8 +254,9 @@ const UploadContentModal = ({ open, allData, handleClose, imageSmallUrls }) => {
                     }}
                     arrowLeft={arrowLeft}
                     arrowRight={arrowRight}
+                    onClick={() => setBigImageIdx(idx)}
                   >
-                    {imageSmallUrls.map((imageUrl, idx) => {
+                    {moodboadImages?.contents?.map((imageUrl, idx) => {
                       return (
                         <Carousel.Item key={idx}>
                           <Box
@@ -236,6 +272,7 @@ const UploadContentModal = ({ open, allData, handleClose, imageSmallUrls }) => {
                                   idx !== bigImageIdx && "1px solid #FFCC33",
                               },
                               display: "flex",
+                              cursor: "pointer",
                               overflow: "hidden",
                             }}
                           >
@@ -463,6 +500,17 @@ const UploadContentModal = ({ open, allData, handleClose, imageSmallUrls }) => {
                             )}
                           />
                         </Box>
+                        <div>
+                          {errors && errors.images && (
+                            <Typography
+                              variant="caption"
+                              color="error"
+                              sx={{ fontSize: "0.85rem" }}
+                            >
+                              {errors.images.message}
+                            </Typography>
+                          )}
+                        </div>
                         <Box
                           sx={{
                             mt: "30px",
@@ -516,8 +564,9 @@ const UploadContentModal = ({ open, allData, handleClose, imageSmallUrls }) => {
                             textTransform: "none",
                             boxShadow: "none",
                           }}
+                          disabled={loading}
                         >
-                          Submit
+                          {loading ? "Uploading..." : "Submit"}
                         </Button>
                       </Box>
                     </Box>

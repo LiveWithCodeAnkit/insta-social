@@ -3,16 +3,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { todoIssueFormSchema } from "../schema";
 import { postTodoIssueByCreator } from "../../../../store/campaign_request/campaignRequest.slice";
 
-export const useTodoIssueForm = ({ allData, handleClose }) => {
+export const useTodoIssueForm = ({ allData, handleClose, updatingFunction = () => { } }) => {
     const dispatch = useDispatch();
     // console.log(allData, "allDataallData");
-    // const settingInfo = useSelector(
-    //     (state) => state.CampaignRequest.addCampaignByCreator?.addCampaignByCreatorData
-    // );
+    const loading = useSelector(
+        (state) => state?.CampaignRequest?.campaignTodoIssuesByCreator?.loading
+    );
 
     const initialValues = {
         // campaignsName: "",
-        issueType: "",
+        issueType: " ",
         issueInfo: "",
     };
 
@@ -39,11 +39,13 @@ export const useTodoIssueForm = ({ allData, handleClose }) => {
         const res = await dispatch(postTodoIssueByCreator(issueDetailsbyCreator));
         if (res.payload?.success) {
             handleClose();
+            updatingFunction && updatingFunction();
         }
     };
 
     return {
         initialValues,
+        loading,
         schema: todoIssueFormSchema,
         submit: handleIssueForm,
     };

@@ -6,15 +6,21 @@ import { getCampaignRequestByCreator } from "../../../../store/campaign_request/
 import { useRouter } from "next/navigation";
 import UploadContentModal from "./modal/UploadContentModal";
 import TodoIssueModalForm from "./modal/TodoIssueModalForm";
+import IssueModalForm from "./modal/IssueModalForm";
 
 const All = () => {
-  const [open, setOpen] = useState({ showModal: false, id: "" });
+  const [open, setOpen] = useState({ showModal: false, alldata: "" });
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const dispatch = useDispatch();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [issueOpen, setIssueOpen] = useState({
+    showIssueModal: false,
+    id: "",
+    allData: "",
+  });
+  const [issueLinkOpen, setIssueLinkOpen] = useState({
     showIssueModal: false,
     id: "",
     allData: "",
@@ -30,6 +36,16 @@ const All = () => {
   );
 
   console.log("campaignByCreator", campaignByCreator);
+
+  const updatingFunction = () => {
+    dispatch(
+      getCampaignRequestByCreator({
+        page: page + 1,
+        pageSize: rowsPerPage,
+        requestStatus: [],
+      })
+    );
+  };
 
   useEffect(() => {
     dispatch(
@@ -83,7 +99,7 @@ const All = () => {
       new Date(
         data?.campaignId?.campaignDetails?.readyToReviewDate
       ).toLocaleDateString(),
-      data?.campaignId?._id,
+      data?.campaignId,
       data?.requestStatus
     );
   });
@@ -91,7 +107,7 @@ const All = () => {
   const handleViewClick = (event, item) => {
     event.stopPropagation();
     // console.log("clicked", item.campaignId);
-    router.push(`/creator/dashboard/campaign/${item.campaignDetails}`);
+    router.push(`/creator/dashboard/my-campaign/${item?.campaignDetails?._id}`);
   };
 
   const headCells = [
@@ -150,7 +166,12 @@ const All = () => {
             {item?.status === "Awaiting_Content_Approval" ||
             item?.status === "Content_Approved" ||
             item?.status === "Content_Rejected" ||
-            item?.status === "Issue" ? (
+            item?.status === "Issue" ||
+            item?.status === "Completed" ||
+            item?.status === "Awaiting_Shipment" ||
+            item?.status === "Cancelled" ||
+            item?.status === "Request_Approved" ||
+            item?.status === "Request_Rejected" ? (
               "-"
             ) : (
               <>
@@ -192,34 +213,44 @@ const All = () => {
       disablePadding: false,
       label: "Action",
       renderCell: (item, index) => {
+        console.log("item", item);
         return (
           <>
             {item?.status === "Awaiting_Content_Approval" ||
             item?.status === "Content_Approved" ||
             item?.status === "Content_Rejected" ||
-            item?.status === "Issue" ? (
+            item?.status === "Issue" ||
+            item?.status === "Completed" ||
+            item?.status === "Awaiting_Shipment" ||
+            item?.status === "Cancelled" ||
+            item?.status === "Request_Approved" ? (
               "-"
             ) : (
               <>
-                <Button
-                  variant="contained"
-                  type="button"
-                  sx={{
-                    //   border: "1px solid #212121",
-                    "&:hover": { background: "#FFCC33" },
-                    background: "#FFCC33",
-                    boxShadow: "none",
-                    color: "#212121",
-                    // height: "35px",
-                    // width: "118px",
-                    borderRadius: "50px",
-                    fontWeight: 500,
-                    textTransform: "none",
-                  }}
-                  onClick={(e) => setOpen({ showModal: true, id: item.id })}
-                >
-                  Upload Content
-                </Button>
+                {item?.campaignDetails?.campaignDetails?.permissionRequired ===
+                  true && item.status === "Awaiting_Content" ? (
+                  <Button
+                    variant="contained"
+                    type="button"
+                    sx={{
+                      //   border: "1px solid #212121",
+                      "&:hover": { background: "#FFCC33" },
+                      background: "#FFCC33",
+                      boxShadow: "none",
+                      color: "#212121",
+                      // height: "35px",
+                      // width: "118px",
+                      borderRadius: "50px",
+                      fontWeight: 500,
+                      textTransform: "none",
+                    }}
+                    onClick={(e) => setOpen({ showModal: true, alldata: item })}
+                  >
+                    Upload Content
+                  </Button>
+                ) : (
+                  "-"
+                )}
               </>
             )}
           </>
@@ -234,7 +265,10 @@ const All = () => {
       renderCell: (item, index) => {
         return (
           <>
-            {item?.status === "Content_Approved" ? (
+            {(item?.campaignDetails?.campaignDetails?.permissionRequired ===
+              false &&
+              item.status === "Awaiting_Content") ||
+            item?.status === "Content_Approved" ? (
               <Button
                 variant="outlined"
                 type="button"
@@ -282,7 +316,11 @@ const All = () => {
               justifyContent: "center",
               height: "36px",
               width: "190px",
-              backgroundColor: "#A4E504",
+              backgroundColor:
+                item?.status === "Cancelled" ||
+                item?.status === "Request_Rejected"
+                  ? "#F2424C"
+                  : "#A4E504",
               borderRadius: "8px",
             }}
           >
@@ -301,6 +339,12 @@ const All = () => {
                 ? "Awaiting Content"
                 : item?.status === "Past_Deadline"
                 ? "Past Deadline"
+                : item?.status === "Cancelled"
+                ? "Cancelled"
+                : item?.status === "Request_Approved"
+                ? "Request Pending"
+                : item?.status === "Request_Rejected"
+                ? "Request Rejected"
                 : "Completed"}
             </Typography>
           </Box>
@@ -330,12 +374,11 @@ const All = () => {
           sx={{
             width: "100%",
             mb: 2,
-            borderRadius: "30px",
             boxShadow: "0px 0px 30px 0px #0000000D",
             padding: "30px 30px 00px 30px",
+            "& .MuiTableContainer-root": { borderRadius: "10px" },
           }}
         >
-          {/* <CommonTable rows={rows} headCells={headCells} /> */}
           {rows && (
             <CommonTable
               rows={rows || []}
@@ -353,13 +396,22 @@ const All = () => {
       <UploadContentModal
         open={open.showModal}
         allData={open.alldata}
-        handleClose={() => setOpen({ showModal: false, id: "" })}
+        handleClose={() => setOpen({ showModal: false, alldata: "" })}
         imageSmallUrls={imageSmallUrls}
+        updatingFunction={updatingFunction}
       />
       <TodoIssueModalForm
         open={issueOpen.showIssueModal}
         allData={issueOpen.allData}
         handleClose={() => setIssueOpen({ showIssueModal: false, id: "" })}
+        updatingFunction={updatingFunction}
+      />
+      <IssueModalForm
+        open={issueLinkOpen.showIssueModal}
+        allData={issueLinkOpen.allData}
+        handleClose={() => setIssueLinkOpen({ showIssueModal: false, id: "" })}
+        imageSmallUrls={imageSmallUrls}
+        updatingFunction={updatingFunction}
       />
     </>
   );

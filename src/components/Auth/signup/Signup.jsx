@@ -4,7 +4,7 @@ import { Box, Container, Grid, Typography } from "@mui/material";
 import Image from "next/image";
 import AuthSocial from "../AuthSocial";
 import Link from "next/link";
-const SignUp = () => {
+const SignUp = ({ tittle, loginLink, role }) => {
   return (
     <Box style={{ height: "100vh" }}>
       <Box
@@ -41,7 +41,7 @@ const SignUp = () => {
                       color: "#FFCC33",
                     }}
                   >
-                    Sign Up Brands
+                    {tittle}
                   </Typography>
                   <Typography
                     sx={{
@@ -55,7 +55,7 @@ const SignUp = () => {
                 </Box>
 
                 <AuthSocial />
-                <SignupForm />
+                <SignupForm role={role} />
 
                 <Box
                   sx={{
@@ -66,10 +66,10 @@ const SignUp = () => {
                   }}
                 >
                   <Typography variant="body2" align="center">
-                    Already I have an account?
+                    Already have an account?
                   </Typography>
                   <Link
-                    href="/"
+                    href={loginLink}
                     style={{
                       fontSize: "16px",
                       fontWeight: "400",

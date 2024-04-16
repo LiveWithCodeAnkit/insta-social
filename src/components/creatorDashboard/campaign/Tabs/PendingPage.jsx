@@ -181,7 +181,6 @@ const PendingPage = () => {
             "& .MuiTableContainer-root": { borderRadius: "10px" },
           }}
         >
-          {/* <CommonTable rows={rows} headCells={headCells} /> */}
           {rows && (
             <CommonTable
               rows={rows || []}

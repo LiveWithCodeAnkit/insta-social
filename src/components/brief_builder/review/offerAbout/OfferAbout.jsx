@@ -8,7 +8,7 @@ const OfferAbout = ({ offerDetails }) => {
     !Array.isArray(offerDetails) ||
     offerDetails.length === 0
   ) {
-    return <div>No offer details provided</div>;
+    return;
   }
 
   return (
@@ -44,7 +44,7 @@ const OfferAbout = ({ offerDetails }) => {
                   }}
                 >
                   <Image
-                    src={"/images/reviewHand.png"}
+                    src={offer.offerImage}
                     alt="infopic"
                     width={300}
                     height={300}
@@ -59,9 +59,14 @@ const OfferAbout = ({ offerDetails }) => {
                     }}
                   >
                     <Typography variant="h2">{offer.productName}</Typography>
-                    <p style={{ color: "#777777", width: "100%" }}>
-                      {offer.description}
-                    </p>
+
+                    <div className="parent">
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: offer.description,
+                        }}
+                      ></div>
+                    </div>
                     <Box
                       as="div"
                       sx={{
@@ -120,12 +125,15 @@ const OfferAbout = ({ offerDetails }) => {
                             <label
                               style={{ fontSize: "18px", color: "#777777" }}
                             >
-                              Color:
+                              Varient Type:
                             </label>
                             <label
                               style={{ fontSize: "18px", color: "#C1121F" }}
                             >
-                              {variant.variantType}
+                              {/* {variant.variantType} */}
+                              {Array.isArray(variant.variantType)
+                                ? variant.variantType.join(", ")
+                                : variant.variantType}
                             </label>
                           </Box>
                           <Box
@@ -139,7 +147,7 @@ const OfferAbout = ({ offerDetails }) => {
                             <label
                               style={{ fontSize: "18px", color: "#777777" }}
                             >
-                              Size:
+                              Varient Description:
                             </label>
                             <label
                               style={{ fontSize: "18px", color: "#C1121F" }}

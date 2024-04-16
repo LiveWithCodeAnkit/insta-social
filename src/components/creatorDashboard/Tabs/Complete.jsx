@@ -3,6 +3,7 @@ import { Box, Button, Paper, Typography } from "@mui/material";
 import CommonTable from "@/components/common/commonTable/CommonTable";
 import { useDispatch, useSelector } from "react-redux";
 import { getCampaignRequestByCreator } from "../../../../store/campaign_request/campaignRequest.slice";
+import { useRouter } from "next/navigation";
 
 const Complete = () => {
   const [open, setOpen] = useState({ showModal: false, id: "" });
@@ -11,6 +12,7 @@ const Complete = () => {
   const dispatch = useDispatch();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const router = useRouter();
   // const [filterStatus, setFilterStatus] = useState("To-Do");
 
   // console.log(activeTab, "activeTab");
@@ -74,10 +76,16 @@ const Complete = () => {
       new Date(
         data?.campaignId?.campaignDetails?.readyToReviewDate
       ).toLocaleDateString(),
-      data?.campaignId?.campaignDetails?.id,
+      data?.campaignId,
       data?.requestStatus
     );
   });
+
+  const handleViewClick = (event, item) => {
+    event.stopPropagation();
+    // console.log("clicked", item.campaignId);
+    router.push(`/creator/dashboard/my-campaign/${item?.campaignDetails?._id}`);
+  };
 
   const headCells = [
     {
@@ -104,6 +112,7 @@ const Complete = () => {
       disablePadding: false,
       label: "Campaign Details",
       renderCell: (item, index) => {
+        console.log(item, "item in complte");
         return (
           <Button
             variant="outlined"
@@ -117,6 +126,7 @@ const Complete = () => {
               fontWeight: 500,
               textTransform: "none",
             }}
+            onClick={(event) => handleViewClick(event, item)}
           >
             View Brief
           </Button>
@@ -171,12 +181,11 @@ const Complete = () => {
           sx={{
             width: "100%",
             mb: 2,
-            borderRadius: "30px",
+            "& .MuiTableContainer-root": { borderRadius: "10px" },
             boxShadow: "0px 0px 30px 0px #0000000D",
             padding: "30px 30px 00px 30px",
           }}
         >
-          {/* <CommonTable rows={rows} headCells={headCells} /> */}
           {rows && (
             <CommonTable
               rows={rows || []}

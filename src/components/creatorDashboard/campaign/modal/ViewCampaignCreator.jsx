@@ -48,27 +48,31 @@ const ViewCampaignCreator = ({
 
   const campaignModalDetails = campaignData?.campaignId?.campaignDetails || "";
 
+  const campaignModalImages =
+    campaignData?.campaignId?.campaignDetails?.moodBoardDocs || [];
   // console.log(campaignModalDetails, "campaignModalDetails");
+  //
+  // console.log(campaignModalImages, "campaignModalImages");
 
-  const extractContentBetweenTags = (htmlString, tagName) => {
-    const regex = new RegExp(`<${tagName}>(.*?)<\/${tagName}>`, "g");
-    const matches = htmlString?.match(regex);
-    return matches
-      ? matches.map((match) =>
-          match.replace(`<${tagName}>`, "").replace(`</${tagName}>`, "")
-        )
-      : [];
-  };
-  const { campaignMessage } = campaignModalDetails;
+  // const extractContentBetweenTags = (htmlString, tagName) => {
+  //   const regex = new RegExp(`<${tagName}>(.*?)<\/${tagName}>`, "g");
+  //   const matches = htmlString?.match(regex);
+  //   return matches
+  //     ? matches.map((match) =>
+  //         match.replace(`<${tagName}>`, "").replace(`</${tagName}>`, "")
+  //       )
+  //     : [];
+  // };
+  // const { campaignMessage } = campaignModalDetails;
 
-  const MessageParagraphs = extractContentBetweenTags(campaignMessage, "p");
+  // const MessageParagraphs = extractContentBetweenTags(campaignMessage, "p");
 
-  // Extract list items from campaignMessage
-  const ulContentMatch = campaignMessage?.match(/<ul>(.*?)<\/ul>/s);
-  const ulMessageContent = ulContentMatch ? ulContentMatch[1] : "";
-  const listItemsOfMessage = ulMessageContent
-    ? ulMessageContent.match(/<li>(.*?)<\/li>/gs)
-    : [];
+  // // Extract list items from campaignMessage
+  // const ulContentMatch = campaignMessage?.match(/<ul>(.*?)<\/ul>/s);
+  // const ulMessageContent = ulContentMatch ? ulContentMatch[1] : "";
+  // const listItemsOfMessage = ulMessageContent
+  //   ? ulMessageContent.match(/<li>(.*?)<\/li>/gs)
+  //   : [];
 
   return (
     <Box>
@@ -99,13 +103,15 @@ const ViewCampaignCreator = ({
                 width: "500px",
               }}
             >
-              <Image
-                src={imageSmallUrls[bigImageIdx]}
-                alt="image"
-                // width={500}
-                // height={500}
-                fill={true}
-              />
+              {campaignModalImages?.contents?.length > 0 && (
+                <Image
+                  src={campaignModalImages?.contents[0]}
+                  alt="image"
+                  // width={400}
+                  // height={400}
+                  fill={true}
+                />
+              )}
             </Box>
             <Typography
               sx={{
@@ -115,10 +121,17 @@ const ViewCampaignCreator = ({
                 width: "500px",
               }}
             >
-              {MessageParagraphs}
+              {/* {MessageParagraphs} */}
+              <div className="parent">
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: campaignModalDetails?.campaignMessage,
+                  }}
+                ></div>
+              </div>
             </Typography>
 
-            {listItemsOfMessage && listItemsOfMessage?.length > 0 && (
+            {/* {listItemsOfMessage && listItemsOfMessage?.length > 0 && (
               <ul
                 style={{
                   padding: "1.5rem",
@@ -133,7 +146,7 @@ const ViewCampaignCreator = ({
                   </li>
                 ))}
               </ul>
-            )}
+            )} */}
           </Box>
           <Box
             sx={{

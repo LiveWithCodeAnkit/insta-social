@@ -85,14 +85,21 @@ const arrowRight = () => {
   );
 };
 
-const IssueModalForm = ({ open, allData, handleClose, imageSmallUrls }) => {
+const IssueModalForm = ({
+  open,
+  allData,
+  handleClose,
+  imageSmallUrls,
+  updatingFunction,
+}) => {
   const [bigImageIdx, setBigImageIdx] = useState(0);
   const [openBigImage, setOpenBigImage] = useState(false);
   const handleOpenBigImage = () => setOpenBigImage(true);
   const handleCloseBigImage = () => setOpenBigImage(false);
-  const { initialValues, schema, submit } = useIssueForm({
+  const { initialValues, schema, loading, submit } = useIssueForm({
     allData,
     handleClose,
+    updatingFunction,
   });
 
   const {
@@ -105,6 +112,19 @@ const IssueModalForm = ({ open, allData, handleClose, imageSmallUrls }) => {
     mode: "onChange",
     resolver: yupResolver(schema),
   });
+
+  console.log(allData, "allData in IssueModal");
+
+  const moodboadImages =
+    allData?.campaignDetails?.campaignDetails?.moodBoardDocs || [];
+
+  const handleAllDownload = async (e, image) => {
+    e.preventDefault();
+    const link = document.createElement("a");
+    link.href = image;
+    link.download = image.split("/").pop();
+    link.click();
+  };
 
   return (
     <Box>
@@ -145,7 +165,7 @@ const IssueModalForm = ({ open, allData, handleClose, imageSmallUrls }) => {
                   }}
                 >
                   <Image
-                    src={imageSmallUrls[bigImageIdx]}
+                    src={moodboadImages?.contents?.[bigImageIdx]}
                     alt="image"
                     width={500}
                     height={500}
@@ -162,11 +182,17 @@ const IssueModalForm = ({ open, allData, handleClose, imageSmallUrls }) => {
                       width: 30,
                       cursor: "pointer",
                     }}
+                    onClick={(e) =>
+                      handleAllDownload(
+                        e,
+                        moodboadImages?.contents?.[bigImageIdx]
+                      )
+                    }
                   >
                     <FaDownload fontSize="14px" />
                   </Avatar>
                   <Box
-                    onClick={handleOpenBigImage}
+                    // onClick={handleOpenBigImage}
                     sx={{
                       position: "absolute",
                       top: 15,
@@ -198,7 +224,7 @@ const IssueModalForm = ({ open, allData, handleClose, imageSmallUrls }) => {
                   arrowLeft={arrowLeft}
                   arrowRight={arrowRight}
                 >
-                  {imageSmallUrls.map((imageUrl, idx) => {
+                  {moodboadImages?.contents?.map((imageUrl, idx) => {
                     return (
                       <Carousel.Item key={idx}>
                         <Box
@@ -316,8 +342,9 @@ const IssueModalForm = ({ open, allData, handleClose, imageSmallUrls }) => {
                           textTransform: "none",
                           boxShadow: "none",
                         }}
+                        disabled={loading}
                       >
-                        Submit
+                        {loading ? "Loading..." : "Submit"}
                       </Button>
                     </Box>
                   </Box>

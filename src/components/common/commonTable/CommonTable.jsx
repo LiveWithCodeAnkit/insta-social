@@ -41,6 +41,7 @@ export default function CommonTable({
   onChangeRowsPerPage,
   onChangePagePagination,
   pagination,
+  isCheckbox = false,
 }) {
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("calories");
@@ -100,6 +101,19 @@ export default function CommonTable({
         }}
       >
         <TableRow>
+          {isCheckbox && rows.length > 0 && (
+            <TableCell padding="checkbox">
+              <Checkbox
+                color="primary"
+                // indeterminate={numSelected > 0 && numSelected < rowCount}
+                // checked={rowCount > 0 && numSelected === rowCount}
+                // onChange={onSelectAllClick}
+                inputProps={{
+                  "aria-label": "select all desserts",
+                }}
+              />
+            </TableCell>
+          )}
           {headCells.map((headCell) => (
             <TableCell
               key={headCell.id}
@@ -234,22 +248,37 @@ export default function CommonTable({
                     selected={isItemSelected}
                     sx={{ cursor: "pointer" }}
                   >
+                    {isCheckbox && (
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          color="primary"
+                          // checked={isItemSelected}
+                          inputProps={
+                            {
+                              // "aria-labelledby": labelId,
+                            }
+                          }
+                        />
+                      </TableCell>
+                    )}
                     {headCells.map((headCell) => {
                       return (
-                        <TableCell
-                          key={headCell.id}
-                          // align={headCell.numeric ? "right" : "left"}
-                          // padding={headCell.disablePadding ? "none" : "normal"}
-                          sx={{
-                            color: "secondary.main",
-                            opacity: headCell?.renderCell ? 1 : "0.7",
-                            fontSize: "14px",
-                          }}
-                        >
-                          {headCell?.renderCell
-                            ? headCell.renderCell(row, index)
-                            : row[headCell.id]}
-                        </TableCell>
+                        <>
+                          <TableCell
+                            key={headCell.id}
+                            // align={headCell.numeric ? "right" : "left"}
+                            // padding={headCell.disablePadding ? "none" : "normal"}
+                            sx={{
+                              color: "secondary.main",
+                              opacity: headCell?.renderCell ? 1 : "0.7",
+                              fontSize: "14px",
+                            }}
+                          >
+                            {headCell?.renderCell
+                              ? headCell.renderCell(row, index)
+                              : row[headCell.id]}
+                          </TableCell>
+                        </>
                       );
                     })}
                   </TableRow>

@@ -14,6 +14,7 @@ export const authOptions = {
         session.jwt = token.jwt;
         session.sessionId = token.sessionId;
         session.role = token.role;
+        session.profileCompleted=token.profileCompleted
       }
 
       return session;
@@ -25,6 +26,7 @@ export const authOptions = {
           jwt: user.jwt,
           sessionId: user.sessionId,
           role: user.role,
+          profileCompleted: user.profileCompleted,
         };
       }
 
@@ -38,7 +40,6 @@ export const authOptions = {
       async authorize(credentials, request) {
         const { email, password, role } = credentials;
 
-        console.log("API_ENDPOINT :-", API_ENDPOINT);
         try {
           const response = await fetch(API_ENDPOINT, {
             method: "POST",
@@ -61,15 +62,15 @@ export const authOptions = {
           const jwt = user.token;
           const sessionId = user?.data?._id;
           const userRole = user.data.role;
-
-          console.log("userRole:-", userRole);
-
+          const profileCompleted = user.data.profileCompleted;
+          console.log("user auth :-", profileCompleted);
           return {
             ...credentials,
             jwt,
             sessionId,
             user,
             role: userRole,
+            profileCompleted,
           };
         } catch (error) {
           console.error("Error during authentication:", error);

@@ -31,10 +31,16 @@ const style = {
   borderRadius: "50px",
 };
 
-const TodoIssueModalForm = ({ open, allData, handleClose }) => {
-  const { initialValues, schema, submit } = useTodoIssueForm({
+const TodoIssueModalForm = ({
+  open,
+  allData,
+  handleClose,
+  updatingFunction,
+}) => {
+  const { initialValues, loading, schema, submit } = useTodoIssueForm({
     allData,
     handleClose,
+    updatingFunction,
   });
 
   const {
@@ -123,14 +129,15 @@ const TodoIssueModalForm = ({ open, allData, handleClose }) => {
                           select
                           fullWidth
                           value={value}
+                          defaultValue=" "
                           label="Select Issue Type"
                           onChange={onChange}
-                          // placeholder="Issue Type"
                           error={Boolean(errors.issueType)}
                           {...(errors.issueType && {
                             helperText: errors.issueType.message,
                           })}
                         >
+                          <MenuItem value=" ">Select Issue Type</MenuItem>
                           <MenuItem value="PRODUCT_ISSUE">
                             Product Issue
                           </MenuItem>
@@ -199,8 +206,9 @@ const TodoIssueModalForm = ({ open, allData, handleClose }) => {
                   textTransform: "none",
                   boxShadow: "0px 4px 20px 0px #FFD24B80",
                 }}
+                disabled={loading}
               >
-                Submit
+                {loading ? "Loading..." : "Submit"}
               </Button>
             </Box>
           </Box>

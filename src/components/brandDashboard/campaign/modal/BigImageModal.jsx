@@ -105,7 +105,7 @@ const BigImageModal = ({ open, handleClose, imageSmallUrls, bigImageIdx }) => {
           arrowLeft={arrowLeft}
           arrowRight={arrowRight}
         >
-          {imageSmallUrls.map((imageUrl, idx) => {
+          {imageSmallUrls?.map((imageUrl, idx) => {
             return (
               <Carousel.Item key={idx}>
                 <Box

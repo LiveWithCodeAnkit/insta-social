@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { createCampaign } from "../../../../store/brief_builder/campaign/campaign.slice";
 import { productFormSchema } from "../schema";
 import { useDispatch, useSelector } from "react-redux";
@@ -7,8 +8,8 @@ export const useProductsForm = ({ handleTab }) => {
     (state) => state.Campaign.addCampaignDetails?.campaign
   );
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
 
-  console.log("info cam:-", infoCam?.brandDetails);
   const initialValues = {
     products: [
       {
@@ -18,6 +19,7 @@ export const useProductsForm = ({ handleTab }) => {
   };
 
   const handleProductForm = async (values) => {
+    setLoading(true);
     try {
       const formData = new FormData();
 
@@ -30,8 +32,6 @@ export const useProductsForm = ({ handleTab }) => {
           })),
         },
       };
-
-      console.log("i am product form :-", values.products);
 
       formData.append("data", JSON.stringify(productDetails));
       values.products.forEach((image, i) => {
@@ -47,10 +47,12 @@ export const useProductsForm = ({ handleTab }) => {
     } catch (error) {
       console.error("Error handling product form:", error);
     }
+    setLoading(false);
   };
 
   return {
     initialValues,
+    loading,
     schema: productFormSchema,
     submit: handleProductForm,
   };

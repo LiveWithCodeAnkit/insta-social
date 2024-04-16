@@ -1,8 +1,21 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Divider from "@mui/material/Divider";
 import { Box, Typography, Card } from "@mui/material";
-const Standard = () => {
+import { CgArrowLongRight, CgArrowLongLeft } from "react-icons/cg";
+import Button from "@mui/material/Button";
+
+const Standard = ({ handleChange, setinfoTittle }) => {
+  const [clickedCard, setClickedCard] = useState("Pro");
+
+  useEffect(() => {
+    setinfoTittle(clickedCard);
+  }, [clickedCard, setinfoTittle]);
+
+  const handleCardClick = (cardType) => {
+    setClickedCard(cardType);
+  };
+
   return (
     <>
       <Box
@@ -22,7 +35,11 @@ const Standard = () => {
             padding: "1rem",
             height: "21.1rem",
             borderRadius: "1.5rem",
+            backgroundColor:
+              clickedCard === "Standard" ? "#FFF3AB" : "transparent",
+            cursor: "pointer",
           }}
+          onClick={() => handleCardClick("Standard")}
         >
           <Typography
             variant="label"
@@ -51,9 +68,11 @@ const Standard = () => {
             padding: "1rem",
             height: "21.1rem",
             borderRadius: "1.5rem",
-            backgroundColor: "#FFF3AB",
             position: "relative",
+            backgroundColor: clickedCard === "Pro" ? "#FFF3AB" : "transparent",
+            cursor: "pointer",
           }}
+          onClick={() => handleCardClick("Pro")}
         >
           <Typography
             variant="label"
@@ -85,6 +104,53 @@ const Standard = () => {
             />
           </Box>
         </Card>
+      </Box>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "end",
+          gap: "0.5rem",
+          marginTop: "2rem",
+        }}
+      >
+        <Button
+          variant="outlined"
+          startIcon={<CgArrowLongLeft />}
+          sx={{
+            height: "50px",
+            width: "147px",
+            color: "#212121",
+            borderRadius: "50px",
+            fontWeight: 600,
+            textTransform: "none",
+            borderColor: "black",
+          }}
+        >
+          Previous
+        </Button>
+        <Button
+          type="submit"
+          sx={{
+            background: "#FFCC33",
+            color: "#212121",
+            height: "50px",
+            width: "117px",
+            borderRadius: "50px",
+            fontWeight: 600,
+            textTransform: "none",
+
+            "&:hover": {
+              background: "#FFCC33",
+            },
+          }}
+          variant="contained"
+          endIcon={<CgArrowLongRight />}
+          onClick={() => {
+            handleChange(event, 1);
+          }}
+        >
+          Next
+        </Button>
       </Box>
     </>
   );

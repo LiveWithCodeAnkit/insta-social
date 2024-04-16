@@ -153,7 +153,7 @@ const TextFieldStyled = styled(TextField)(({ theme }) => ({
     "& textarea.MuiInputBase-inputSizeSmall:placeholder-shown": {
       overflowX: "hidden",
     },
-    fontSize: "18px",
+    fontSize: "14px",
   },
 
   // ** For Date Picker

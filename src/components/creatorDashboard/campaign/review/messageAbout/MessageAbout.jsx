@@ -5,51 +5,8 @@ const MessageAbout = ({ campaignCreatorData }) => {
   const campaignDetails = campaignCreatorData?.campaignDetails || "";
   const productDetails = campaignCreatorData?.productDetails || "";
 
-  console.log(campaignDetails, "messageAbout");
-  console.log(productDetails, "productDetails into messageAbout");
-
-  const extractContentBetweenTags = (htmlString, tagName) => {
-    const regex = new RegExp(`<${tagName}>(.*?)<\/${tagName}>`, "g");
-    const matches = htmlString?.match(regex);
-    return matches
-      ? matches.map((match) =>
-          match.replace(`<${tagName}>`, "").replace(`</${tagName}>`, "")
-        )
-      : [];
-  };
-  const { campaignMessage, hooks } = campaignDetails;
-
-  // productDetails extract
-  const { info, productHooks } = productDetails;
-
-  const MessageParagraphs = extractContentBetweenTags(campaignMessage, "p");
-
-  // const ProductParagraphs = extractContentBetweenTags(info, "p");
-
-  // console.log(ProductParagraphs)
-
-  // Extract list items from campaignMessage
-  const ulContentMatch = campaignMessage?.match(/<ul>(.*?)<\/ul>/s);
-  const ulMessageContent = ulContentMatch ? ulContentMatch[1] : "";
-  const listItemsOfMessage = ulMessageContent
-    ? ulMessageContent.match(/<li>(.*?)<\/li>/gs)
-    : [];
-
-  // Extract list items from hooks
-  const ulContentMatchHook = hooks?.match(/<ul>(.*?)<\/ul>/s);
-  const ulHookContent = ulContentMatchHook ? ulContentMatchHook[1] : "";
-  const listItemsOfHook = ulHookContent
-    ? ulHookContent.match(/<li>(.*?)<\/li>/gs)
-    : [];
-
-  // Extract list items from campaignMessage
-  // const ulContentProductMatch = info?.match(/<ul>(.*?)<\/ul>/s);
-  // const ulMessageProductContent = ulContentProductMatch
-  //   ? ulContentProductMatch[1]
-  //   : "";
-  // const listItemsOfProduct = ulMessageProductContent
-  //   ? ulMessageProductContent.match(/<li>(.*?)<\/li>/gs)
-  //   : [];
+  // console.log(campaignDetails, "messageAbout");
+  // console.log(productDetails, "productDetails into messageAbout");
 
   return (
     <>
@@ -65,28 +22,22 @@ const MessageAbout = ({ campaignCreatorData }) => {
       >
         <Box
           as="div"
-          sx={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "1.2rem",
+            marginBottom: "1rem",
+          }}
         >
           <Typography variant="h2">Messaging</Typography>
           <Box>
-            <p style={{ color: "#777777" }}>{MessageParagraphs}</p>
-
-            {listItemsOfMessage && listItemsOfMessage.length > 0 && (
-              <ul
-                style={{
-                  padding: "1.5rem",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "1.8rem",
+            <div className="parent">
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: campaignDetails?.campaignMessage,
                 }}
-              >
-                {listItemsOfMessage.map((item, index) => (
-                  <li key={`list-item-${index}`} style={{ color: "#777777" }}>
-                    {item.replace(/<\/?li>/g, "")}
-                  </li>
-                ))}
-              </ul>
-            )}
+              ></div>
+            </div>
           </Box>
         </Box>
         <Box
@@ -96,22 +47,11 @@ const MessageAbout = ({ campaignCreatorData }) => {
           <Typography variant="h2">Hooks</Typography>
 
           <Box>
-            {listItemsOfHook && listItemsOfHook.length > 0 && (
-              <ul
-                style={{
-                  padding: "1.5rem",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "1.8rem",
-                }}
-              >
-                {listItemsOfHook.map((item, index) => (
-                  <li key={`list-item-${index}`} style={{ color: "#777777" }}>
-                    {item.replace(/<\/?li>/g, "")}
-                  </li>
-                ))}
-              </ul>
-            )}
+            <div className="parent">
+              <div
+                dangerouslySetInnerHTML={{ __html: campaignDetails?.hooks }}
+              ></div>
+            </div>
           </Box>
         </Box>
         <Box
@@ -123,7 +63,7 @@ const MessageAbout = ({ campaignCreatorData }) => {
           }}
         >
           <Typography variant="h2">Product Info</Typography>
-          <Box>
+          <Box sx={{ display: "grid", gap: "1.8rem" }}>
             {productDetails &&
               productDetails?.map((product, index) => (
                 <Box
@@ -135,10 +75,10 @@ const MessageAbout = ({ campaignCreatorData }) => {
                 >
                   {product?.images?.map((productImage, index) => (
                     <Image
-                      src={`/${productImage}`}
+                      src={`${productImage}`}
                       alt={`Image ${index}`}
-                      width={400}
-                      height={400}
+                      width={300}
+                      height={300}
                     />
                   ))}
 
@@ -150,7 +90,6 @@ const MessageAbout = ({ campaignCreatorData }) => {
                       gap: "1.2rem",
                     }}
                   >
-                    <Typography variant="h2">{product?.name}</Typography>
                     <Box
                       sx={{
                         display: "flex",
@@ -158,7 +97,11 @@ const MessageAbout = ({ campaignCreatorData }) => {
                         gap: "1.5rem",
                       }}
                     >
-                      <p style={{ color: "#777777" }}>{product?.info}</p>
+                      <div className="parent">
+                        <div
+                          dangerouslySetInnerHTML={{ __html: product?.info }}
+                        ></div>
+                      </div>
                     </Box>
                   </Box>
                 </Box>

@@ -6,33 +6,33 @@ import { postCampaignByCreator } from "../../../../store/campaign_request/campai
 
 export const useSettingForm = () => {
     const dispatch = useDispatch();
-    const settingInfo = useSelector(
-        (state) => state.CampaignRequest.addCampaignByCreator?.addCampaignByCreatorData
+    const loading = useSelector(
+        (state) => state.CampaignRequest?.addCampaignByCreator?.loading
     );
 
     const initialValues = {
-        firstName: "hello",
-        lastName: "world",
-        gender: "MALE",
-        language: "HINDI",
-        instagramUserName: "@liveDemo",
-        tiktokUserName: "@liveTiktok",
-        dob: null,
-        email: "a@gmail.com",
-        phone: "7845129696",
-        address1: "xyz Galleria",
-        address2: "10 Galleria",
-        cityName: "Surat",
-        stateName: "Gujarat",
-        postalCode: "394517",
-        countryName: "INDIA",
+        firstName: "",
+        lastName: "",
+        gender: " ",
+        language: " ",
+        instagramUserName: "",
+        tiktokUserName: "",
+        dob: "",
+        email: "",
+        phone: "",
+        address1: "",
+        address2: "",
+        cityName: "",
+        stateName: "",
+        postalCode: "",
+        countryName: " ",
     };
 
     const convertToUTC = (date) => {
         if (date) {
             return new Date(date).toISOString();
         }
-        return null;
+        return "";
     };
 
 
@@ -69,12 +69,12 @@ export const useSettingForm = () => {
             language: language,
             email: email,
             phone: phone,
-            address: address1,
+            address1: address1,
             address2: address2,
             city: cityName,
             state: stateName,
             postalCode: postalCode,
-            country: countryName,
+            country: countryName.value,
             socialMediaLinks: [
                 { platForm: "Instagram", link: null, userName: instagramUserName },
                 { platForm: "Tiktok", link: null, userName: tiktokUserName },
@@ -87,7 +87,7 @@ export const useSettingForm = () => {
 
     return {
         initialValues,
-        // loading,
+        loading,
         schema: settingFormSchema,
         submit: handleSettingForm,
     };

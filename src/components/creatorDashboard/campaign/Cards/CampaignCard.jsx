@@ -7,8 +7,10 @@ const CampaignCard = ({ item, onCardClickHandler }) => {
   // console.log(item, "CamapignCarditem");
 
   const campaignCardDetails = item?.campaignId?.campaignDetails || "";
+  const moodImages = item?.campaignId?.campaignDetails?.moodBoardDocs || [];
 
-  // console.log("campaignCardDetails", campaignCardDetails);
+  console.log("campaignCardDetails", campaignCardDetails);
+  // console.log("moodImages", moodImages);
 
   const extractContentBetweenTags = (htmlString, tagName) => {
     const regex = new RegExp(`<${tagName}>(.*?)<\/${tagName}>`, "g");
@@ -34,6 +36,9 @@ const CampaignCard = ({ item, onCardClickHandler }) => {
           backgroundColor: "#F2F6FC",
           borderRadius: "15px",
           cursor: "pointer",
+          overflow: "hidden",
+          position: "relative",
+          height: "fit-content",
         }}
       >
         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -52,20 +57,33 @@ const CampaignCard = ({ item, onCardClickHandler }) => {
           sx={{
             borderRadius: "15px",
             my: "10px",
-            // height: "200px",
-            // width: "300px",
+            maxHeight: "250px",
+            overflow: "hidden",
           }}
         >
           <Image
-            src={item.contentPhoto}
+            src={
+              moodImages?.contents?.length > 0 ? moodImages?.contents[0] : ""
+            }
             alt=""
             layout="responsive"
-            width={330}
-            height={330}
+            width={250}
+            height={250}
+            objectFit="cover"
             // fill={true}
           />
         </Box>
-        <Typography variant="body1">{MessageParagraphs}</Typography>
+        <Typography
+          variant="body1"
+          sx={{
+            overflowY: "auto",
+            maxHeight: "80px",
+            height: "100px",
+            scrollbarWidth: "thin",
+          }}
+        >
+          {MessageParagraphs}
+        </Typography>
         <Box
           sx={{
             display: "flex",
@@ -81,7 +99,12 @@ const CampaignCard = ({ item, onCardClickHandler }) => {
               justifyContent: "center",
               height: "30px",
               width: "190px",
-              backgroundColor: "#5ADA5F",
+              backgroundColor:
+                item?.requestStatus === "Request_Rejected" ||
+                item?.requestStatus === "Cancelled" ||
+                item?.requestStatus === "Content_Rejected"
+                  ? "#F2424C"
+                  : "#A4E504",
               borderRadius: "8px",
             }}
           >
@@ -100,6 +123,12 @@ const CampaignCard = ({ item, onCardClickHandler }) => {
                 ? "Awaiting Content"
                 : item?.requestStatus === "Past_Deadline"
                 ? "Past Deadline"
+                : item?.requestStatus === "Request_Approved"
+                ? "Request Pending"
+                : item?.requestStatus === "Cancelled"
+                ? "Cancelled"
+                : item?.requestStatus === "Request_Rejected"
+                ? "Request Rejected"
                 : "Completed"}
             </Typography>
           </Box>

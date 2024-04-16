@@ -15,13 +15,18 @@ import React from "react";
 import AuthSocial from "../AuthSocial";
 import LoginForm from "./LoginForm";
 import Link from "next/link";
-const Login = ({ title, pathLoc, linkTitle, role }) => {
+import { useRouter } from "next/navigation";
+
+const Login = ({ title, pathLoc, linkTitle, role, signupUrl }) => {
+  const router = useRouter();
   return (
     <Box style={{ height: "100vh" }}>
       <Box
         sx={{
           p: "18px 50px",
+          cursor: "pointer",
         }}
+        onClick={() => router.push("/")}
       >
         <Image
           src="/images/logo.png"
@@ -81,7 +86,7 @@ const Login = ({ title, pathLoc, linkTitle, role }) => {
                     Don’t have an account?
                   </Typography>
                   <Link
-                    href="/signup"
+                    href={signupUrl}
                     style={{
                       fontSize: "16px",
                       fontWeight: "400",
@@ -101,12 +106,12 @@ const Login = ({ title, pathLoc, linkTitle, role }) => {
                   }}
                 >
                   <Typography variant="body2" align="center">
-                    Signin as
+                    Sign in as
                   </Typography>
                   <Link
                     href={pathLoc}
                     style={{
-                      fontSize: "16px",
+                      fontSize: "14px",
                       fontWeight: "400",
                       color: "#FFCC33",
                       textDecoration: "none",

@@ -6,6 +6,7 @@ import { Box, Stack, Tab, Tabs, Typography } from "@mui/material";
 import Image from "next/image";
 import AllPage from "./Tabs/AllPage";
 import PendingPage from "./Tabs/PendingPage";
+import DeadlineTable from "./Tabs/DeadlineTable";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -50,6 +51,9 @@ const NewCampaigns = () => {
           boxShadow: "0px 0px 30px 0px #0000000D",
           borderRadius: "30px",
           p: "30px",
+          // position: "sticky",
+          // top: "0",
+          // zIndex: 1,
         }}
       >
         <Box
@@ -83,11 +87,15 @@ const NewCampaigns = () => {
             }}
           >
             <Tab
-              label={<Typography variant="subtitle1">All (15)</Typography>}
+              label={<Typography variant="subtitle1">All</Typography>}
               {...a11yProps(0)}
             />
             <Tab
-              label={<Typography variant="subtitle1">Pending (10)</Typography>}
+              label={<Typography variant="subtitle1">Pending</Typography>}
+              {...a11yProps(1)}
+            />
+            <Tab
+              label={<Typography variant="subtitle1">Past Deadline</Typography>}
               {...a11yProps(1)}
             />
           </Tabs>
@@ -98,6 +106,9 @@ const NewCampaigns = () => {
       </TabPanel>
       <TabPanel value={value} index={1}>
         <PendingPage />
+      </TabPanel>
+      <TabPanel value={value} index={2}>
+        <DeadlineTable />
       </TabPanel>
     </Box>
   );

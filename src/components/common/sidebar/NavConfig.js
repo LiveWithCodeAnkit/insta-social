@@ -7,6 +7,11 @@
 
 const navConfigBrand = [
   {
+    title: "Brief Builder",
+    path: "/brief-builder",
+    icon: "",
+  },
+  {
     title: "My Campaigns",
     path: "/brand/dashboard",
     icon: "",

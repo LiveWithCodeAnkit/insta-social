@@ -1,13 +1,11 @@
-import { useEffect } from "react";
+import { useState } from "react";
 import { createCampaign } from "../../../../store/brief_builder/campaign/campaign.slice";
 import { brandFormSchema } from "../schema";
 import { useDispatch, useSelector } from "react-redux";
 
 export const useBrandForm = ({ handleTab }) => {
   const dispatch = useDispatch();
-  const loading = useSelector(
-    (state) => state.Campaign.addCampaignDetails?.campaign.loading
-  );
+  const [loading, setLoading] = useState(false);
 
   const initialValues = {
     brandName: "",
@@ -15,42 +13,49 @@ export const useBrandForm = ({ handleTab }) => {
     brandInstagram: "",
     brandTiktok: "",
     brandDescription: "",
-    fileUpload: "",
+    fileUpload: null,
   };
 
   const handleBrandForm = async (values) => {
-    const {
-      brandName,
-      brandDescription,
-      brandTiktok,
-      brandWebsite,
-      fileUpload,
-      brandInstagram,
-    } = values;
+    setLoading(true);
 
-    console.log("values:-",values);
-    const formData = new FormData();
-    const brandDetails = {
-      brandDetails: {
-        name: brandName,
-        type: "xyz",
-        info: brandDescription,
-        website: brandWebsite,
-        socialMediaLinks: [
-          { platForm: "Instagram", link: brandInstagram },
-          { platForm: "Tiktok", link: brandTiktok },
-        ],
-      },
-    };
+    try {
+      const {
+        brandName,
+        brandDescription,
+        brandTiktok,
+        brandWebsite,
+        fileUpload,
+        brandInstagram,
+      } = values;
 
-    formData.append("data", JSON.stringify(brandDetails));
+      const formData = new FormData();
+      const brandDetails = {
+        brandDetails: {
+          name: brandName,
+          type: "xyz",
+          info: brandDescription,
+          website: brandWebsite,
+          socialMediaLinks: [
+            { platForm: "Instagram", link: brandInstagram },
+            { platForm: "Tiktok", link: brandTiktok },
+          ],
+        },
+      };
 
-    if (fileUpload) {
-      formData.append("brandDetails.logo", fileUpload[0]);
-      const res = await dispatch(createCampaign(formData));
-      if (res.payload?.success) {
-        handleTab(1);
+      formData.append("data", JSON.stringify(brandDetails));
+
+      if (fileUpload) {
+        formData.append("brandDetails.logo", fileUpload[0]);
+        const res = await dispatch(createCampaign(formData));
+        if (res.payload?.success) {
+          handleTab(1);
+        }
       }
+    } catch (error) {
+      console.error("An error occurred while submitting the form:", error);
+    } finally {
+      setLoading(false);
     }
   };
 

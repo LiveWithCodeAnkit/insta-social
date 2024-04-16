@@ -1,8 +1,17 @@
 import { Box, Typography } from "@mui/material";
 import React from "react";
 import LaunchIcon from "@mui/icons-material/Launch";
+import { useRouter } from "next/navigation";
 
-const ShippingInfo = () => {
+const ShippingInfo = ({ campaignCreatorData, campaignRequestId }) => {
+  console.log("campaignCreatorData", campaignCreatorData);
+  console.log("campaignRequestId", campaignRequestId);
+  const campaignUserDetails = campaignCreatorData?.userDetails || "";
+  const router = useRouter();
+
+  const handleShippingEdit = () => {
+    router.push("/creator/dashboard/settings");
+  };
   return (
     <>
       <Box
@@ -36,11 +45,22 @@ const ShippingInfo = () => {
               mt: "10px",
             }}
           >
-            <Typography variant="h6">irma vazquez</Typography>
-            <Typography variant="h6">9310 bxxxx</Typography>
-            <Typography variant="h6">xxxxx xx</Typography>
-            <Typography variant="h6">miami , fl 33147</Typography>
-            <Typography variant="h6">united states</Typography>
+            <Typography variant="h6">
+              {campaignUserDetails?.firstName +
+                " " +
+                campaignUserDetails?.lastName}
+            </Typography>
+            <Typography variant="h6">
+              {campaignUserDetails?.address1}
+            </Typography>
+            <Typography variant="h6">
+              {campaignUserDetails?.address2}
+            </Typography>
+            <Typography variant="h6">{campaignUserDetails?.phone}</Typography>
+            <Typography variant="h6">
+              {campaignUserDetails?.city} , {campaignUserDetails?.state}
+            </Typography>
+            <Typography variant="h6">{campaignUserDetails?.country}</Typography>
           </Box>
           <Box
             sx={{
@@ -50,9 +70,10 @@ const ShippingInfo = () => {
               cursor: "pointer",
               color: "primary.main",
             }}
+            onClick={handleShippingEdit}
           >
-            <Typography variant="h4">Edit Shipping Info</Typography>
-            <LaunchIcon sx={{ mt: "3px" }} />
+            <Typography variant="h6">Edit Shipping Info</Typography>
+            <LaunchIcon sx={{ mt: "0px" }} />
           </Box>
         </Box>
       </Box>

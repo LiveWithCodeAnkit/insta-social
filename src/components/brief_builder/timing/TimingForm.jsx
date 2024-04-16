@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { Box, Typography, Card } from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import Button from "@mui/material/Button";
@@ -13,9 +13,29 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { DemoItem } from "@mui/x-date-pickers/internals/demo";
 import { useTimingForm } from "../hook";
+import { useDispatch, useSelector } from "react-redux";
+import { getCampaignbyId } from "../../../../store/brief_builder/campaign/campaign.slice";
 
 const TimingForm = ({ handleTab }) => {
-  const { initialValues, schema, submit } = useTimingForm({ handleTab });
+  const dispatch = useDispatch();
+  const infoCam = useSelector(
+    (state) => state.Campaign.addCampaignDetails?.campaign
+  );
+
+  useEffect(() => {
+    if (infoCam?._id) {
+      dispatch(getCampaignbyId({ campaignId: infoCam._id }));
+    }
+  }, [dispatch, infoCam?._id]);
+
+  const campaignData = useSelector(
+    (state) => state.Campaign.getCampaignbyId.campaignData
+  );
+
+  const { initialValues, loading, schema, submit } = useTimingForm({
+    handleTab,
+    campaignData,
+  });
   const {
     handleSubmit,
     control,
@@ -134,47 +154,53 @@ const TimingForm = ({ handleTab }) => {
                   )}
                 </DemoItem>
               </LocalizationProvider>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DemoItem
-                  label={
-                    <Typography
-                      variant="label"
-                      sx={{
-                        fontSize: "14px",
-                        fontWeight: "600",
-                      }}
+              {campaignData?.campaignDetails?.permissionRequired ? (
+                <>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DemoItem
+                      label={
+                        <Typography
+                          variant="label"
+                          sx={{
+                            fontSize: "14px",
+                            fontWeight: "600",
+                          }}
+                        >
+                          Content Submitted for Approval
+                        </Typography>
+                      }
                     >
-                      Content Submitted for Approval
-                    </Typography>
-                  }
-                >
-                  <Controller
-                    name="contentSubmitted"
-                    control={control}
-                    defaultValue={initialValues.contentSubmitted}
-                    render={({ field: { value, onChange } }) => (
-                      <DatePicker
-                        value={value}
-                        onChange={onChange}
-                        sx={{
-                          width: "30rem",
-                          "& .MuiOutlinedInput-input": {
-                            padding: "10.5px 14px",
-                          },
-                          borderColor: errors.contentSubmitted
-                            ? "red"
-                            : "black",
-                        }}
+                      <Controller
+                        name="contentSubmitted"
+                        control={control}
+                        defaultValue={initialValues.contentSubmitted}
+                        render={({ field: { value, onChange } }) => (
+                          <DatePicker
+                            value={value}
+                            onChange={onChange}
+                            sx={{
+                              width: "30rem",
+                              "& .MuiOutlinedInput-input": {
+                                padding: "10.5px 14px",
+                              },
+                              borderColor: errors.contentSubmitted
+                                ? "red"
+                                : "black",
+                            }}
+                          />
+                        )}
                       />
-                    )}
-                  />
-                  {errors.contentSubmitted && (
-                    <Typography variant="caption" color="error">
-                      {errors.contentSubmitted.message}
-                    </Typography>
-                  )}
-                </DemoItem>
-              </LocalizationProvider>
+                      {errors.contentSubmitted && (
+                        <Typography variant="caption" color="error">
+                          {errors.contentSubmitted.message}
+                        </Typography>
+                      )}
+                    </DemoItem>
+                  </LocalizationProvider>
+                </>
+              ) : (
+                ""
+              )}
             </Box>
             <Box
               sx={{
@@ -297,8 +323,9 @@ const TimingForm = ({ handleTab }) => {
                 }}
                 variant="contained"
                 endIcon={<CgArrowLongRight />}
+                disabled={loading}
               >
-                Next
+                {loading ? "Loading..." : "Next"}
               </Button>
             </Box>
           </Card>

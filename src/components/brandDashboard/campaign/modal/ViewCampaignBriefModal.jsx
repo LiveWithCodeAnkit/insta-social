@@ -76,11 +76,19 @@ const arrowRight = () => {
   );
 };
 
-const ViewCampaignBriefModal = ({ open, handleClose, imageSmallUrls }) => {
+const ViewCampaignBriefModal = ({
+  open,
+  handleClose,
+  completeModel,
+  page,
+  rowsPerPage,
+  campaignId,
+}) => {
   const [bigImageIdx, setBigImageIdx] = useState(0);
   const [openBigImage, setOpenBigImage] = useState(false);
   const handleOpenBigImage = () => setOpenBigImage(true);
   const handleCloseBigImage = () => setOpenBigImage(false);
+  // console.log(completeModel,"completeModel");
 
   return (
     <Box>
@@ -120,7 +128,7 @@ const ViewCampaignBriefModal = ({ open, handleClose, imageSmallUrls }) => {
                 }}
               >
                 <Image
-                  src={imageSmallUrls[bigImageIdx]}
+                  src={completeModel?.uploadedContent?.[bigImageIdx]?.content}
                   alt="image"
                   width={400}
                   height={400}
@@ -173,7 +181,7 @@ const ViewCampaignBriefModal = ({ open, handleClose, imageSmallUrls }) => {
                 arrowLeft={arrowLeft}
                 arrowRight={arrowRight}
               >
-                {imageSmallUrls.map((imageUrl, idx) => {
+                {completeModel?.uploadedContent?.map((imageUrl, idx) => {
                   return (
                     <Carousel.Item key={idx}>
                       <Box
@@ -190,7 +198,7 @@ const ViewCampaignBriefModal = ({ open, handleClose, imageSmallUrls }) => {
                         }}
                       >
                         <Image
-                          src={imageUrl}
+                          src={imageUrl?.content}
                           onClick={() => {
                             setBigImageIdx(idx);
                             // onClickBigImage();
@@ -322,7 +330,13 @@ const ViewCampaignBriefModal = ({ open, handleClose, imageSmallUrls }) => {
               </Box>
             </Grid>
           </Grid>
-          <Box sx={{ mt: "20px", display:"flex", justifyContent:"space-between" }}>
+          <Box
+            sx={{
+              mt: "20px",
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
             <Box>
               <Button
                 variant="outlined"
@@ -409,7 +423,12 @@ const ViewCampaignBriefModal = ({ open, handleClose, imageSmallUrls }) => {
         </Box>
       </Modal>
 
-      <BigImageModal open={openBigImage} handleClose={handleCloseBigImage} imageSmallUrls={imageSmallUrls} bigImageIdx />
+      <BigImageModal
+        open={openBigImage}
+        handleClose={handleCloseBigImage}
+        imageSmallUrls={completeModel?.campaignId?.campaignDetails?.moodBoardDocs?.contents}
+        bigImageIdx
+      />
     </Box>
   );
 };

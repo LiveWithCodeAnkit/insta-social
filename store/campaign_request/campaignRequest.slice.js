@@ -63,9 +63,16 @@ export const campaignApproveReject = createAsyncThunk(
           status: payload.status,
         }
       );
-      return response.data;
+      if (response.success) {
+        Success(response.message);
+        return response;
+      } else {
+        Error(response.message);
+        return response;
+      }
     } catch (error) {
-      throw error;
+      Error(error.message);
+      console.log(error)
     }
   }
 );
@@ -82,12 +89,47 @@ export const contentApprovebyBrand = createAsyncThunk(
           rejectMessage: payload.rejectMessage,
         }
       );
-      return response.data;
+      // return response.data;
+      if (response.success) {
+        Success(response.message);
+        return response;
+      } else {
+        Error(response.message);
+        return response;
+      }
     } catch (error) {
+      Error(error.message);
       throw error;
     }
   }
 );
+
+export const contentIsFavoritebyBrand = createAsyncThunk(
+  "content-is-favorite-by-brand",
+  async (payload) => {
+    console.log("Favorite into payload:-", payload);
+    try {
+      const response = await POST(
+        "campaign-request/like-campaign-request",
+        {
+          campaignRequestId: payload.campaignRequestId,
+          isFavorite: payload.isFavorite
+        }
+      );
+      // return response.data;
+      if (response.success) {
+        Success(response.message);
+        return response;
+      } else {
+        Error(response.message);
+        return response;
+      }
+    } catch (error) {
+      Error(error.message);
+      throw error;
+    }
+  }
+)
 
 export const likeDislikeContent = createAsyncThunk(
   "like-dislike-content",
@@ -99,8 +141,14 @@ export const likeDislikeContent = createAsyncThunk(
           contentId: payload.contentId,
         }
       );
-      return response.data;
+      // return response.data;
+      if (response.success) {
+        return response;
+      } else {
+        return response;
+      }
     } catch (error) {
+      Error(error.message);
       throw error;
     }
   }
@@ -172,12 +220,12 @@ export const getCampaignRequestByCreator = createAsyncThunk(
 export const postTodoIssueByCreator = createAsyncThunk(
   "add-todoIssueByCreator",
   async (payload) => {
-    console.log("payload postTodoIssueByCreator :-", payload);
+    // console.log("payload postTodoIssueByCreator :-", payload);
     try {
       const response = await POST("campaign-request/raise-issue", payload);
 
       if (response.success) {
-        Success("Successfully created Issue!!");
+        Success(response.message);
         return response;
       }
       else {
@@ -195,12 +243,12 @@ export const postTodoIssueByCreator = createAsyncThunk(
 export const postContentSubmittedByCreator = createAsyncThunk(
   "add-contentSubmittedByCreator",
   async (payload) => {
-    console.log("payload postContentSubmittedByCreator :-", payload);
+    // console.log("payload postContentSubmittedByCreator :-", payload);
     try {
       const response = await POST("campaign/upload-content", payload);
 
       if (response.success) {
-        Success("Successfully created Content submitted!!");
+        Success(response.message);
         return response;
       }
       else {
@@ -219,12 +267,12 @@ export const postContentSubmittedByCreator = createAsyncThunk(
 export const postContentLinkByCreator = createAsyncThunk(
   "add-contentLinkByCreator",
   async (payload) => {
-    console.log("payload postContentLinkByCreator :-", payload);
+    // console.log("payload postContentLinkByCreator :-", payload);
     try {
       const response = await POST("campaign/save-posted-content", payload);
 
       if (response.success) {
-        Success("Successfully submitted!!");
+        Success(response.message);
         return response;
       }
       else {
@@ -260,12 +308,12 @@ export const getCreatorIssuesbyId = createAsyncThunk(
 export const postCampaignByCreator = createAsyncThunk(
   "add-campaignByCreator",
   async (payload) => {
-    console.log("payload postCampaignByCreator :-", payload);
+    // console.log("payload postCampaignByCreator :-", payload);
     try {
       const response = await POST("user/edit-profile-details", payload);
 
       if (response.success) {
-        Success("Successfully created creator profile!!");
+        Success(response.message);
         return response;
       } else {
         Warn("Error occurred while creating creator profile");
@@ -277,6 +325,19 @@ export const postCampaignByCreator = createAsyncThunk(
     }
   }
 );
+
+// Setting Form Get API
+export const getCreatorProfileByCreator = createAsyncThunk(
+  "get-creatorProfileByCreator",
+  async (payload) => {
+    try {
+      const response = await GET("user/profile-details");
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+)
 
 // view brief id based on
 export const getCampaignCreatorbyId = createAsyncThunk(
@@ -297,7 +358,7 @@ export const getCampaignCreatorbyId = createAsyncThunk(
 export const optionCampaignRequestByCreator = createAsyncThunk(
   "post-campaignRequestByCreator",
   async (payload) => {
-    console.log("payload postCampaignByCreator :-", payload);
+    // console.log("payload postCampaignByCreator :-", payload);
     try {
       const response = await POST(
         "campaign-request/campaign-approval",
@@ -305,7 +366,7 @@ export const optionCampaignRequestByCreator = createAsyncThunk(
       );
 
       if (response.success) {
-        // Success("Successfully created creator profile!!");
+        Success(response.message);
         return response;
       } else {
         // Warn("Error occurred while creating creator profile");
@@ -356,6 +417,11 @@ export const campaignRequestSlice = createSlice({
       addCampaignByCreatorData: {},
       error: null,
     },
+    getCreatorProfileByCreator: {
+      loading: false,
+      getCreatorProfileByCreatorData: {},
+      error: null,
+    },
     getCampaignCreatorbyId: {
       loading: false,
       getCampaignCreatorbyIdAllData: {},
@@ -380,7 +446,7 @@ export const campaignRequestSlice = createSlice({
       .addCase(getCampaignRequest.rejected, (state, action) => {
         console.log(action, "action");
         state.campaignRequest.loading = false;
-        state.campaignRequest.error = action.payload.message;
+        state.campaignRequest.error = action.payload?.message;
       })
 
       .addCase(getCampaignIssuesbyId.pending, (state) => {
@@ -479,6 +545,18 @@ export const campaignRequestSlice = createSlice({
       .addCase(postCampaignByCreator.rejected, (state, action) => {
         state.addCampaignByCreator.loading = false;
         state.addCampaignByCreator.error = action.payload.message;
+      })
+      .addCase(getCreatorProfileByCreator.pending, (state) => {
+        state.getCreatorProfileByCreator.loading = true;
+      })
+      .addCase(getCreatorProfileByCreator.fulfilled, (state, action) => {
+        state.getCreatorProfileByCreator.loading = false;
+        state.getCreatorProfileByCreator.getCreatorProfileByCreatorData =
+          action.payload;
+      })
+      .addCase(getCreatorProfileByCreator.rejected, (state, action) => {
+        state.getCreatorProfileByCreator.loading = false;
+        state.getCreatorProfileByCreator.error = action.payload?.message;
       })
       .addCase(getCampaignCreatorbyId.pending, (state) => {
         state.getCampaignCreatorbyId.loading = true;

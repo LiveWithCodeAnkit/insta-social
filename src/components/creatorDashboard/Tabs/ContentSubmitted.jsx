@@ -28,7 +28,6 @@ const ContentSubmitted = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [issueLinkOpen, setIssueLinkOpen] = useState({
     showIssueModal: false,
-    id: "",
     allData: "",
   });
   const dispatch = useDispatch();
@@ -41,6 +40,20 @@ const ContentSubmitted = () => {
   );
 
   // console.log("campaignByCreator", campaignByCreator);
+
+  const updatingFunction = () => {
+    dispatch(
+      getCampaignRequestByCreator({
+        page: page + 1,
+        pageSize: rowsPerPage,
+        requestStatus: [
+          "Awaiting_Content_Approval",
+          "Content_Rejected",
+          "Content_Approved",
+        ],
+      })
+    );
+  };
 
   useEffect(() => {
     dispatch(
@@ -82,7 +95,7 @@ const ContentSubmitted = () => {
       new Date(
         data?.campaignId?.campaignDetails?.readyToReviewDate
       ).toLocaleDateString(),
-      data.campaignId?._id,
+      data?.campaignId,
       data?.requestStatus
     );
   });
@@ -138,6 +151,7 @@ const ContentSubmitted = () => {
       disablePadding: false,
       label: "Post Content",
       renderCell: (item, index) => {
+        console.log("item in postcontent", item);
         return (
           <>
             {item?.status === "Content_Approved" ? (
@@ -160,7 +174,6 @@ const ContentSubmitted = () => {
                 onClick={(e) =>
                   setIssueLinkOpen({
                     showIssueModal: true,
-                    id: item?.id,
                     allData: item,
                   })
                 }
@@ -228,7 +241,7 @@ const ContentSubmitted = () => {
   const handleViewClick = (event, item) => {
     event.stopPropagation();
     // console.log("clicked", item.campaignId);
-    router.push(`/creator/dashboard/campaign/${item.campaignDetails}`);
+    router.push(`/creator/dashboard/my-campaign/${item.campaignDetails}`);
   };
 
   return (
@@ -238,9 +251,9 @@ const ContentSubmitted = () => {
           sx={{
             width: "100%",
             mb: 2,
-            borderRadius: "30px",
             boxShadow: "0px 0px 30px 0px #0000000D",
             padding: "30px 30px 00px 30px",
+            "& .MuiTableContainer-root": { borderRadius: "10px" },
           }}
         >
           {rows && (
@@ -260,8 +273,11 @@ const ContentSubmitted = () => {
       <IssueModalForm
         open={issueLinkOpen.showIssueModal}
         allData={issueLinkOpen.allData}
-        handleClose={() => setIssueLinkOpen({ showIssueModal: false, id: "" })}
+        handleClose={() =>
+          setIssueLinkOpen({ showIssueModal: false, allData: "" })
+        }
         imageSmallUrls={imageSmallUrls}
+        updatingFunction={updatingFunction}
       />
     </>
   );

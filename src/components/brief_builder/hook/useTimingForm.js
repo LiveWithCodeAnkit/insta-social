@@ -1,11 +1,14 @@
-import { timingFormSchema } from "../schema";
+import { timingFormSchema, timingFormSchemaOne } from "../schema";
 import { useDispatch, useSelector } from "react-redux";
 import { createCampaign } from "../../../../store/brief_builder/campaign/campaign.slice";
+import { useState } from "react";
 
-export const useTimingForm = ({ handleTab }) => {
+export const useTimingForm = ({ handleTab, campaignData }) => {
   const infoCam = useSelector(
     (state) => state.Campaign.addCampaignDetails?.campaign
   );
+  const [loading, setLoading] = useState(false);
+
   const dispatch = useDispatch();
   const initialValues = {
     creatorsReadyToReview: null,
@@ -23,6 +26,7 @@ export const useTimingForm = ({ handleTab }) => {
   };
 
   const handleTimingForm = async (values) => {
+    setLoading(true);
     const valuesInUTC = {
       creatorsReadyToReview: convertToUTC(values.creatorsReadyToReview),
       productShipped: convertToUTC(values.productShipped),
@@ -30,8 +34,6 @@ export const useTimingForm = ({ handleTab }) => {
       fromDate: convertToUTC(values.fromDate),
       toDate: convertToUTC(values.toDate),
     };
-
-    // console.log("TimingForm values -:", valuesInUTC);
 
     // Use valuesInUTC as needed
     const {
@@ -63,11 +65,15 @@ export const useTimingForm = ({ handleTab }) => {
     if (res.payload?.success) {
       handleTab(7);
     }
+    setLoading(false);
   };
 
   return {
     initialValues,
-    schema: timingFormSchema,
+    loading,
+    schema: campaignData?.campaignDetails?.permissionRequired
+      ? timingFormSchema
+      : timingFormSchemaOne,
     submit: handleTimingForm,
   };
 };

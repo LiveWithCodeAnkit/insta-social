@@ -1,12 +1,12 @@
 import { useDispatch, useSelector } from "react-redux";
 import { issueFormSchema } from "../schema";
-import { postContentLinkByCreator, postContentSubmittedByCreator } from "../../../../store/campaign_request/campaignRequest.slice";
+import { getCampaignRequestByCreator, postContentLinkByCreator, postContentSubmittedByCreator } from "../../../../store/campaign_request/campaignRequest.slice";
 
 
-export const useIssueForm = ({ allData, handleClose }) => {
-    // const infoCam = useSelector(
-    //     (state) => state.Campaign.addCampaignDetails?.campaign
-    // );
+export const useIssueForm = ({ allData, handleClose, updatingFunction = () => { } }) => {
+    const loading = useSelector(
+        (state) => state.CampaignRequest?.campainContentLinkbyCreator?.loading
+    );
     const dispatch = useDispatch();
     const initialValues = {
         link: "",
@@ -30,13 +30,15 @@ export const useIssueForm = ({ allData, handleClose }) => {
         const res = await dispatch(postContentLinkByCreator(contentLinkDetails));
         if (res.payload?.success) {
             handleClose();
+            updatingFunction && updatingFunction();
         }
-        console.log("res", res);
+        // console.log("res", res);
     };
 
     return {
         initialValues,
         schema: issueFormSchema,
+        loading,
         submit: handleIssueLinkForm,
     };
 };

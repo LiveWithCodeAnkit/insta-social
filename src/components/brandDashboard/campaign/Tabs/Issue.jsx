@@ -82,7 +82,7 @@ const Issue = () => {
   const rows = issueData?.data?.map((item) => {
     return createData(
       item._id,
-      item.creatorId.firstName + " " + item.creatorId.lastName,
+      item.creatorId?.firstName + " " + item.creatorId?.lastName,
       item.product,
       "",
       "",
@@ -275,17 +275,20 @@ const Issue = () => {
       </Box>
 
       {rows && (
-        <CommonTable
-          rows={rows}
-          headCells={headCells}
-          onclickHandler={onRowClickHandler}
-          page={page}
-          rowsPerPage={rowsPerPage}
-          onChangePage={handleChangePage}
-          onChangeRowsPerPage={handleChangeRowsPerPage}
-          pagination={issueData.pagination}
-          onChangePagePagination={handleChangePageForPagination}
-        />
+        <Box sx={{ "& .MuiTableContainer-root": { borderRadius: "10px" } }}>
+          <CommonTable
+            rows={rows}
+            headCells={headCells}
+            onclickHandler={onRowClickHandler}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            onChangePage={handleChangePage}
+            onChangeRowsPerPage={handleChangeRowsPerPage}
+            pagination={issueData.pagination}
+            onChangePagePagination={handleChangePageForPagination}
+            isCheckbox={true}
+          />
+        </Box>
       )}
 
       <IssueBriefModal

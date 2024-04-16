@@ -18,82 +18,6 @@ import { getUploadedContent, likeDislikeContent } from "../../../../../store/cam
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "next/navigation";
 
-const data = [
-  {
-    id: 1,
-    handle: "neatandsocial",
-    profilephoto: "/images/dummy/profilephoto.png",
-    contentPhoto: "/images/dummy/neatandsocial.png",
-    campaignName: "Tangerine & Citrus Blossom",
-  },
-  {
-    id: 2,
-    handle: "Our.littlehome",
-    profilephoto: "/images/dummy/profilephoto.png",
-    contentPhoto: "/images/dummy/Our.littlehome.png",
-    campaignName: "Classic Pack",
-  },
-  {
-    id: 3,
-    handle: "Mamatoflowers",
-    profilephoto: "/images/dummy/profilephoto.png",
-    contentPhoto: "/images/dummy/Mamatoflowers.png",
-    campaignName: "Tangerine & Citrus Blossom",
-  },
-  {
-    id: 4,
-    handle: "liveymonte",
-    profilephoto: "/images/dummy/profilephoto.png",
-    contentPhoto: "/images/dummy/liveymonte.png",
-    campaignName: "Tangerine & Citrus Blossom",
-  },
-  {
-    id: 5,
-    handle: "Threebowsandablonde",
-    profilephoto: "/images/dummy/profilephoto.png",
-    contentPhoto: "/images/dummy/Threebowsandablonde.png",
-    campaignName: "Tangerine & Citrus Blossom",
-  },
-  {
-    id: 6,
-    handle: "An.olive.grove",
-    profilephoto: "/images/dummy/profilephoto.png",
-    contentPhoto: "/images/dummy/An.olive.grove.png",
-    campaignName: "Tangerine & Citrus Blossom",
-  },
-  {
-    id: 7,
-    handle: "melissafutagaki",
-    profilephoto: "/images/dummy/profilephoto.png",
-    contentPhoto: "/images/dummy/melissafutagaki.png",
-    campaignName: "Tangerine & Citrus Blossom",
-  },
-  {
-    id: 8,
-    handle: "greeneclecticmama",
-    profilephoto: "/images/dummy/profilephoto.png",
-    contentPhoto: "/images/dummy/greeneclecticmama.png",
-    campaignName: "Tangerine & Citrus Blossom",
-  },
-];
-
-const imageSmallUrls = [
-  "/images/dummy/small_pic_1.png",
-  "/images/dummy/small_pic_2.png",
-  "/images/dummy/small_pic_5.png",
-  "/images/dummy/small_pic_3.png",
-  "/images/dummy/small_pic_4.png",
-  "/images/dummy/small_pic_2.png",
-  "/images/dummy/small_pic_3.png",
-  "/images/dummy/small_pic_4.png",
-  "/images/dummy/small_pic_2.png",
-  "/images/dummy/small_pic_3.png",
-  "/images/dummy/small_pic_4.png",
-  "/images/dummy/small_pic_2.png",
-  "/images/dummy/small_pic_3.png",
-  "/images/dummy/small_pic_4.png",
-];
-
 const ContentSubmitted = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(8);
@@ -140,6 +64,7 @@ const ContentSubmitted = () => {
           pageSize: rowsPerPage,
         })
       );
+      handleClose();
     });
   };
 
@@ -210,7 +135,7 @@ const ContentSubmitted = () => {
             <Grid item xs={3}>
               <CampaignCard
                 item={item}
-                status={"Pending Approval"}
+                status={item.contentApprovalStatus}
                 onCardClickHandler={onRowClickHandler}
                 likeDislikeChangeHandler={likeDislikeChangeHandler}
               />
@@ -245,11 +170,11 @@ const ContentSubmitted = () => {
       <ContentSubmittedModal
         open={open}
         handleClose={handleClose}
-        imageSmallUrls={imageSmallUrls}
         infoModel={modalData}
         page={page}
         rowsPerPage={rowsPerPage}
         campaignId={params.campaignId}
+        likeDislikeChangeHandler={likeDislikeChangeHandler}
       />
     </Box>
   );

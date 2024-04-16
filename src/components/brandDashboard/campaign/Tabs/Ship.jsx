@@ -43,8 +43,8 @@ const Ship = () => {
   const rows = shipmentData?.data?.map((item) => {
     return createData(
       item._id,
-      item.creatorId.firstName + " " + item.creatorId.lastName,
-      item.creatorId.address1 + "," + item.creatorId.address2,
+      item.creatorId?.firstName + " " + item.creatorId?.lastName,
+      item.creatorId?.address1 + "," + item.creatorId?.address2,
       item.product
     );
   });
@@ -251,7 +251,7 @@ const Ship = () => {
           pageSize: rowsPerPage,
         })
       );
-    })
+    });
   };
 
   const orderShippedIndividually = (item, e) => {
@@ -270,7 +270,7 @@ const Ship = () => {
         })
       );
     });
-  }
+  };
 
   return (
     <Box>
@@ -346,16 +346,19 @@ const Ship = () => {
       </Box>
 
       {rows && (
-        <CommonTable
-          rows={rows}
-          headCells={headCells}
-          page={page}
-          rowsPerPage={rowsPerPage}
-          onChangePage={handleChangePage}
-          onChangeRowsPerPage={handleChangeRowsPerPage}
-          pagination={shipmentData.pagination}
-          onChangePagePagination={handleChangePageForPagination}
-        />
+        <Box sx={{ "& .MuiTableContainer-root": { borderRadius: "10px" } }}>
+          <CommonTable
+            rows={rows}
+            headCells={headCells}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            onChangePage={handleChangePage}
+            onChangeRowsPerPage={handleChangeRowsPerPage}
+            pagination={shipmentData.pagination}
+            onChangePagePagination={handleChangePageForPagination}
+            isCheckbox={true}
+          />
+        </Box>
       )}
     </Box>
   );

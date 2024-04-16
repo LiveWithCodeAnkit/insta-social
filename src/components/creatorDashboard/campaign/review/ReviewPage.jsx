@@ -49,7 +49,12 @@ const ReviewPage = () => {
         <AboutConcept />
         <MessageAbout campaignCreatorData={campaignCreatorData} />
         <DoPage campaignCreatorData={campaignCreatorData} />
-        {campaignRequestId && <ShippingInfo />}
+        {campaignRequestId && (
+          <ShippingInfo
+            campaignCreatorData={campaignCreatorData}
+            campaignRequestId={campaignRequestId}
+          />
+        )}
         {campaignRequestId && (
           <JoinCampaign
             campaignCreatorData={campaignCreatorData}

@@ -66,22 +66,6 @@ const Navbar = ({ onOpenSidebar }) => {
               boxShadow: "0px 4px 20px 0px #FFD24B80",
             }}
           >
-            New Campaign
-          </Button>
-          <Button
-            variant="outlined"
-            type="button"
-            sx={{
-              // "&:hover": { background: "#FFCC33" },
-              border: "1px solid #212121",
-              color: "#212121",
-              height: "50px",
-              width: "118px",
-              borderRadius: "50px",
-              fontWeight: 600,
-              textTransform: "none",
-            }}
-          >
             Messages
           </Button>
           <Box
