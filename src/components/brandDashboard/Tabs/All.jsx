@@ -20,7 +20,7 @@ const All = ({ activeTab }) => {
   const router = useRouter();
   const capmpaignsData = useSelector((state) => state.Campaign.getCampaigns);
 
-  console.log("capmpaignsData", capmpaignsData.campaigns);
+  // console.log("capmpaignsData", capmpaignsData.campaigns);
 
   useEffect(() => {
     const statusForFilter =
@@ -51,10 +51,14 @@ const All = ({ activeTab }) => {
   }
 
   const rows = capmpaignsData?.campaigns?.data?.map((data, index) => {
+    const readyToReviewDate = data.campaignDetails.readyToReviewDate
+      ? dayjs(data.campaignDetails.readyToReviewDate).format("DD/MM/YYYY")
+      : "----";
+
     return createData(
       data._id,
       data.campaignDetails.campaignName,
-      dayjs(data.campaignDetails.readyToReviewDate).format("DD/MM/YYYY"),
+      readyToReviewDate,
       "",
       data.campaignDetails.campaignStatus
     );
@@ -100,7 +104,7 @@ const All = ({ activeTab }) => {
           <Button
             variant="outlined"
             type="button"
-            onClick={(e) => onClickBrief(item)}
+            onClick={(e) => onClickBrief(e, item)}
             sx={{
               border: "1px solid #212121",
               color: "#212121",
@@ -124,6 +128,7 @@ const All = ({ activeTab }) => {
       renderCell: (item, index) => {
         return (
           <Box
+            onClick={(e) => item.status === "Draft" && onClickDraft(e, item)}
             sx={{
               display: "flex",
               alignItems: "center",
@@ -137,6 +142,7 @@ const All = ({ activeTab }) => {
                   ? "#F2424C"
                   : "#FFCC33",
               borderRadius: "8px",
+              cursor: "pointer",
             }}
           >
             <Typography variant="body1">{item.status}</Typography>
@@ -160,11 +166,20 @@ const All = ({ activeTab }) => {
     setPage(0);
   };
 
-  const onClickBrief = (item) => {
-    console.log(item, "item");
-    router.push(`/brand/dashboard/${item.id}`);
+  const onClickBrief = (e, item) => {
+    e.stopPropagation();
+
+    router.push(`/brand/dashboard/view-brief/${item.id}`);
   };
 
+  const onClickDraft = (e, item) => {
+    e.stopPropagation();
+    router.push(`/brief_builder/${item.id}`);
+  };
+
+  const onclickHandler = (item) => {
+    router.push(`/brand/dashboard/${item.id}`);
+  };
   return (
     <Box sx={{ width: "100%", display: "block" }}>
       <Paper
@@ -198,7 +213,8 @@ const All = ({ activeTab }) => {
             onChangeRowsPerPage={handleChangeRowsPerPage}
             pagination={capmpaignsData.campaigns.pagination}
             onChangePagePagination={handleChangePageForPagination}
-            isCheckbox={true}
+            isCheckbox={false}
+            onclickHandler={onclickHandler}
           />
         )}
         {/* )} */}

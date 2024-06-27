@@ -6,7 +6,8 @@ import { getCampaignRequestByCreator } from "../../../../store/campaign_request/
 import { useRouter } from "next/navigation";
 import UploadContentModal from "./modal/UploadContentModal";
 import TodoIssueModalForm from "./modal/TodoIssueModalForm";
-import IssueModalForm from "./modal/IssueModalForm";
+import { statusColorMap, statusMap } from "@/helper/fn";
+import PostLinkModalForm from "./modal/PostLinkModalForm";
 
 const All = () => {
   const [open, setOpen] = useState({ showModal: false, alldata: "" });
@@ -96,9 +97,11 @@ const All = () => {
       data._id,
       data.campaignId?.campaignDetails?.campaignName,
       data?.campaignId?.brandDetails?.name,
-      new Date(
-        data?.campaignId?.campaignDetails?.readyToReviewDate
-      ).toLocaleDateString(),
+      data?.campaignId?.campaignDetails?.readyToReviewDate
+        ? new Date(
+            data?.campaignId?.campaignDetails?.readyToReviewDate
+          ).toLocaleDateString()
+        : "-",
       data?.campaignId,
       data?.requestStatus
     );
@@ -108,6 +111,13 @@ const All = () => {
     event.stopPropagation();
     // console.log("clicked", item.campaignId);
     router.push(`/creator/dashboard/my-campaign/${item?.campaignDetails?._id}`);
+  };
+
+  const handleStatusClick = (item) => {
+    console.log(item, "item");
+    if (item?.status === "Content_Rejected") {
+      setOpen({ showModal: true, alldata: item });
+    }
   };
 
   const headCells = [
@@ -163,45 +173,35 @@ const All = () => {
       renderCell: (item, index) => {
         return (
           <>
-            {item?.status === "Awaiting_Content_Approval" ||
-            item?.status === "Content_Approved" ||
-            item?.status === "Content_Rejected" ||
-            item?.status === "Issue" ||
-            item?.status === "Completed" ||
-            item?.status === "Awaiting_Shipment" ||
-            item?.status === "Cancelled" ||
-            item?.status === "Request_Approved" ||
-            item?.status === "Request_Rejected" ? (
-              "-"
+            {item?.status === "Awaiting_Content" ? (
+              <Button
+                variant="outlined"
+                type="button"
+                sx={{
+                  border: "none",
+                  color: "#00B2F7",
+                  // height: "35px",
+                  // width: "118px",
+                  borderRadius: "50px",
+                  fontWeight: 500,
+                  textTransform: "none",
+                  "&:hover": {
+                    borderColor: "info.main",
+                    backgroundColor: "info.lighter",
+                  },
+                }}
+                onClick={(e) =>
+                  setIssueOpen({
+                    showIssueModal: true,
+                    id: item?.id,
+                    allData: item,
+                  })
+                }
+              >
+                Report issue
+              </Button>
             ) : (
-              <>
-                <Button
-                  variant="outlined"
-                  type="button"
-                  sx={{
-                    border: "none",
-                    color: "#00B2F7",
-                    // height: "35px",
-                    // width: "118px",
-                    borderRadius: "50px",
-                    fontWeight: 500,
-                    textTransform: "none",
-                    "&:hover": {
-                      borderColor: "info.main",
-                      backgroundColor: "info.lighter",
-                    },
-                  }}
-                  onClick={(e) =>
-                    setIssueOpen({
-                      showIssueModal: true,
-                      id: item?.id,
-                      allData: item,
-                    })
-                  }
-                >
-                  Report issue
-                </Button>
-              </>
+              "-"
             )}
           </>
         );
@@ -227,8 +227,9 @@ const All = () => {
               "-"
             ) : (
               <>
-                {item?.campaignDetails?.campaignDetails?.permissionRequired ===
-                  true && item.status === "Awaiting_Content" ? (
+                {/* item?.campaignDetails?.campaignDetails?.permissionRequired ===
+                true && */}
+                {item.status === "Awaiting_Content" ? (
                   <Button
                     variant="contained"
                     type="button"
@@ -265,10 +266,9 @@ const All = () => {
       renderCell: (item, index) => {
         return (
           <>
-            {(item?.campaignDetails?.campaignDetails?.permissionRequired ===
-              false &&
-              item.status === "Awaiting_Content") ||
-            item?.status === "Content_Approved" ? (
+            {/* (item?.campaignDetails?.campaignDetails?.permissionRequired ===
+            false && item.status === "Awaiting_Content") || */}
+            {item?.status === "Content_Approved" ? (
               <Button
                 variant="outlined"
                 type="button"
@@ -316,16 +316,18 @@ const All = () => {
               justifyContent: "center",
               height: "36px",
               width: "190px",
-              backgroundColor:
-                item?.status === "Cancelled" ||
-                item?.status === "Request_Rejected"
-                  ? "#F2424C"
-                  : "#A4E504",
+              backgroundColor: statusColorMap[item?.status],
+              // item?.status === "Cancelled" ||
+              // item?.status === "Request_Rejected"
+              //   ? "#F2424C"
+              //   : "#A4E504",
               borderRadius: "8px",
             }}
+            onClick={() => handleStatusClick(item)}
           >
             <Typography variant="body1">
-              {item?.status === "Awaiting_Content_Approval"
+              {statusMap[item?.status]}
+              {/* {item?.status === "Awaiting_Content_Approval"
                 ? "Awaiting Content Approval"
                 : item?.status === "Content_Approved"
                 ? "Content Approved"
@@ -345,7 +347,7 @@ const All = () => {
                 ? "Request Pending"
                 : item?.status === "Request_Rejected"
                 ? "Request Rejected"
-                : "Completed"}
+                : "Completed"} */}
             </Typography>
           </Box>
         );
@@ -374,6 +376,7 @@ const All = () => {
           sx={{
             width: "100%",
             mb: 2,
+            borderRadius: "30px",
             boxShadow: "0px 0px 30px 0px #0000000D",
             padding: "30px 30px 00px 30px",
             "& .MuiTableContainer-root": { borderRadius: "10px" },
@@ -393,24 +396,24 @@ const All = () => {
           )}
         </Paper>
       </Box>
-      <UploadContentModal
-        open={open.showModal}
-        allData={open.alldata}
-        handleClose={() => setOpen({ showModal: false, alldata: "" })}
-        imageSmallUrls={imageSmallUrls}
-        updatingFunction={updatingFunction}
-      />
+      {open.alldata && (
+        <UploadContentModal
+          open={open.showModal}
+          allData={open.alldata}
+          handleClose={() => setOpen({ showModal: false, alldata: "" })}
+          updatingFunction={updatingFunction}
+        />
+      )}
       <TodoIssueModalForm
         open={issueOpen.showIssueModal}
         allData={issueOpen.allData}
         handleClose={() => setIssueOpen({ showIssueModal: false, id: "" })}
         updatingFunction={updatingFunction}
       />
-      <IssueModalForm
+      <PostLinkModalForm
         open={issueLinkOpen.showIssueModal}
         allData={issueLinkOpen.allData}
         handleClose={() => setIssueLinkOpen({ showIssueModal: false, id: "" })}
-        imageSmallUrls={imageSmallUrls}
         updatingFunction={updatingFunction}
       />
     </>

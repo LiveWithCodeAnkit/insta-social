@@ -59,9 +59,11 @@ const PendingPage = () => {
       data._id,
       data?.campaignId?.campaignDetails?.campaignName,
       data?.campaignId?.brandDetails?.name,
-      new Date(
-        data?.campaignId?.campaignDetails?.readyToReviewDate
-      ).toLocaleDateString(),
+      data?.campaignId?.campaignDetails?.readyToReviewDate
+        ? new Date(
+            data?.campaignId?.campaignDetails?.readyToReviewDate
+          ).toLocaleDateString()
+        : "-",
       data?.campaignId?._id,
       data?.requestStatus
     );

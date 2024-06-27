@@ -1,0 +1,1 @@
+export { subMenuBrand } from "./brandInfo";

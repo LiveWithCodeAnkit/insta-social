@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getCampaignCreatorbyId } from "../../../../../store/campaign_request/campaignRequest.slice";
 import { useSearchParams } from "next/navigation";
 import AboutConcept from "./conceptAbout/AboutConcept";
+import PaidPaymentInfo from "@/components/brief_builder/review/paidPayment/PaidPaymentInfo";
 
 const ReviewPage = () => {
   const dispatch = useDispatch();
@@ -22,10 +23,13 @@ const ReviewPage = () => {
       state.CampaignRequest?.getCampaignCreatorbyId
         ?.getCampaignCreatorbyIdAllData
   );
-  console.log(campaignCreatorData, "campaignCreatorData");
+  // console.log(campaignCreatorData, "campaignCreatorData");
   const campaignRequestId = queryParamsId.get("data");
-  console.log("campaignRequestId", campaignRequestId);
-  console.log("paramsId", paramsId);
+  // console.log("campaignRequestId", campaignRequestId);
+  // console.log("paramsId", paramsId);
+  const filteredPaidData = campaignCreatorData?.offerDetails?.filter(
+    (item) => item.offerType === "PAID"
+  );
 
   useEffect(() => {
     const res = dispatch(getCampaignCreatorbyId({ campaignId: paramsId?.id }));
@@ -45,8 +49,9 @@ const ReviewPage = () => {
         }}
       >
         <BrandAbout campaignCreatorData={campaignCreatorData} />
+        <PaidPaymentInfo filteredPaidData={filteredPaidData} />
         <MoodBond campaignCreatorData={campaignCreatorData} />
-        <AboutConcept />
+        <AboutConcept campaignCreatorData={campaignCreatorData} />
         <MessageAbout campaignCreatorData={campaignCreatorData} />
         <DoPage campaignCreatorData={campaignCreatorData} />
         {campaignRequestId && (

@@ -1,7 +1,4 @@
-import React, { useEffect, useState } from "react";
-import Image from "next/image";
 import {
-  Avatar,
   Box,
   Button,
   FormControl,
@@ -9,16 +6,19 @@ import {
   MenuItem,
   Select,
   Stack,
-  Typography,
+  Typography
 } from "@mui/material";
-import FavoriteIcon from "@mui/icons-material/Favorite";
+import { useParams } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getUploadedContent,
+  likeDislikeContent,
+} from "../../../../../store/campaign_request/campaignRequest.slice";
 import CampaignCard from "../Cards/CampaignCard";
 import ContentSubmittedModal from "../modal/ContentSubmittedModal";
-import { getUploadedContent, likeDislikeContent } from "../../../../../store/campaign_request/campaignRequest.slice";
-import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "next/navigation";
 
-const ContentSubmitted = () => {
+const ContentSubmitted = ({ fetchCampaignStatistics }) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(8);
   const [open, setOpen] = useState(false);
@@ -64,74 +64,77 @@ const ContentSubmitted = () => {
           pageSize: rowsPerPage,
         })
       );
+      //fetchCampaignStatistics();
       handleClose();
     });
   };
 
   return (
     <Box>
-      {contentSubmittedData?.data?.length > 0 && (
-        <Box sx={{ display: "flex", justifyContent: "flex-end", mb: "20px" }}>
-          <Stack direction={"row"} spacing={"30px"}>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Typography variant="subtitle1">View</Typography>
-              <FormControl
+      {/* {contentSubmittedData?.data?.length > 0 && ( */}
+      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: "20px" }}>
+        <Stack direction={"row"} spacing={"30px"}>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Typography variant="subtitle1">View</Typography>
+            <FormControl
+              sx={{
+                m: 1,
+                minWidth: 160,
+                "& .MuiInputBase-input": {
+                  p: "12px 10px",
+                },
+              }}
+            >
+              <Select
+                //   value={age}
+                //   onChange={handleChange}
+                defaultValue={"card"}
+                displayEmpty
+                inputProps={{ "aria-label": "Without label" }}
                 sx={{
-                  m: 1,
-                  minWidth: 160,
-                  "& .MuiInputBase-input": {
-                    p: "12px 10px",
-                  },
+                  "& .MuiSelect-icon": { color: "#212121", opacity: 0.6 },
                 }}
+                disabled={contentSubmittedData?.data?.length === 0}
               >
-                <Select
-                  //   value={age}
-                  //   onChange={handleChange}
-                  defaultValue={"card"}
-                  displayEmpty
-                  inputProps={{ "aria-label": "Without label" }}
-                  sx={{
-                    "& .MuiSelect-icon": { color: "#212121", opacity: 0.6 },
-                  }}
-                >
-                  <MenuItem value={"card"}>Card</MenuItem>
-                  <MenuItem value={"table"}>Table</MenuItem>
-                </Select>
-              </FormControl>
-            </Box>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Typography variant="subtitle1">Sort by</Typography>
-              <FormControl
+                <MenuItem value={"card"}>Card</MenuItem>
+                <MenuItem value={"table"}>Table</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Typography variant="subtitle1">Sort by</Typography>
+            <FormControl
+              sx={{
+                m: 1,
+                minWidth: 160,
+                "& .MuiInputBase-input": {
+                  p: "12px 10px",
+                },
+              }}
+            >
+              <Select
+                //   value={age}
+                //   onChange={handleChange}
+                defaultValue={"new"}
+                displayEmpty
+                inputProps={{ "aria-label": "Without label" }}
                 sx={{
-                  m: 1,
-                  minWidth: 160,
-                  "& .MuiInputBase-input": {
-                    p: "12px 10px",
-                  },
+                  "& .MuiSelect-icon": { color: "#212121", opacity: 0.6 },
                 }}
+                disabled={contentSubmittedData?.data?.length === 0}
               >
-                <Select
-                  //   value={age}
-                  //   onChange={handleChange}
-                  defaultValue={"new"}
-                  displayEmpty
-                  inputProps={{ "aria-label": "Without label" }}
-                  sx={{
-                    "& .MuiSelect-icon": { color: "#212121", opacity: 0.6 },
-                  }}
-                >
-                  <MenuItem value={"new"}>New</MenuItem>
-                  <MenuItem value={"old"}>Old</MenuItem>
-                </Select>
-              </FormControl>
-            </Box>
-          </Stack>
-        </Box>
-      )}
+                <MenuItem value={"new"}>New</MenuItem>
+                <MenuItem value={"old"}>Old</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+        </Stack>
+      </Box>
+      {/* )} */}
 
-      <Grid container spacing={"30px"}>
-        {contentSubmittedData?.data?.length > 0 &&
-          contentSubmittedData.data.map((item) => (
+      {contentSubmittedData?.data?.length > 0 ? (
+        <Grid container spacing={"30px"}>
+          {contentSubmittedData.data.map((item) => (
             <Grid item xs={3}>
               <CampaignCard
                 item={item}
@@ -141,7 +144,12 @@ const ContentSubmitted = () => {
               />
             </Grid>
           ))}
-      </Grid>
+        </Grid>
+      ) : (
+        <Typography variant="h4" sx={{ textAlign: "center", mt: "30px" }}>
+          No data found
+        </Typography>
+      )}
 
       {contentSubmittedData?.data?.length > 0 && (
         <Box sx={{ display: "flex", justifyContent: "center" }}>

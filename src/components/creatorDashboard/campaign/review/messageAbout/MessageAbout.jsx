@@ -54,7 +54,7 @@ const MessageAbout = ({ campaignCreatorData }) => {
             </div>
           </Box>
         </Box>
-        <Box
+        {/* <Box
           as="div"
           sx={{
             display: "flex",
@@ -107,7 +107,7 @@ const MessageAbout = ({ campaignCreatorData }) => {
                 </Box>
               ))}
           </Box>
-        </Box>
+        </Box> */}
       </Box>
     </>
   );

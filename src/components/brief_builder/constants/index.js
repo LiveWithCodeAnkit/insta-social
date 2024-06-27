@@ -4,3 +4,6 @@ export { navConfigBriefBuilder } from "./briefBuilder";
 export { aboutOffer } from "./briefBuilder";
 export { campaignInfoStanderd } from "./briefBuilder";
 export { campaignInfoPro } from "./briefBuilder";
+export { genderList } from "./briefBuilder";
+export { chatUserList } from "./briefBuilder";
+export { appSocketMessages } from "./briefBuilder";

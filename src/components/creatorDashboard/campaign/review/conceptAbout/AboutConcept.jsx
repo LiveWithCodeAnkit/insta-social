@@ -2,7 +2,11 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
 
-const AboutConcept = () => {
+const AboutConcept = ({ campaignCreatorData }) => {
+  console.log(campaignCreatorData, "campaignCreatorData");
+  const conceptDetails =
+    campaignCreatorData?.campaignDetails?.campaignConcept || "";
+  console.log(conceptDetails, "conceptDetails");
   return (
     <>
       <Box
@@ -14,6 +18,7 @@ const AboutConcept = () => {
           display: "flex",
           justifyContent: "space-between",
           gap: "1.8rem",
+          width: "100%",
         }}
       >
         <Box
@@ -22,7 +27,7 @@ const AboutConcept = () => {
         >
           <Typography variant="h2">Concept</Typography>
           <Box>
-            <p style={{ color: "#777777" }}>
+            {/* <p style={{ color: "#777777" }}>
               Lorem Ipsum is simply dummy text of the printing and typesetting
               industry. Lorem Ipsum has been the industry's standard dummy text
               ever since the 1500s, when an unknown printer took a galley of
@@ -53,7 +58,14 @@ const AboutConcept = () => {
                   even slightly believable. If you
                 </p>
               </li>
-            </ul>
+            </ul> */}
+            <div className="parent">
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: conceptDetails,
+                }}
+              ></div>
+            </div>
           </Box>
         </Box>
       </Box>

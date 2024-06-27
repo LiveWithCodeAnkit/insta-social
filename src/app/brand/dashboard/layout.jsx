@@ -10,9 +10,7 @@ import Loading from "@/components/common/loader/Loading";
 const Layout = (props) => {
   const router = useRouter();
   const { data: session, status, update } = useSession();
-  if (typeof window !== "undefined") {
-    console.log("status:-");
-  }
+
   useEffect(() => {
     if (status === "authenticated") {
       if (session?.role !== "BRAND") {

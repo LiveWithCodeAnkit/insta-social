@@ -6,7 +6,6 @@ import { Box, Stack, Tab, Tabs, Typography } from "@mui/material";
 import Image from "next/image";
 import AllPage from "./Tabs/AllPage";
 import PendingPage from "./Tabs/PendingPage";
-import DeadlineTable from "./Tabs/DeadlineTable";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -94,10 +93,6 @@ const NewCampaigns = () => {
               label={<Typography variant="subtitle1">Pending</Typography>}
               {...a11yProps(1)}
             />
-            <Tab
-              label={<Typography variant="subtitle1">Past Deadline</Typography>}
-              {...a11yProps(1)}
-            />
           </Tabs>
         </Box>
       </Box>
@@ -106,9 +101,6 @@ const NewCampaigns = () => {
       </TabPanel>
       <TabPanel value={value} index={1}>
         <PendingPage />
-      </TabPanel>
-      <TabPanel value={value} index={2}>
-        <DeadlineTable />
       </TabPanel>
     </Box>
   );

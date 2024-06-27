@@ -3,16 +3,20 @@ import { Box, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid";
 
 const DoPage = ({ campaignDetails }) => {
-  if (!campaignDetails) {
-    return;
+  if (
+    !campaignDetails ||
+    !campaignDetails.doThings ||
+    !campaignDetails.doNotThings
+  ) {
+    return null;
   }
+
   const { doThings, doNotThings } = campaignDetails;
 
   return (
     <>
       <Grid container spacing={2}>
         <Grid item xs={6}>
-          {" "}
           <Box
             sx={{
               backgroundColor: "white",

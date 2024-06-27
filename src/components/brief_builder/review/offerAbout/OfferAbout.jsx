@@ -38,7 +38,7 @@ const OfferAbout = ({ offerDetails }) => {
                   as="div"
                   sx={{
                     display: "flex",
-                    justifyContent: "space-between",
+                    justifyContent: "start",
                     alignItems: "start",
                     gap: "1.2rem",
                   }}
@@ -105,58 +105,44 @@ const OfferAbout = ({ offerDetails }) => {
                           <label>Instagram : @brand</label>
                         </Box>
                       </Box>
-                      {offer.variants.map((variant, index) => (
+                      <Box
+                        as="div"
+                        sx={{
+                          display: "flex",
+                          gap: "1.8rem",
+                        }}
+                      >
                         <Box
                           as="div"
                           sx={{
                             display: "flex",
-                            gap: "1.8rem",
+                            justifyContent: "start",
+                            gap: "0.3rem",
                           }}
-                          key={index}
                         >
-                          <Box
-                            as="div"
-                            sx={{
-                              display: "flex",
-                              justifyContent: "start",
-                              gap: "0.3rem",
-                            }}
-                          >
-                            <label
-                              style={{ fontSize: "18px", color: "#777777" }}
-                            >
-                              Varient Type:
-                            </label>
-                            <label
-                              style={{ fontSize: "18px", color: "#C1121F" }}
-                            >
-                              {/* {variant.variantType} */}
-                              {Array.isArray(variant.variantType)
-                                ? variant.variantType.join(", ")
-                                : variant.variantType}
-                            </label>
-                          </Box>
-                          <Box
-                            as="div"
-                            sx={{
-                              display: "flex",
-                              justifyContent: "start",
-                              gap: "0.3rem",
-                            }}
-                          >
-                            <label
-                              style={{ fontSize: "18px", color: "#777777" }}
-                            >
-                              Varient Description:
-                            </label>
-                            <label
-                              style={{ fontSize: "18px", color: "#C1121F" }}
-                            >
-                              {variant.variantDes}
-                            </label>
-                          </Box>
+                          <label style={{ fontSize: "18px", color: "#777777" }}>
+                            Variant Type:
+                          </label>
+                          <label style={{ fontSize: "18px", color: "#C1121F" }}>
+                            {offer.variant?.variantType.join(", ")}
+                          </label>
                         </Box>
-                      ))}
+                        <Box
+                          as="div"
+                          sx={{
+                            display: "flex",
+                            justifyContent: "start",
+                            gap: "0.3rem",
+                          }}
+                        >
+                          <label style={{ fontSize: "18px", color: "#777777" }}>
+                            Variant Description:
+                          </label>
+                          <label style={{ fontSize: "18px", color: "#C1121F" }}>
+                            {offer.variant?.variantDes}
+                          </label>
+                        </Box>
+                      </Box>
                     </Box>
                   </Box>
                 </Box>

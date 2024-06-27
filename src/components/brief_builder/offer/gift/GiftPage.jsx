@@ -1,22 +1,24 @@
 "use client";
 import { Box, Typography } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { useOfferForm } from "../../hook";
 import CustomTextField from "@/components/common/text-field";
 import FileUpload from "@/components/common/fileupload/FileUpload";
-import Variant from "./Variant";
 import Button from "@mui/material/Button";
 import { BiPlus } from "react-icons/bi";
 import { CgArrowLongRight, CgArrowLongLeft } from "react-icons/cg";
 import { RiDeleteBin6Fill } from "react-icons/ri";
+import { MuiChipsInput } from "mui-chips-input";
+import FileUploaderMultiple from "@/components/common/fileuploader/FileUploaderMultiple";
 
-const GiftPage = ({ handleChange }) => {
+const GiftPage = ({ handleTabInside, handleTab }) => {
   const { initialValues, loading, schema, submit } = useOfferForm({
-    handleChange,
+    handleTabInside,
+    handleTab,
   });
-
+  // handleTab(3);
   const {
     reset,
     control,
@@ -35,23 +37,36 @@ const GiftPage = ({ handleChange }) => {
 
   const handleAddGiftCard = () => {
     append({
-      offerImage: null,
+      offerImage: [],
       productName: "",
       description: "",
       productLink: "",
-      unitsPerCreator: "0",
-      variants: [
-        {
-          variantType: "",
-          variantDes: "",
-        },
-      ],
+      variantType: [],
+      variantDes: "",
     });
   };
 
   const handleRemoveOffer = (offerId) => {
     remove(offerId);
   };
+  const isValueUnique = (chipValue, allChipValues) => {
+    return allChipValues.indexOf(chipValue) === -1;
+  };
+
+  const hasAppended = useRef(false);
+  useEffect(() => {
+    if (!hasAppended.current && fields.length === 0) {
+      append({
+        offerImage: [],
+        productName: "",
+        description: "",
+        productLink: "",
+        variantType: [],
+        variantDes: "",
+      });
+      hasAppended.current = true;
+    }
+  }, [fields, append]);
 
   return (
     <>
@@ -157,33 +172,18 @@ const GiftPage = ({ handleChange }) => {
                   gap: "0.5rem",
                 }}
               >
-                <Box
-                  sx={{
-                    border: "2px dashed #FFCC33",
-                    borderRadius: "15px",
-                    width: "full",
-                    height: "12.5rem",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    backgroundColor: "#FEFAED",
-                  }}
-                >
-                  <Controller
-                    name={`gifts[${index}].offerImage`}
-                    control={control}
-                    render={({ field: { onChange } }) => (
-                      <FileUpload
-                        iconName="img"
-                        maxSize={12582912}
-                        errorText="File size is too large, please upload file size within (12MB)"
-                        onChange={(file) => {
-                          onChange(file);
-                        }}
-                      />
-                    )}
-                  />
-                </Box>
+                <Controller
+                  name={`gifts[${index}].offerImage`}
+                  control={control}
+                  render={({ field: { value, onChange } }) => (
+                    <FileUploaderMultiple
+                      name={"fileUpload"}
+                      value={value}
+                      onChange={onChange}
+                      errors={errors}
+                    />
+                  )}
+                />
                 {errors.gifts && errors.gifts[index]?.offerImage && (
                   <Typography
                     variant="caption"
@@ -221,6 +221,7 @@ const GiftPage = ({ handleChange }) => {
                     rows={5}
                     fullWidth
                     multiline
+                    value={value}
                     onChange={onChange}
                     placeholder="Product Description"
                     error={Boolean(errors?.gifts?.[index]?.description)}
@@ -243,7 +244,7 @@ const GiftPage = ({ handleChange }) => {
                   />
                 )}
               />
-              <Controller
+              {/* <Controller
                 name={`gifts[${index}].unitsPerCreator`}
                 control={control}
                 rules={{ required: true }}
@@ -259,9 +260,76 @@ const GiftPage = ({ handleChange }) => {
                     }
                   />
                 )}
-              />
+              /> */}
 
-              <Variant index={index} control={control} errors={errors} />
+              <Box
+                as="div"
+                sx={{
+                  backgroundColor: "#FEFAED",
+                  padding: "0.6rem",
+                  borderRadius: "0.6rem",
+                  display: "flex",
+                  flexDirection: "column",
+                  width: "100%",
+                  gap: "0.6rem",
+                  alignItems: "center",
+                }}
+              >
+                <Controller
+                  name={`gifts[${index}].variantType`}
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <MuiChipsInput
+                      {...field}
+                      helperText={
+                        field.value?.length === 4
+                          ? "Max 04 Tags"
+                          : "" || errors?.gifts?.[index]?.variantType?.message
+                      }
+                      error={fieldState.invalid}
+                      validate={(chipValue) => {
+                        const allChipValues = field.value;
+                        const isUnique = isValueUnique(
+                          chipValue,
+                          allChipValues
+                        );
+                        return {
+                          isError: !isUnique,
+                          textError: "Value must be unique",
+                        };
+                      }}
+                      addOnBlur
+                      className="custom-chip-input"
+                      size="small"
+                      inputProps={{
+                        maxLength: 12,
+                        style: {
+                          display: field.value?.length === 4 ? "none" : "block",
+                        },
+                      }}
+                      placeholder="Variants Type"
+                    />
+                  )}
+                />
+
+                <Controller
+                  name={`gifts[${index}].variantDes`}
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field: { value, onChange } }) => (
+                    <CustomTextField
+                      rows={5}
+                      fullWidth
+                      multiline
+                      value={value}
+                      onChange={onChange}
+                      placeholder="Variant Description"
+                      error={Boolean(errors?.gifts?.[index]?.variantDes)}
+                      helperText={errors?.gifts?.[index]?.variantDes?.message}
+                    />
+                  )}
+                />
+              </Box>
             </Box>
           ))}
         </Box>
@@ -277,6 +345,9 @@ const GiftPage = ({ handleChange }) => {
               fontWeight: 600,
               textTransform: "none",
               borderColor: "black",
+            }}
+            onClick={() => {
+              handleTab(1);
             }}
           >
             Previous

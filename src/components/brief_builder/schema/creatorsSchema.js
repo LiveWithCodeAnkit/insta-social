@@ -4,10 +4,9 @@ export const creatorsSchema = Yup.object().shape({
   country: Yup.array()
     .required("At least one country must be selected")
     .min(1, "At least one country must be selected"),
-  gender: Yup.string()
+  gender: Yup.array()
     .required("Gender required")
-    .notOneOf([" "], "Gender required")
-    .oneOf(["MALE", "FEMALE", "OTHERS"], "Invalid gender value"),
+    .min(1, "At least one gender must be selected"),
   age: Yup.array()
     .required("Age required")
     .of(

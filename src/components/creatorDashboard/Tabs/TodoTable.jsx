@@ -3,10 +3,14 @@ import { Box, Button, Paper, Typography } from "@mui/material";
 import CommonTable from "@/components/common/commonTable/CommonTable";
 import UploadContentModal from "./modal/UploadContentModal";
 import { useDispatch, useSelector } from "react-redux";
-import { getCampaignRequestByCreator } from "../../../../store/campaign_request/campaignRequest.slice";
+import {
+  getCampaignRequestByCreator,
+  getStatisticsByCreator,
+} from "../../../../store/campaign_request/campaignRequest.slice";
 import { useRouter } from "next/navigation";
 import TodoIssueModalForm from "./modal/TodoIssueModalForm";
-import IssueModalForm from "./modal/IssueModalForm";
+import { statusColorMap } from "@/helper/fn";
+import PostLinkModalForm from "./modal/PostLinkModalForm";
 
 const TodoTable = ({ activeTab }) => {
   const [open, setOpen] = useState({ showModal: false, alldata: "" });
@@ -46,6 +50,7 @@ const TodoTable = ({ activeTab }) => {
         requestStatus: ["Awaiting_Shipment", "Awaiting_Content"],
       })
     );
+    dispatch(getStatisticsByCreator());
   };
 
   useEffect(() => {
@@ -80,6 +85,7 @@ const TodoTable = ({ activeTab }) => {
     brandName,
     deadline,
     campaignDetails,
+    reportIssue,
     status
   ) {
     return {
@@ -88,19 +94,24 @@ const TodoTable = ({ activeTab }) => {
       brandName,
       deadline,
       campaignDetails,
+      reportIssue,
       status,
     };
   }
 
   const rows = campaignByCreator?.data?.map((item, index) => {
+    console.log("item into rows", item);
     return createData(
       item._id,
       item.campaignId?.campaignDetails?.campaignName,
       item?.campaignId?.brandDetails?.name,
-      new Date(
-        item?.campaignId?.campaignDetails?.readyToReviewDate
-      ).toLocaleDateString(),
+      item?.campaignId?.campaignDetails?.readyToReviewDate
+        ? new Date(
+            item?.campaignId?.campaignDetails?.readyToReviewDate
+          ).toLocaleDateString()
+        : "-",
       item?.campaignId,
+      item,
       item?.requestStatus
     );
   });
@@ -202,8 +213,7 @@ const TodoTable = ({ activeTab }) => {
       renderCell: (item, index) => {
         return (
           <>
-            {item?.campaignDetails?.campaignDetails?.permissionRequired ===
-              true && item.status === "Awaiting_Content" ? (
+            {item.status === "Awaiting_Content" ? (
               <Button
                 variant="contained"
                 type="button"
@@ -238,8 +248,9 @@ const TodoTable = ({ activeTab }) => {
       renderCell: (item, index) => {
         return (
           <>
-            {item?.campaignDetails?.campaignDetails?.permissionRequired ===
-              false && item.status === "Awaiting_Content" ? (
+            {/* item?.campaignDetails?.campaignDetails?.permissionRequired ===
+            false && item?.status === "Awaiting_Content" */}
+            {item?.status === "Content_Approved" ? (
               <Button
                 variant="outlined"
                 type="button"
@@ -288,7 +299,8 @@ const TodoTable = ({ activeTab }) => {
               height: "36px",
               width: "150px",
               backgroundColor:
-                item?.status === "Awaiting_Shipment" ? "#FFCC33" : "#A4E504",
+                // item?.status === "Awaiting_Shipment" ? "#FFCC33" : "#A4E504",
+                statusColorMap[item?.status],
               borderRadius: "8px",
             }}
           >
@@ -333,6 +345,7 @@ const TodoTable = ({ activeTab }) => {
             mb: 2,
             boxShadow: "0px 0px 30px 0px #0000000D",
             padding: "30px 30px 00px 30px",
+            borderRadius: "30px",
             "& .MuiTableContainer-root": { borderRadius: "10px" },
           }}
         >
@@ -354,20 +367,22 @@ const TodoTable = ({ activeTab }) => {
         open={open.showModal}
         allData={open.alldata}
         handleClose={() => setOpen({ showModal: false, alldata: "" })}
-        imageSmallUrls={imageSmallUrls}
         updatingFunction={updatingFunction}
       />
       <TodoIssueModalForm
         open={issueOpen.showIssueModal}
         allData={issueOpen.allData}
-        handleClose={() => setIssueOpen({ showIssueModal: false, id: "" })}
+        handleClose={() =>
+          setIssueOpen({ showIssueModal: false, id: "", allData: "" })
+        }
         updatingFunction={updatingFunction}
       />
-      <IssueModalForm
+      <PostLinkModalForm
         open={issueLinkOpen.showIssueModal}
         allData={issueLinkOpen.allData}
-        handleClose={() => setIssueLinkOpen({ showIssueModal: false, id: "" })}
-        imageSmallUrls={imageSmallUrls}
+        handleClose={() =>
+          setIssueLinkOpen({ showIssueModal: false, id: "", allData: "" })
+        }
         updatingFunction={updatingFunction}
       />
     </>

@@ -1,12 +1,16 @@
-import React, { useEffect, useState } from "react";
 import { Box } from "@mui/material";
-import { campaignInfoStanderd, campaignInfoPro } from "../../constants";
-import { CgArrowLongRight, CgArrowLongLeft } from "react-icons/cg";
 import Button from "@mui/material/Button";
+import { useParams } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { CgArrowLongLeft, CgArrowLongRight } from "react-icons/cg";
 import { useDispatch, useSelector } from "react-redux";
-import { createCampaign } from "../../../../../store/brief_builder/campaign/campaign.slice";
+import {
+  createCampaign,
+  getCampaignbyId,
+} from "../../../../../store/brief_builder/campaign/campaign.slice";
+import { campaignInfoPro, campaignInfoStanderd } from "../../constants";
 
-const CreatorsCard = ({ infoTittle, handleTab }) => {
+const CreatorsCard = ({ infoTittle, handleTab, handleChange }) => {
   const campaignInfo =
     infoTittle === "Pro" ? campaignInfoPro : campaignInfoStanderd;
 
@@ -14,6 +18,26 @@ const CreatorsCard = ({ infoTittle, handleTab }) => {
     (state) => state.Campaign.addCampaignDetails?.campaign
   );
   const dispatch = useDispatch();
+  const { brief_builder } = useParams();
+  //
+  const campaignData = useSelector(
+    (state) => state.Campaign.getCampaignbyId.campaignData
+  );
+
+  //
+
+  useEffect(() => {
+    if (infoCam?._id) {
+      dispatch(getCampaignbyId({ campaignId: infoCam._id }));
+    }
+  }, [dispatch, infoCam?._id]);
+
+  useEffect(() => {
+    if (brief_builder && brief_builder.length > 0) {
+      dispatch(getCampaignbyId({ campaignId: brief_builder[0] }));
+    }
+  }, [dispatch, brief_builder]);
+  //
   const [loading, setLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [isNextDisabled, setIsNextDisabled] = useState(true);
@@ -44,22 +68,22 @@ const CreatorsCard = ({ infoTittle, handleTab }) => {
     }
   };
 
-  const handleNextApi = async () => {
-    const { amountInfo, numInfo } = selectedItem;
+  const campaignId = infoCam?._id || (brief_builder && brief_builder[0]);
 
+  const handleNextApi = async () => {
+    const { amountInfo, numInfo, maxFollowers, minFollowers } = selectedItem;
     const newamoutnInfo = convertAmountToNumber(amountInfo);
 
     setLoading(true);
     const campaignDetails = {
       campaignDetails: {
-        campaignId: infoCam?._id,
+        campaignId: campaignId,
 
         details: {
-          campaignType: infoTittle,
           minNumberOfCreator: numInfo,
           followersCriteria: {
-            minFollowers: 100,
-            maxFollowers: 250,
+            minFollowers: minFollowers,
+            maxFollowers: maxFollowers,
           },
           approxAmount: newamoutnInfo,
         },
@@ -138,7 +162,7 @@ const CreatorsCard = ({ infoTittle, handleTab }) => {
               }}
             >
               <label style={{ fontSize: "25px", fontWeight: "800" }}>
-                100k-250k
+                {item.rangeInfo}
               </label>
               <Box
                 as="div"
@@ -181,6 +205,9 @@ const CreatorsCard = ({ infoTittle, handleTab }) => {
             fontWeight: 600,
             textTransform: "none",
             borderColor: "black",
+          }}
+          onClick={() => {
+            handleChange(event, 0);
           }}
         >
           Previous

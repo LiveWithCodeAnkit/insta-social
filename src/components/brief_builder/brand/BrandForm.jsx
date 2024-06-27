@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Typography, Card } from "@mui/material";
 import Button from "@mui/material/Button";
 import CustomTextField from "../../common/text-field";
@@ -8,13 +8,7 @@ import { useForm, Controller } from "react-hook-form";
 import { useBrandForm } from "../hook";
 import { CgArrowLongRight } from "react-icons/cg";
 import QuillMinimal from "@/components/common/editer/Editor";
-import { FaUpload } from "react-icons/fa";
-import { MdOutlineModeEdit } from "react-icons/md";
-import { IoClose } from "react-icons/io5";
-import { MdAddAPhoto } from "react-icons/md";
-import ImageUploading from "react-images-uploading";
-import Image from "next/image";
-import FileUpload from "@/components/common/fileupload/FileUpload";
+import FileUploaderMultiple from "@/components/common/fileuploader/FileUploaderMultiple";
 
 const buttonStyle = {
   background: "none",
@@ -33,14 +27,6 @@ const BrandForm = ({ handleTab }) => {
     handleTab,
   });
 
-  const [images, setImages] = React.useState([]);
-  const maxNumber = 1;
-  const onImageChange = (imageList, addUpdateIndex) => {
-    // data for submit
-
-    setImages(imageList);
-  };
-
   const {
     reset,
     control,
@@ -51,6 +37,10 @@ const BrandForm = ({ handleTab }) => {
     mode: "onChange",
     resolver: yupResolver(schema),
   });
+
+  useEffect(() => {
+    reset(initialValues);
+  }, [initialValues]);
 
   return (
     <>
@@ -121,9 +111,9 @@ const BrandForm = ({ handleTab }) => {
                   <CustomTextField
                     fullWidth
                     value={value}
-                    label="Brand Instagram"
+                    label="Instagram Handle"
                     onChange={onChange}
-                    placeholder="Brand Instagram"
+                    placeholder="Instagram"
                     error={Boolean(errors.brandInstagram)}
                     {...(errors.brandInstagram && {
                       helperText: errors.brandInstagram.message,
@@ -140,9 +130,9 @@ const BrandForm = ({ handleTab }) => {
                   <CustomTextField
                     fullWidth
                     value={value}
-                    label="Brand Tiktok"
+                    label="Tiktok Handle"
                     onChange={onChange}
-                    placeholder="Brand Tiktok"
+                    placeholder="Tiktok"
                     error={Boolean(errors.brandTiktok)}
                     {...(errors.brandTiktok && {
                       helperText: errors.brandTiktok.message,
@@ -215,47 +205,19 @@ const BrandForm = ({ handleTab }) => {
               >
                 Upload Cover Picture
               </Typography>
-              <Box
-                sx={{
-                  border: "2px dashed #FFCC33",
-                  borderRadius: "15px",
-                  width: "100%",
-                  minHeight: "12.5rem",
-                  height: "100%",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  backgroundColor: "#FEFAED",
-                  position: "relative",
-                }}
-              >
-                <Controller
-                  name="fileUpload"
-                  control={control}
-                  render={({ field: { onChange }, fieldState: { error } }) => (
-                    <FileUpload
-                      iconName="img"
-                      maxSize={12582912}
-                      errorText="File size is too large, please upload file size within (12MB)"
-                      onChange={(file) => {
-                        onChange(file);
-                      }}
-                      error={!!error}
-                    />
-                  )}
-                />
-              </Box>
-              {errors.fileUpload && (
-                <Typography
-                  variant="caption"
-                  color="error"
-                  sx={{
-                    fontSize: "0.875rem",
-                  }}
-                >
-                  {errors.fileUpload.message}
-                </Typography>
-              )}
+
+              <Controller
+                name="fileUpload"
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                  <FileUploaderMultiple
+                    name={"fileUpload"}
+                    value={value}
+                    onChange={onChange}
+                    errors={errors}
+                  />
+                )}
+              />
             </Box>
 
             <Box sx={{ display: "flex", justifyContent: "end" }}>

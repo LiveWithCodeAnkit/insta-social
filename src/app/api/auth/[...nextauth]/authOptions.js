@@ -1,5 +1,6 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import { NextResponse } from "next/server";
+import FacebookProvider from "next-auth/providers/facebook";
 
 const API_ENDPOINT = `${process.env.NEXT_PUBLIC_API_URL}/auth/login`;
 
@@ -14,7 +15,7 @@ export const authOptions = {
         session.jwt = token.jwt;
         session.sessionId = token.sessionId;
         session.role = token.role;
-        session.profileCompleted=token.profileCompleted
+        session.profileCompleted = token.profileCompleted;
       }
 
       return session;
@@ -34,6 +35,10 @@ export const authOptions = {
     },
   },
   providers: [
+    FacebookProvider({
+      clientId: process.env.FACEBOOK_CLIENT_ID,
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+    }),
     CredentialsProvider({
       type: "credentials",
       credentials: {},
@@ -63,7 +68,6 @@ export const authOptions = {
           const sessionId = user?.data?._id;
           const userRole = user.data.role;
           const profileCompleted = user.data.profileCompleted;
-          console.log("user auth :-", profileCompleted);
           return {
             ...credentials,
             jwt,

@@ -1,39 +1,20 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
-import { Box, Typography, Card } from "@mui/material";
-import Button from "@mui/material/Button";
-import CustomTextField from "../../common/text-field";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm, Controller, useFieldArray } from "react-hook-form";
-import { useContentForm } from "../hook";
-import { CgArrowLongLeft, CgArrowLongRight } from "react-icons/cg";
-import ImageUploading from "react-images-uploading";
-import { AiFillDelete, AiFillCamera } from "react-icons/ai";
-import { FaUpload } from "react-icons/fa";
-import { MdOutlineModeEdit } from "react-icons/md";
-import { IoClose } from "react-icons/io5";
-import Image from "next/image";
-import { MdAddAPhoto } from "react-icons/md";
-import { HiPlus, HiMinus } from "react-icons/hi";
-import { RiDeleteBin6Fill } from "react-icons/ri";
 import QuillMinimal from "@/components/common/editer/Editor";
 import FileUploaderMultiple from "@/components/common/fileuploader/FileUploaderMultiple";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { Box, Typography } from "@mui/material";
+import Button from "@mui/material/Button";
+import React, { useEffect, useRef } from "react";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { CgArrowLongLeft, CgArrowLongRight } from "react-icons/cg";
+import { HiPlus } from "react-icons/hi";
+import { RiDeleteBin6Fill } from "react-icons/ri";
+import CustomTextField from "../../common/text-field";
+import { useContentForm } from "../hook";
 
-const buttonStyle = {
-  background: "none",
-  border: "none",
-  color: "#FFCC33",
-  textDecoration: "none",
-  cursor: "pointer",
-  padding: 0,
-  fontSize: "16px",
-  fontWeight: "bold",
-  height: "20px",
-};
-
-const ContentForm = ({ handleChange }) => {
+const ContentForm = ({ handleTab }) => {
   const { initialValues, loading, schema, submit } = useContentForm({
-    handleChange,
+    handleTab,
   });
 
   const {
@@ -51,8 +32,9 @@ const ContentForm = ({ handleChange }) => {
     control,
     name: "externalLinks",
   });
+
   const handleAddExternalLink = () => {
-    append({});
+    append({ label: "", value: "" });
   };
 
   const handleRemoveExternalLink = (ExternalLinkIndex) => {
@@ -60,12 +42,11 @@ const ContentForm = ({ handleChange }) => {
   };
   useEffect(() => {
     if (!hasAppended.current && fields.length === 0) {
-      append({});
+      append({ label: "", value: "" });
       hasAppended.current = true;
     }
   }, [fields, append]);
 
-  console.log("errors :-", errors);
   return (
     <form onSubmit={handleSubmit(submit)}>
       <Box
@@ -107,9 +88,11 @@ const ContentForm = ({ handleChange }) => {
             control={control}
             render={({ field: { value, onChange } }) => (
               <FileUploaderMultiple
+                name={"images"}
                 value={value}
                 onChange={onChange}
                 errors={errors}
+                maxFileNum={10}
               />
             )}
           />
@@ -122,25 +105,97 @@ const ContentForm = ({ handleChange }) => {
             sx={{
               display: "flex",
               justifyContent: "start",
-              alignItems: "end",
+              alignItems: "center",
               gap: "1.2rem",
             }}
           >
-            <Controller
-              name={`externalLinks[${index}]`}
-              control={control}
-              rules={{ required: true }}
-              render={({ field: { value, onChange } }) => (
-                <CustomTextField
-                  fullWidth
-                  value={value.externalLinks}
-                  sx={{ width: "30rem" }}
-                  onChange={onChange}
-                  placeholder="External Links"
-                  label={index === 0 ? "External Link" : undefined}
-                />
-              )}
-            />
+            <Box>
+              <Controller
+                name={`externalLinks[${index}].label`}
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                  <CustomTextField
+                    fullWidth
+                    value={value}
+                    sx={{ width: "30rem" }}
+                    label="Label"
+                    onChange={onChange}
+                    placeholder="Label of Link"
+                  />
+                )}
+              />
+
+              <span>
+                {errors.externalLinks && errors.externalLinks[index]?.label && (
+                  <Typography
+                    variant="body2"
+                    sx={{ color: "error.main", marginLeft: "8px" }}
+                  >
+                    {errors.externalLinks[index].label.message}
+                  </Typography>
+                )}
+                {(!errors.externalLinks ||
+                  !errors.externalLinks[index]?.label) && (
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color:
+                        errors.externalLinks &&
+                        errors.externalLinks[index]?.label
+                          ? "error.main"
+                          : "black",
+                      marginLeft: "8px",
+                    }}
+                  >
+                    &nbsp;
+                  </Typography>
+                )}
+              </span>
+            </Box>
+
+            <Box>
+              <Controller
+                name={`externalLinks[${index}].value`}
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                  <CustomTextField
+                    fullWidth
+                    value={value}
+                    sx={{ width: "30rem" }}
+                    onChange={onChange}
+                    placeholder="External Links"
+                    label={"External Link"}
+                  />
+                )}
+              />
+              <span>
+                {errors.externalLinks && errors.externalLinks[index]?.value && (
+                  <Typography
+                    variant="body2"
+                    sx={{ color: "error.main", marginLeft: "8px" }}
+                  >
+                    {errors.externalLinks[index].value.message}
+                  </Typography>
+                )}
+                {(!errors.externalLinks ||
+                  !errors.externalLinks[index]?.value) && (
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color:
+                        errors.externalLinks &&
+                        errors.externalLinks[index]?.value
+                          ? "error.main"
+                          : "black",
+                      marginLeft: "8px",
+                    }}
+                  >
+                    &nbsp;
+                  </Typography>
+                )}
+              </span>
+            </Box>
+
             {index === fields.length - 1 ? (
               <Box
                 sx={{
@@ -177,17 +232,6 @@ const ContentForm = ({ handleChange }) => {
                 <RiDeleteBin6Fill />
               </Box>
             )}
-            <span>
-              {errors.externalLinks &&
-                typeof errors.externalLinks[index]?.message === "string" && (
-                  <Typography
-                    variant="body2"
-                    sx={{ color: "error.main", marginLeft: "8px" }}
-                  >
-                    Not Valid
-                  </Typography>
-                )}
-            </span>
           </Box>
         ))}
 
@@ -314,9 +358,7 @@ const ContentForm = ({ handleChange }) => {
             )}
           </Box>
         </Box>
-        <Box
-          sx={{ width: "34.3rem", display: "flex", gap: "1.8rem", mt: "2rem" }}
-        >
+        <Box sx={{ width: "100%", display: "flex", gap: "1.8rem", mt: "2rem" }}>
           <Box
             as="div"
             sx={{
@@ -357,6 +399,44 @@ const ContentForm = ({ handleChange }) => {
               </Typography>
             )}
           </Box>
+          <Box
+            as="div"
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "start",
+              gap: "0.5rem",
+              height: "100%",
+              width: "100%",
+            }}
+          >
+            <Typography
+              variant="label"
+              sx={{
+                fontSize: "14px",
+                fontWeight: "700",
+              }}
+            >
+              Concept
+            </Typography>
+            <Controller
+              name="campaignConcept"
+              control={control}
+              rules={{ required: true }}
+              render={({ field: { value, onChange } }) => (
+                <QuillMinimal
+                  value={value}
+                  onChange={onChange}
+                  label="campaignConcept"
+                />
+              )}
+            />
+            {errors.campaignConcept && (
+              <Typography variant="caption" color="error">
+                {errors.campaignConcept.message}
+              </Typography>
+            )}
+          </Box>
         </Box>
 
         <Box sx={{ display: "flex", justifyContent: "end", gap: "0.5rem" }}>
@@ -371,6 +451,9 @@ const ContentForm = ({ handleChange }) => {
               fontWeight: 600,
               textTransform: "none",
               borderColor: "black",
+            }}
+            onClick={() => {
+              handleTab(3);
             }}
           >
             Previous

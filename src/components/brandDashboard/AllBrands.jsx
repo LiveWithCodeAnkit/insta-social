@@ -4,7 +4,10 @@ import React, { useEffect, useState } from "react";
 import { AppBar, Box, Tab, Tabs, Typography, useTheme } from "@mui/material";
 import All from "./Tabs/All";
 import { useDispatch, useSelector } from "react-redux";
-import { getCampaignsData } from "../../../store/brief_builder/campaign/campaign.slice";
+import {
+  getCampaignsData,
+  resetCampaignData,
+} from "../../../store/brief_builder/campaign/campaign.slice";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -35,6 +38,7 @@ function a11yProps(index) {
 
 const AllBrands = () => {
   const theme = useTheme();
+  const dispatch = useDispatch();
   const [value, setValue] = useState(0);
   const [value2, setValue2] = useState(2);
   const [activeTab, setActiveTab] = useState("All");
@@ -50,6 +54,10 @@ const AllBrands = () => {
     setValue2(newValue);
     setValue(4);
   };
+
+  useEffect(() => {
+    dispatch(resetCampaignData());
+  }, []);
 
   return (
     <Box>

@@ -62,6 +62,8 @@ const TodoIssueModalForm = ({
     }
   }, [allData]);
 
+  // console.log(allData, "allData into todo");
+
   return (
     <Box>
       <Modal
@@ -95,7 +97,6 @@ const TodoIssueModalForm = ({
                 mt: "0px",
               }}
             >
-              {/* <Typography variant="h3">Classic Pack</Typography> */}
               <Box sx={{ my: "20px" }}>
                 <Grid container spacing={4}>
                   <Grid item xs={6}>
@@ -138,12 +139,25 @@ const TodoIssueModalForm = ({
                           })}
                         >
                           <MenuItem value=" ">Select Issue Type</MenuItem>
-                          <MenuItem value="PRODUCT_ISSUE">
+                          <MenuItem
+                            value="PRODUCT_ISSUE"
+                            disabled={
+                              allData?.reportIssue?.selectedOfferVariants
+                                ?.giftOffers <= 0
+                            }
+                          >
                             Product Issue
                           </MenuItem>
-                          <MenuItem value="SHIPPING_ISSUE">
+                          <MenuItem
+                            value="SHIPPING_ISSUE"
+                            disabled={
+                              allData?.reportIssue?.selectedOfferVariants
+                                ?.giftOffers <= 0
+                            }
+                          >
                             Shipping Issue
                           </MenuItem>
+                          <MenuItem value="OTHER_ISSUE">Other Issue</MenuItem>
                         </CustomTextField>
                       )}
                     />

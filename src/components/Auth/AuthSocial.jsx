@@ -1,4 +1,5 @@
 import { Box, Divider, Stack, Typography } from "@mui/material";
+import { signIn } from "next-auth/react";
 import Image from "next/image";
 import React from "react";
 
@@ -22,7 +23,7 @@ const AuthSocial = () => {
             height={60}
           />
         </Box>
-        <Box sx={{ cursor: "pointer" }}>
+        <Box sx={{ cursor: "pointer" }} onClick={() => signIn("facebook")}>
           <Image
             src="/images/facebook_logo.png"
             alt="Facebook Logo"

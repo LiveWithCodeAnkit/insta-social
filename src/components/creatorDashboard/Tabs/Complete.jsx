@@ -4,6 +4,7 @@ import CommonTable from "@/components/common/commonTable/CommonTable";
 import { useDispatch, useSelector } from "react-redux";
 import { getCampaignRequestByCreator } from "../../../../store/campaign_request/campaignRequest.slice";
 import { useRouter } from "next/navigation";
+import { statusColorMap } from "@/helper/fn";
 
 const Complete = () => {
   const [open, setOpen] = useState({ showModal: false, id: "" });
@@ -73,9 +74,11 @@ const Complete = () => {
       data._id,
       data.campaignId?.campaignDetails?.campaignName,
       data?.campaignId?.brandDetails?.name,
-      new Date(
-        data?.campaignId?.campaignDetails?.readyToReviewDate
-      ).toLocaleDateString(),
+      data?.campaignId?.campaignDetails?.readyToReviewDate
+        ? new Date(
+            data?.campaignId?.campaignDetails?.readyToReviewDate
+          ).toLocaleDateString()
+        : "-",
       data?.campaignId,
       data?.requestStatus
     );
@@ -149,7 +152,8 @@ const Complete = () => {
               height: "36px",
               width: "150px",
               backgroundColor:
-                item?.status === "Completed" ? "#A4E504" : "#FFCC33",
+                // item?.status === "Completed" ? "#A4E504" : "#FFCC33",
+                statusColorMap[item?.status],
               borderRadius: "8px",
             }}
           >
@@ -181,6 +185,7 @@ const Complete = () => {
           sx={{
             width: "100%",
             mb: 2,
+            borderRadius: "30px",
             "& .MuiTableContainer-root": { borderRadius: "10px" },
             boxShadow: "0px 0px 30px 0px #0000000D",
             padding: "30px 30px 00px 30px",

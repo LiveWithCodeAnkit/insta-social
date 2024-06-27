@@ -1,12 +1,12 @@
 import CommonTable from "@/components/common/commonTable/CommonTable";
 import { Box, Button, Paper, Stack, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import IssueModalForm from "./modal/TodoIssueModalForm";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getCampaignRequestByCreator,
   getCreatorIssuesbyId,
 } from "../../../../store/campaign_request/campaignRequest.slice";
+import { statusMap } from "@/helper/fn";
 // import AwaitingContentModal from "../modal/AwaitingContentModal";
 
 const imageSmallUrls = [
@@ -84,6 +84,11 @@ const Issue = () => {
       numeric: true,
       disablePadding: false,
       label: "Issue Type",
+      renderCell: (item, index) => {
+        return (
+          <Typography variant="body1">{statusMap[item?.issueType]}</Typography>
+        );
+      },
     },
     {
       id: "issueḬnfo",
@@ -111,9 +116,7 @@ const Issue = () => {
               borderRadius: "8px",
             }}
           >
-            <Typography variant="body1">
-              {item?.status === "PENDING" ? "Pending" : ""}
-            </Typography>
+            <Typography variant="body1">{item?.status}</Typography>
           </Box>
         );
       },
@@ -144,6 +147,7 @@ const Issue = () => {
             mb: 2,
             boxShadow: "0px 0px 30px 0px #0000000D",
             padding: "30px 30px 00px 30px",
+            borderRadius: "30px",
             "& .MuiTableContainer-root": { borderRadius: "10px" },
           }}
         >
@@ -187,7 +191,6 @@ const Issue = () => {
           )}
         </Paper>
       </Box>
-      {/* <IssueModalForm open={open} handleClose={handleClose} /> */}
     </Box>
   );
 };

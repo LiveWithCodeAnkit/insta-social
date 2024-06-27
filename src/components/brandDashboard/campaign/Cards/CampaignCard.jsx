@@ -2,10 +2,18 @@ import Image from "next/image";
 import React from "react";
 import { Avatar, Box, Button, Typography } from "@mui/material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import { getUploadedContent, likeDislikeContent } from "../../../../../store/campaign_request/campaignRequest.slice";
+import {
+  getUploadedContent,
+  likeDislikeContent,
+} from "../../../../../store/campaign_request/campaignRequest.slice";
 import { useDispatch } from "react-redux";
 
-const CampaignCard = ({ item, status, onCardClickHandler,likeDislikeChangeHandler }) => {
+const CampaignCard = ({
+  item,
+  status,
+  onCardClickHandler,
+  likeDislikeChangeHandler,
+}) => {
   const dispatch = useDispatch();
   console.log(item, "item");
   // const likeDislikeChangeHandler = (itemId, e) => {
@@ -35,6 +43,9 @@ const CampaignCard = ({ item, status, onCardClickHandler,likeDislikeChangeHandle
           backgroundColor: "#F2F6FC",
           borderRadius: "15px",
           cursor: "pointer",
+          overflow: "hidden",
+          position: "relative",
+          height: "fit-content",
         }}
       >
         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -63,18 +74,56 @@ const CampaignCard = ({ item, status, onCardClickHandler,likeDislikeChangeHandle
             my: "10px",
             // height: "200px",
             // width: "300px",
+            maxHeight: "330px",
+            height: "330px",
+            overflow: "hidden",
+            display:"flex",
+            justifyContent:"center",
+            alignItems:"center"
           }}
         >
-          <Image
-            src={item?.uploadedContent?.[0]?.content}
+          {/* <Image
+            src={item?.uploadedContent?.[0]}
             alt=""
             layout="responsive"
             width={330}
             height={330}
             // fill={true}
-          />
+          /> */}
+          {item?.uploadedContent?.[0]?.endsWith(".mp4") ? (
+            <video
+              // controls
+              width={330}
+              height={330}
+              style={{ borderRadius: "20px" }}
+            >
+              <source src={item?.uploadedContent?.[0]} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          ) : (
+            <Image
+              src={item?.uploadedContent?.[0]}
+              alt=""
+              layout="responsive"
+              width={330}
+              height={330}
+              // fill={true}
+              style={{ borderRadius: "15px" }}
+            />
+          )}
         </Box>
-        <Typography variant="body1">{item?.caption}</Typography>
+        <Typography
+          variant="body1"
+          style={{
+            height: "68px",
+            overflow: "hidden",
+            display: "-webkit-box",
+            WebkitLineClamp: 3,
+            WebkitBoxOrient: "vertical",
+          }}
+        >
+          {item?.caption}
+        </Typography>
         <Box
           sx={{
             display: "flex",

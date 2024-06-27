@@ -19,12 +19,15 @@ export const settingFormSchema = Yup.object().shape({
     .max(new Date().getFullYear() - 19, "Must be at most 19 years old"),
   email: Yup.string(),
   phone: Yup.string()
-    .matches(phoneRules, { message: "Please valid number" })
+    .matches(phoneRules, { message: "Phone number is required" })
     .required("Phone number is required"),
-  address1: Yup.string().required("Address is required"),
+  address1: Yup.string().required("Address 1 is required"),
   address2: Yup.string().required("Address 2 is required"),
   cityName: Yup.string().required("City name is required"),
   stateName: Yup.string().required("State name is required"),
   postalCode: Yup.string().required("Postal code is required"),
-  countryName: Yup.object().required("Country name is required"),
+  countryName: Yup.object().shape({
+    label: Yup.string().required("Country name is required"),
+    value: Yup.string().required("Country name is required")
+  })
 });
