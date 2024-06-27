@@ -302,7 +302,8 @@ const SettingsForm = () => {
                     defaultValue={initialValues.dob}
                     render={({ field: { value, onChange } }) => (
                       <DatePicker
-                        value={dayjs(value)}
+                        // value={dayjs(value)}
+                        value={value ? dayjs(value) : null}
                         onChange={onChange}
                         placeholder="dob"
                         sx={{
@@ -387,7 +388,7 @@ const SettingsForm = () => {
                   color: "#212121",
                 }}
               >
-                Address
+                Address 1
               </InputLabel>
               <Controller
                 name="address1"
@@ -603,13 +604,13 @@ const SettingsForm = () => {
                     />
                   )}
                 />
-                {errors.countryName && (
+                {errors.countryName?.value && (
                   <Typography
                     variant="caption"
                     color="error"
                     sx={{ marginTop: "0.3rem", fontSize: "0.875rem" }}
                   >
-                    {errors.countryName.message}
+                    {errors.countryName?.value?.message}
                   </Typography>
                 )}
               </Box>

@@ -20,6 +20,8 @@ import { FaEye } from "react-icons/fa";
 import { FaComment } from "react-icons/fa";
 import { CgMaximize } from "react-icons/cg";
 import BigImageModal from "./BigImageModal";
+import JSZip from "jszip";
+import { useRouter } from "next/navigation";
 
 const style = {
   position: "absolute",
@@ -80,6 +82,7 @@ const ViewCampaignBriefModal = ({
   open,
   handleClose,
   completeModel,
+  likeDislikeChangeHandler,
   page,
   rowsPerPage,
   campaignId,
@@ -88,7 +91,44 @@ const ViewCampaignBriefModal = ({
   const [openBigImage, setOpenBigImage] = useState(false);
   const handleOpenBigImage = () => setOpenBigImage(true);
   const handleCloseBigImage = () => setOpenBigImage(false);
+  const router = useRouter()
   // console.log(completeModel,"completeModel");
+
+
+  const handleBigImgDownload = async (e, image) => {
+    e.preventDefault();
+    const link = document.createElement("a");
+    link.href = image;
+    link.download = image.split("/").pop();
+    link.click();
+  };
+
+  const handleDownloadAll = async (e, images) => {
+    e.preventDefault();
+
+    const zip = new JSZip();
+
+    const addFileToZip = async (url) => {
+      const fileName = url?.substring(url.lastIndexOf("/") + 1);
+      const response = await fetch(url);
+
+      const fileContent = await response.blob(); // Get blob data from response
+      zip.file(fileName, fileContent);
+    };
+
+    images.forEach(({ content }) => addFileToZip(content));
+
+    zip.generateAsync({ type: "blob" }).then((zipBlob) => {
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(zipBlob);
+      link.download = "images.zip";
+      link.click();
+    });
+  };
+
+  const handleMessage = () => {
+    router.push("/brief_builder/message-brand")
+  };
 
   return (
     <Box>
@@ -128,7 +168,7 @@ const ViewCampaignBriefModal = ({
                 }}
               >
                 <Image
-                  src={completeModel?.uploadedContent?.[bigImageIdx]?.content}
+                  src={completeModel?.uploadedContent?.[bigImageIdx]}
                   alt="image"
                   width={400}
                   height={400}
@@ -145,6 +185,12 @@ const ViewCampaignBriefModal = ({
                     width: 30,
                     cursor: "pointer",
                   }}
+                  onClick={(e) =>
+                    handleBigImgDownload(
+                      e,
+                      completeModel?.uploadedContent?.[bigImageIdx]
+                    )
+                  }
                 >
                   <FaDownload fontSize="14px" />
                 </Avatar>
@@ -198,7 +244,7 @@ const ViewCampaignBriefModal = ({
                         }}
                       >
                         <Image
-                          src={imageUrl?.content}
+                          src={imageUrl}
                           onClick={() => {
                             setBigImageIdx(idx);
                             // onClickBigImage();
@@ -216,15 +262,21 @@ const ViewCampaignBriefModal = ({
             </Grid>
             <Grid item xs={7}>
               <Box>
-                <Typography variant="h4">Classic Pack</Typography>
+                <Typography variant="h4">
+                  {completeModel?.campaignId?.campaignDetails?.campaignName}
+                </Typography>
                 <Typography
                   variant="subtitle2"
-                  sx={{ color: "#777777", mt: "20px" }}
+                  sx={{
+                    color: "#777777",
+                    mt: "20px",
+                    overflowY: "auto",
+                    maxHeight: "150px",
+                    height: "150px",
+                    scrollbarWidth: "thin",
+                  }}
                 >
-                  Lorem Ipsum is simply dummy text of the printing and
-                  typesetting industry. Lorem Ipsum has been the industry's
-                  standard dummy text ever since the 1500s, It is a long
-                  established fact that a reader will be
+                  {completeModel?.caption}
                 </Typography>
                 <Box
                   sx={{
@@ -338,26 +390,57 @@ const ViewCampaignBriefModal = ({
             }}
           >
             <Box>
-              <Button
-                variant="outlined"
-                type="button"
-                startIcon={<FavoriteIcon />}
-                sx={{
-                  "&:hover": {
+              {!completeModel?.isLikedByBrand && (
+                <Button
+                  variant="outlined"
+                  type="button"
+                  startIcon={<FavoriteIcon />}
+                  onClick={(e) =>
+                    likeDislikeChangeHandler(completeModel?._id, e)
+                  }
+                  sx={{
+                    "&:hover": {
+                      border: "1px solid #F00E0E",
+                      backgroundColor: "#eabdbd",
+                    },
                     border: "1px solid #F00E0E",
-                    backgroundColor: "#eabdbd",
-                  },
-                  border: "1px solid #F00E0E",
-                  color: "#F00E0E",
-                  height: "40px",
-                  width: "100px",
-                  borderRadius: "8px",
-                  fontSize: "14px",
-                  fontWeight: 600,
-                }}
-              >
-                Like
-              </Button>
+                    color: "#F00E0E",
+                    height: "40px",
+                    width: "100px",
+                    borderRadius: "8px",
+                    fontSize: "14px",
+                    fontWeight: 600,
+                  }}
+                >
+                  Like
+                </Button>
+              )}
+              {completeModel?.isLikedByBrand && (
+                <Button
+                  variant="outlined"
+                  type="button"
+                  startIcon={<FavoriteIcon />}
+                  onClick={(e) =>
+                    likeDislikeChangeHandler(completeModel?._id, e)
+                  }
+                  sx={{
+                    "&:hover": {
+                      border: "1px solid #F00E0E",
+                      backgroundColor: "#eabdbd",
+                    },
+                    backgroundColor: "#F00E0E",
+                    color: "#fff",
+                    height: "40px",
+                    width: "100px",
+                    borderRadius: "8px",
+                    fontSize: "14px",
+                    fontWeight: 600,
+                  }}
+                >
+                  Like
+                </Button>
+              )}
+
               <Button
                 variant="contained"
                 type="button"
@@ -374,6 +457,9 @@ const ViewCampaignBriefModal = ({
                   boxShadow: "none",
                   ml: "15px",
                 }}
+                onClick={(e) =>
+                  handleDownloadAll(e, completeModel?.uploadedContent)
+                }
               >
                 Download All
               </Button>
@@ -415,6 +501,7 @@ const ViewCampaignBriefModal = ({
                   boxShadow: "none",
                   ml: "15px",
                 }}
+                onClick={handleMessage}
               >
                 Message Creator
               </Button>
@@ -426,8 +513,9 @@ const ViewCampaignBriefModal = ({
       <BigImageModal
         open={openBigImage}
         handleClose={handleCloseBigImage}
-        imageSmallUrls={completeModel?.campaignId?.campaignDetails?.moodBoardDocs?.contents}
+        imageSmallUrls={completeModel?.uploadedContent}
         bigImageIdx
+        handleBigImgDownload={completeModel?.uploadedContent?.[bigImageIdx]}
       />
     </Box>
   );

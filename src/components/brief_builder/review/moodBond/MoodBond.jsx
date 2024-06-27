@@ -1,8 +1,9 @@
-import React from "react";
-import Image from "next/image";
 import { Box, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid";
-import { exampleImages } from "../../constants";
+import Tooltip from "@mui/material/Tooltip";
+import Image from "next/image";
+import React from "react";
+import Link from "next/link";
 
 const MoodBond = ({ moodDeatils }) => {
   if (
@@ -49,6 +50,45 @@ const MoodBond = ({ moodDeatils }) => {
                 </Grid>
               ))}
           </Grid>
+
+          <Box
+            as="div"
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "center",
+              gap: "1.5rem",
+            }}
+          >
+            {moodDeatils?.externalLinks &&
+              moodDeatils?.externalLinks.map((content, index) => (
+                <Tooltip title={content?.value} arrow>
+                  <Box
+                    as="div"
+                    key={index}
+                    sx={{
+                      padding: "1rem",
+                      backgroundColor: "#FFF5D6",
+                      borderRadius: "10px",
+                      textAlign: "center",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <Link
+                      href={`https://${content?.value}`}
+                      passHref
+                      target="_blank"
+                      style={{
+                        textDecoration: "none",
+                        color: "black",
+                      }}
+                    >
+                      {content?.label}
+                    </Link>
+                  </Box>
+                </Tooltip>
+              ))}
+          </Box>
         </Box>
       </Box>
     </>

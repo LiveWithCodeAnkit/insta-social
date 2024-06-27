@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Avatar, Box, Button, Divider, Modal, Typography } from "@mui/material";
 import StarIcon from "@mui/icons-material/Star";
@@ -8,7 +8,12 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import CloseIcon from "@mui/icons-material/Close";
 import Carousel from "react-grid-carousel";
 import { useDispatch } from "react-redux";
-import { campaignApproveReject, getCampaignRequest } from "../../../../../store/campaign_request/campaignRequest.slice";
+import {
+  campaignApproveReject,
+  contentIsFavoritebyBrand,
+  getCampaignRequest,
+  getStatisticsByCreator,
+} from "../../../../../store/campaign_request/campaignRequest.slice";
 
 const style = {
   position: "absolute",
@@ -65,14 +70,52 @@ const arrowRight = () => {
   );
 };
 
-const HandleBriefModal = ({ imageSmallUrls, open, handleClose, data, campaignId, page, rowsPerPage }) => {
+const HandleBriefModal = ({
+  imageSmallUrls,
+  open,
+  handleClose,
+  data,
+  campaignId,
+  page,
+  rowsPerPage,
+  fetchCampaignStatistics,
+  getCampaignRequestList,
+}) => {
   console.log(data, "data in >>");
   const dispatch = useDispatch();
+  const [favoriteStatus, setFavoriteStatus] = useState(
+    data?.favorites || false
+  );
+
+  useEffect(() => {
+    console.log(data?.favorites,"data?.favorites");
+    setFavoriteStatus(data?.favorites || false);
+    // return () => {
+    //   setFavoriteStatus(false);
+    // };
+  }, [data]);
+
+  const isFavoriteHandler = (e) => {
+    e.stopPropagation();
+    dispatch(
+      contentIsFavoritebyBrand({
+        campaignRequestId: data.id,
+        isFavorite: !favoriteStatus,
+      })
+    ).then(() => {
+      getCampaignRequestList();
+      setFavoriteStatus((prev) => !prev);
+    });
+  };
 
   const approveRejectHandler = (status, e) => {
     e.stopPropagation();
     dispatch(
-      campaignApproveReject({ campaignId: data.id, status: status })
+      campaignApproveReject({
+        campaignId,
+        campaignRequestIds: [data.id],
+        status,
+      })
     ).then(() => {
       dispatch(
         getCampaignRequest({
@@ -82,6 +125,7 @@ const HandleBriefModal = ({ imageSmallUrls, open, handleClose, data, campaignId,
           pageSize: rowsPerPage,
         })
       );
+      fetchCampaignStatistics();
       handleClose();
     });
   };
@@ -211,9 +255,14 @@ const HandleBriefModal = ({ imageSmallUrls, open, handleClose, data, campaignId,
                 variant="outlined"
                 type="button"
                 startIcon={<StarIcon />}
+                onClick={isFavoriteHandler}
                 sx={{
-                  border: "1px solid #212121",
-                  color: "#212121",
+                  border: favoriteStatus ? "none" : "1px solid #212121",
+                  color: favoriteStatus ? "#fff" : "#212121",
+                  backgroundColor: favoriteStatus ? "#FFCC33" : "#fff",
+                  ":hover": {
+                    background: favoriteStatus && "#fcbf09",
+                  },
                   // height: "40px",
                   // width: "118px",
                   borderRadius: "50px",

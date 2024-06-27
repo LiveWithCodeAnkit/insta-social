@@ -10,16 +10,23 @@ import {
   oneOrderShipped,
 } from "../../../../../store/campaign_request/campaignRequest.slice";
 import { useToastMessages } from "@/components/lib/messages/useToastMessages";
+import TrackingModal from "../modal/TrackingModal";
+import { postExportCSVShipping } from "../../../../../store/brief_builder/campaign/campaign.slice";
 
-const Ship = () => {
+const Ship = ({ fetchCampaignStatistics }) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [selected, setSelected] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [modalData, setModalData] = useState({});
+
   const dispatch = useDispatch();
   const params = useParams();
   const shipmentData = useSelector(
     (state) => state.CampaignRequest.campaignRequest.campaignRequestData
   );
   const { Success, Warn, Error } = useToastMessages();
+  console.log(shipmentData, "shipmentData");
 
   useEffect(() => {
     dispatch(
@@ -31,12 +38,13 @@ const Ship = () => {
       })
     );
   }, [page, rowsPerPage]);
-  function createData(id, handle, address, product) {
+  function createData(id, handle, address, product, tracking) {
     return {
       id,
       handle,
       address,
       product,
+      tracking,
     };
   }
 
@@ -45,55 +53,37 @@ const Ship = () => {
       item._id,
       item.creatorId?.firstName + " " + item.creatorId?.lastName,
       item.creatorId?.address1 + "," + item.creatorId?.address2,
-      item.product
+      item.selectedOfferVariants
+        ?.filter((data) => data?.offerId?.offerType === "GIFT")
+        ?.map(
+          (data) =>
+            `${data?.offerId?.productName || "-"}${
+              `(${data?.variant})` || data?.variant
+            }`
+        )
+        .join(", ") || "-",
+      item.trackingNumber
     );
   });
 
-  // const rows = [
-  //   createData(
-  //     1,
-  //     "neatandsocial",
-  //     "John Doe, 1216 Broadway, Fl 2, New York, NY 10001 United States",
-  //     "Tangerine & Citrus Blossom"
-  //   ),
-  //   createData(
-  //     2,
-  //     "Our.littlehome",
-  //     "John Doe, 1216 Broadway, Fl 2, New York, NY 10001 United States",
-  //     "Classic Pack"
-  //   ),
-  //   createData(
-  //     3,
-  //     "Mamatoflowers",
-  //     "John Doe, 1216 Broadway, Fl 2, New York, NY 10001 United States",
-  //     "Plastic Free Pack"
-  //   ),
-  //   createData(
-  //     4,
-  //     "liveymonte",
-  //     "John Doe, 1216 Broadway, Fl 2, New York, NY 10001 United States",
-  //     "Plastic Free Pack"
-  //   ),
-  //   createData(
-  //     5,
-  //     "Threebowsandablonde",
-  //     "John Doe, 1216 Broadway, Fl 2, New York, NY 10001 United States",
-  //     "Classic Pack"
-  //   ),
-  //   createData(
-  //     6,
-  //     "Mumingfrom.ito.z",
-  //     "John Doe, 1216 Broadway, Fl 2, New York, NY 10001 United States",
-  //     "Herbal Pack"
-  //   ),
-  //   createData(7, "Ice cream sandwich", "", 237, 9.0, 37),
-  //   createData(8, "Jelly Bean", 375, 0.0, 94),
-  //   createData(9, "KitKat", 518, 26.0, 65),
-  //   createData(10, "Lollipop", 392, 0.2, 98),
-  //   createData(11, "Marshmallow", 318, 0, 81),
-  //   createData(12, "Nougat", 360, 19.0, 9),
-  //   createData(13, "Oreo", 437, 18.0, 63),
-  // ];
+  const updatingFunction = () => {
+    dispatch(
+      getCampaignRequest({
+        campaignId: params.campaignId,
+        requestStatus: ["Awaiting_Shipment"],
+        page: page + 1,
+        pageSize: rowsPerPage,
+      })
+    );
+    fetchCampaignStatistics();
+  };
+
+  const shouldShowButton = shipmentData?.data && shipmentData.data.length > 0;
+  const shouldEnableButton =
+    shouldShowButton &&
+    shipmentData.data[0].campaignId.campaignDetails.joinedCretors >=
+      shipmentData.data[0].campaignId.campaignDetails.minNumberOfCreator;
+  console.log(shouldEnableButton, "shouldEnableButton");
 
   const headCells = [
     {
@@ -113,6 +103,20 @@ const Ship = () => {
       numeric: true,
       disablePadding: false,
       label: "Product",
+      renderCell: (item, index) => {
+        return (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              height: "36px",
+              width: "150px",
+            }}
+          >
+            <Typography variant="body1">{item.product}</Typography>
+          </Box>
+        );
+      },
     },
     {
       id: "tracking",
@@ -121,26 +125,50 @@ const Ship = () => {
       label: "Tracking",
       renderCell: (item, index) => {
         return (
-          <Button
-            variant="outlined"
-            type="button"
-            sx={{
-              border: "none !important",
-              color: "#212121",
-              // height: "40px",
-              // width: "118px",
-              borderRadius: "50px",
-              fontSize: "14px",
-              fontWeight: 500,
-              textTransform: "none",
-              color: "secondary.main",
-              opacity: "0.7",
-              whiteSpace: "nowrap",
-              // p:0
-            }}
-          >
-            + &nbsp;Add Tracking
-          </Button>
+          <>
+            {item?.tracking === null ? (
+              <Button
+                variant="outlined"
+                type="button"
+                onClick={(e) => handleOpen(e, item)}
+                sx={{
+                  border: "none !important",
+                  color: "#212121",
+                  borderRadius: "50px",
+                  fontSize: "14px",
+                  fontWeight: 500,
+                  textTransform: "none",
+                  color: "secondary.main",
+                  opacity: "0.7",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                + &nbsp;Add Tracking
+              </Button>
+            ) : (
+              <Button
+                variant="outlined"
+                type="button"
+                onClick={(e) => handleOpen(e, item)}
+                sx={{
+                  border: "none !important",
+                  color: "#212121",
+                  borderRadius: "50px",
+                  fontSize: "14px",
+                  fontWeight: 500,
+                  textTransform: "none",
+                  // color: "secondary.main",
+                  opacity: "0.7",
+                  whiteSpace: "nowrap",
+                  "&:hover ": {
+                    textDecoration: "underline",
+                  },
+                }}
+              >
+                {item?.tracking}
+              </Button>
+            )}
+          </>
         );
       },
     },
@@ -181,7 +209,8 @@ const Ship = () => {
             variant="contained"
             type="button"
             endIcon={<NorthEastIcon />}
-            onClick={(e) => orderShippedIndividually(item, e)}
+            onClick={(e) => orderShippedinBulk([item.id], e)}
+            disabled={!shouldEnableButton}
             sx={{
               // "&:hover": { background: "#FFCC33" },
               background: "#FFCC33",
@@ -225,6 +254,12 @@ const Ship = () => {
     },
   ];
 
+  const handleOpen = (e, item) => {
+    setOpen(true);
+    setModalData(item);
+  };
+  const handleClose = () => setOpen(false);
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -237,10 +272,14 @@ const Ship = () => {
     setPage(0);
   };
 
-  const orderShippedinBulk = () => {
+  const orderShippedinBulk = (selectedItems) => {
+    if (selectedItems.length === 0) {
+      Warn("Please select atleast one item");
+      return;
+    }
     dispatch(
       allOrderShippedinBulk({
-        campaignId: params.campaignId,
+        campaignRequestIds: selectedItems,
       })
     ).then(() => {
       dispatch(
@@ -251,6 +290,7 @@ const Ship = () => {
           pageSize: rowsPerPage,
         })
       );
+      fetchCampaignStatistics();
     });
   };
 
@@ -272,78 +312,126 @@ const Ship = () => {
     });
   };
 
+  const handleSelectAllClick = (event) => {
+    event.stopPropagation();
+    if (event.target.checked) {
+      const newSelected = rows.map((n) => n.id);
+      setSelected(newSelected);
+      return;
+    }
+    setSelected([]);
+  };
+  const handleClickOnCheckbox = (event, id) => {
+    const selectedIndex = selected.indexOf(id);
+    let newSelected = [];
+
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selected, id);
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(selected.slice(1));
+    } else if (selectedIndex === selected.length - 1) {
+      newSelected = newSelected.concat(selected.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        selected.slice(0, selectedIndex),
+        selected.slice(selectedIndex + 1)
+      );
+    }
+    setSelected(newSelected);
+  };
+
+  //api call
+  const handleCSVFIle = async () => {
+    const res = await dispatch(postExportCSVShipping(params.campaignId));
+
+    if (res.payload) {
+      const url = window.URL.createObjectURL(new Blob([res.payload]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "shippingInfo.csv");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    }
+  };
+
+  //
   return (
     <Box>
-      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: "20px" }}>
-        <Stack direction={"row"} spacing={"30px"}>
-          <Button
-            variant="outlined"
-            type="button"
-            sx={{
-              border: "1px solid #212121",
-              color: "#212121",
-              height: "40px",
-              width: "150px",
-              borderRadius: "50px",
-              fontSize: "14px",
-              fontWeight: 600,
-              textTransform: "none",
-            }}
-          >
-            Upload Tracking
-          </Button>
-          <Button
-            variant="outlined"
-            type="button"
-            sx={{
-              border: "1px solid #212121",
-              color: "#212121",
-              height: "40px",
-              width: "150px",
-              borderRadius: "50px",
-              fontSize: "14px",
-              fontWeight: 600,
-              textTransform: "none",
-            }}
-          >
-            Shipping Export
-          </Button>
-          <Button
-            variant="outlined"
-            type="button"
-            sx={{
-              border: "1px solid #212121",
-              color: "#212121",
-              height: "40px",
-              width: "180px",
-              borderRadius: "50px",
-              fontSize: "14px",
-              fontWeight: 600,
-              textTransform: "none",
-            }}
-          >
-            Message All Creators
-          </Button>
-          <Button
-            variant="contained"
-            type="button"
-            onClick={() => orderShippedinBulk()}
-            sx={{
-              background: "#FFCC33",
-              color: "#212121",
-              height: "40px",
-              width: "160px",
-              borderRadius: "50px",
-              fontSize: "14px",
-              fontWeight: 600,
-              textTransform: "none",
-              boxShadow: "none",
-            }}
-          >
-            All Orders Shipped
-          </Button>
-        </Stack>
-      </Box>
+      {rows?.length > 0 && (
+        <Box sx={{ display: "flex", justifyContent: "flex-end", mb: "20px" }}>
+          <Stack direction={"row"} spacing={"30px"}>
+            <Button
+              variant="outlined"
+              type="button"
+              sx={{
+                border: "1px solid #212121",
+                color: "#212121",
+                height: "40px",
+                width: "150px",
+                borderRadius: "50px",
+                fontSize: "14px",
+                fontWeight: 600,
+                textTransform: "none",
+              }}
+            >
+              Upload Tracking
+            </Button>
+            <Button
+              variant="outlined"
+              type="button"
+              sx={{
+                border: "1px solid #212121",
+                color: "#212121",
+                height: "40px",
+                width: "150px",
+                borderRadius: "50px",
+                fontSize: "14px",
+                fontWeight: 600,
+                textTransform: "none",
+              }}
+              onClick={handleCSVFIle}
+            >
+              Shipping Export
+            </Button>
+            <Button
+              variant="outlined"
+              type="button"
+              sx={{
+                border: "1px solid #212121",
+                color: "#212121",
+                height: "40px",
+                width: "180px",
+                borderRadius: "50px",
+                fontSize: "14px",
+                fontWeight: 600,
+                textTransform: "none",
+              }}
+            >
+              Message All Creators
+            </Button>
+            <Button
+              variant="contained"
+              type="button"
+              onClick={() => orderShippedinBulk(selected)}
+              disabled={!shouldEnableButton}
+              sx={{
+                background: "#FFCC33",
+                color: "#212121",
+                height: "40px",
+                width: "160px",
+                borderRadius: "50px",
+                fontSize: "14px",
+                fontWeight: 600,
+                textTransform: "none",
+                boxShadow: "none",
+              }}
+            >
+              All Orders Shipped
+            </Button>
+          </Stack>
+        </Box>
+      )}
 
       {rows && (
         <Box sx={{ "& .MuiTableContainer-root": { borderRadius: "10px" } }}>
@@ -357,9 +445,20 @@ const Ship = () => {
             pagination={shipmentData.pagination}
             onChangePagePagination={handleChangePageForPagination}
             isCheckbox={true}
+            selected={selected}
+            handleSelectAllClick={handleSelectAllClick}
+            handleClickOnCheckbox={handleClickOnCheckbox}
           />
         </Box>
       )}
+      {
+        <TrackingModal
+          open={open}
+          handleClose={handleClose}
+          modalData={modalData}
+          updatingFunction={updatingFunction}
+        />
+      }
     </Box>
   );
 };

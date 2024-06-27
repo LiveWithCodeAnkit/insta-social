@@ -3,12 +3,14 @@ import Image from "next/image";
 import { Box, Button, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { exampleImages } from "../../../constants/creator";
+import Tooltip from "@mui/material/Tooltip";
+import Link from "next/link";
 
 const MoodBond = ({ campaignCreatorData }) => {
   const moodBondDetails =
     campaignCreatorData?.campaignDetails?.moodBoardDocs || {};
 
-  console.log(moodBondDetails, "moodBondDetails");
+  // console.log(moodBondDetails, "moodBondDetails");
   return (
     <>
       <Box
@@ -31,7 +33,7 @@ const MoodBond = ({ campaignCreatorData }) => {
           }}
         >
           <Typography variant="h2">Mood Board</Typography>
-          <Grid container spacing={"30px"} columns={{ sm: 4, md: 6, lg: 8 }}>
+          <Grid container spacing={"30px"} columns={{ sm: 4, md: 6, lg: 12 }}>
             {moodBondDetails?.contents?.map((image, index) => (
               <Grid item sm={2} key={index}>
                 <Image
@@ -39,7 +41,7 @@ const MoodBond = ({ campaignCreatorData }) => {
                   alt={`Image ${index}`}
                   width={200}
                   height={200}
-                  layout="responsive"
+                  // layout="responsive"
                 />
               </Grid>
             ))}
@@ -63,91 +65,31 @@ const MoodBond = ({ campaignCreatorData }) => {
                   gap: "1.8rem",
                 }}
               >
-                <Box
-                  as="div"
-                  sx={{
-                    padding: "1rem",
-                    backgroundColor: "#FFF5D6",
-                    borderRadius: "10px",
-                    cursor: "pointer",
-                  }}
-                >
-                  {link}
-                </Box>
+                <Tooltip title={link?.value} arrow>
+                  <Box
+                    as="div"
+                    sx={{
+                      padding: "1rem",
+                      backgroundColor: "#FFF5D6",
+                      borderRadius: "10px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <Link
+                      href={`https://${link?.value}`}
+                      passHref
+                      target="_blank"
+                      style={{
+                        textDecoration: "none",
+                        color: "black",
+                      }}
+                    >
+                      {link?.label}
+                    </Link>
+                  </Box>
+                </Tooltip>
               </Grid>
             ))}
-            {/* <Grid
-              item
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "1.8rem",
-              }}
-            >
-              <Button
-                sx={{
-                  width: "330px",
-                  height: "50px",
-                  borderRadius: "10px",
-                  background: "#FFF5D6",
-                  color: "common.black",
-                  fontSize: "14px",
-                  fontWeight: "600",
-                }}
-              >
-                Instagram : Example 3
-              </Button>
-              <Button
-                sx={{
-                  width: "330px",
-                  height: "50px",
-                  borderRadius: "10px",
-                  background: "#FFF5D6",
-                  color: "common.black",
-                  fontSize: "14px",
-                  fontWeight: "600",
-                }}
-              >
-                Instagram : Example 4
-              </Button>
-            </Grid>
-            <Grid
-              item
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "1.8rem",
-              }}
-            >
-              <Button
-                sx={{
-                  width: "330px",
-                  height: "50px",
-                  borderRadius: "10px",
-                  background: "#FFF5D6",
-                  color: "common.black",
-                  fontSize: "14px",
-                  fontWeight: "600",
-                }}
-              >
-                Instagram : Example 5
-              </Button>
-              <Button
-                sx={{
-                  width: "330px",
-                  height: "50px",
-                  borderRadius: "10px",
-                  background: "#FFF5D6",
-                  color: "common.black",
-                  fontSize: "14px",
-                  fontWeight: "600",
-                }}
-              >
-                Instagram : Example 6
-              </Button>
-            </Grid> */}
           </Grid>
         </Box>
       </Box>

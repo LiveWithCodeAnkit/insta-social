@@ -3,12 +3,8 @@ import { Fragment, useEffect, useState } from "react";
 
 // ** MUI Imports
 import Box from "@mui/material/Box";
-import List from "@mui/material/List";
 import Button from "@mui/material/Button";
-import ListItem from "@mui/material/ListItem";
 import Typography from "@mui/material/Typography";
-import IconButton from "@mui/material/IconButton";
-import { MdOutlineModeEdit } from "react-icons/md";
 import Image from "next/image";
 // ** Icon Imports
 // import Icon from "src/@core/components/icon";
@@ -32,10 +28,13 @@ const buttonStyle = {
 };
 
 const FileUploaderMultiple = ({
+  label = "",
+  name,
   value,
   onChange,
   imgWidth = 200,
   imgHeight = 200,
+  maxFileNum = 1,
   errors,
 }) => {
   // ** State
@@ -54,32 +53,100 @@ const FileUploaderMultiple = ({
   //   },
   // });
 
+  // const renderFilePreview = (file) => {
+  //   console.log("dfdkfkdkfd:-", file);
+
+  //   if (file.type.startsWith("image")) {
+  //     return (
+  //       <Image
+  //         src={URL.createObjectURL(file)}
+  //         width={imgWidth}
+  //         height={imgHeight}
+  //         alt={file.name}
+  //       />
+  //     );
+  //   } else if (file.type.startsWith("video")) {
+  //     return (
+  //       <video
+  //         style={{
+  //           width: "200px",
+  //           aspectRatio: "auto 200 / 200",
+  //           height: "200px",
+  //         }}
+  //         controls
+  //       >
+  //         <source src={URL.createObjectURL(file)} type={file.type} />
+  //         Your browser does not support the video tag.
+  //       </video>
+  //     );
+  //   } else {
+  //     return <span>Not support</span>;
+  //   }
+  // };
+
   const renderFilePreview = (file) => {
-    if (file.type.startsWith("image")) {
-      return (
-        <Image
-          src={URL.createObjectURL(file)}
-          width={imgWidth}
-          height={imgHeight}
-          alt={file.name}
-        />
-      );
-    } else if (file.type.startsWith("video")) {
-      return (
-        <video
-          style={{
-            width: "200px",
-            aspectRatio: "auto 200 / 200",
-            height: "200px",
-          }}
-          controls
-        >
-          <source src={URL.createObjectURL(file)} type={file.type} />
-          Your browser does not support the video tag.
-        </video>
-      );
+    // Check if file is defined and not null
+    if (file) {
+      // Check if the file starts with "http://" or "https://"
+      if (
+        typeof file === "string" &&
+        (file.startsWith("http://") || file.startsWith("https://")) &&
+        /\.(jpg|jpeg|gif|svg|png)$/i.test(file) && // Check if it's a URL ending with one of these image extensions
+        !/\.(mp4|webm)$/i.test(file)
+      ) {
+        return (
+          <img
+            src={file}
+            alt="preview"
+            style={{ width: "200px", height: "200px" }}
+          />
+        );
+      } else if (
+        typeof file === "string" &&
+        (file.startsWith("http://") || file.startsWith("https://")) &&
+        /\.(mp4|webm)$/i.test(file)
+      ) {
+        return (
+          <video
+            style={{
+              width: "200px",
+              aspectRatio: "auto 200 / 200",
+              height: "200px",
+            }}
+            controls
+          >
+            <source src={file} type="video/webm" />
+            Your browser does not support the video tag.
+          </video>
+        );
+      } else if (file.type.startsWith("image")) {
+        return (
+          <Image
+            src={URL.createObjectURL(file)}
+            width={imgWidth}
+            height={imgHeight}
+            alt={file.name}
+          />
+        );
+      } else if (file.type.startsWith("video")) {
+        return (
+          <video
+            style={{
+              width: "200px",
+              aspectRatio: "auto 200 / 200",
+              height: "200px",
+            }}
+            controls
+          >
+            <source src={URL.createObjectURL(file)} type={file.type} />
+            Your browser does not support the video tag.
+          </video>
+        );
+      } else {
+        return <span>Not supported</span>;
+      }
     } else {
-      return <span>Not support</span>;
+      return <span>No file selected</span>;
     }
   };
 
@@ -90,8 +157,8 @@ const FileUploaderMultiple = ({
         return fileType === "image" || fileType === "video";
       });
 
-      if (files.length + filteredFiles.length > 5) {
-        const remainingSpace = 5 - files.length;
+      if (files.length + filteredFiles.length > maxFileNum) {
+        const remainingSpace = maxFileNum - files.length;
         filteredFiles.splice(remainingSpace);
       }
       setRejectedFiles(fileRejections);
@@ -113,9 +180,18 @@ const FileUploaderMultiple = ({
     },
   });
 
-  const handleRemoveFile = (file) => {
-    setFiles((prevFiles) => prevFiles.filter((f) => f.name !== file.name));
-    onChange(files.filter((f) => f.name !== file.name));
+  // const handleRemoveFile = (file) => {
+  //   setFiles((prevFiles) => prevFiles.filter((f) => f.name !== file.name));
+  //   onChange(files.filter((f) => f.name !== file.name));
+  // };
+
+  const handleRemoveFile = (index) => {
+    setFiles((prevFiles) => {
+      const newFiles = [...prevFiles];
+      newFiles.splice(index, 1);
+      return newFiles;
+    });
+    onChange(files.filter((_, i) => i !== index));
   };
 
   //   const handleRemoveFile = (file) => {
@@ -146,7 +222,7 @@ const FileUploaderMultiple = ({
         <Button
           variant="outlined"
           color="error"
-          onClick={() => handleRemoveFile(file)}
+          onClick={() => handleRemoveFile(index)}
           sx={{
             width: "100%",
           }}
@@ -185,13 +261,14 @@ const FileUploaderMultiple = ({
               sx={{
                 display: "flex",
                 gap: "1rem",
+                flexWrap: "wrap",
               }}
             >
               {fileList}
             </Box>
           </Fragment>
         ) : null}
-        {files.length === 5 ? (
+        {files.length === maxFileNum ? (
           <></>
         ) : (
           <>
@@ -247,7 +324,7 @@ const FileUploaderMultiple = ({
                   fontSize: "30px",
                   color: "#FFCC33",
                   cursor: "pointer",
-                  visibility: files.length !== 5 ? "visible" : "hidden",
+                  visibility: files.length !== 10 ? "visible" : "hidden",
                 }}
               />
             </div>
@@ -262,9 +339,9 @@ const FileUploaderMultiple = ({
         </Typography>
       )}
 
-      {errors && errors.images && (
+      {errors && errors[name] && (
         <Typography variant="caption" color="error">
-          {errors.images.message}
+          {errors[name].message}
         </Typography>
       )}
     </Fragment>

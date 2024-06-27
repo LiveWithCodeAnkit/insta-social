@@ -12,6 +12,7 @@ import { useCreatorsForm } from "../hook";
 import makeAnimated from "react-select/animated";
 import Select from "react-select";
 import countryList from "../../../assets/Contries.json";
+import { genderList } from "../constants";
 
 const CreatorsForm = ({ handleTab }) => {
   const animatedComponents = makeAnimated();
@@ -129,33 +130,84 @@ const CreatorsForm = ({ handleTab }) => {
                 )}
               </Box>
 
-              <Controller
-                name="gender"
-                control={control}
-                render={({ field: { value, onChange } }) => (
-                  <CustomTextField
-                    select
-                    fullWidth
-                    value={value}
-                    sx={{ mb: 4 }}
-                    label="Select Gender"
-                    onChange={onChange}
-                    error={Boolean(errors.gender)}
-                    {...(errors.gender && {
-                      helperText: errors.gender.message,
-                    })}
+              <Box
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.2rem",
+                }}
+              >
+                <Typography
+                  variant="label"
+                  sx={{ fontSize: "14px", fontWeight: "600" }}
+                >
+                  Select Gender
+                </Typography>
+                <Controller
+                  name="gender"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      isMulti
+                      closeMenuOnSelect={true}
+                      components={animatedComponents}
+                      options={genderList.map((item) => ({
+                        value: item.value,
+                        label: item.label,
+                      }))}
+                      placeholder="Select Gender..."
+                      classNamePrefix="select"
+                      className="basic-multi-select"
+                      theme={(theme) => ({
+                        ...theme,
+                        colors: {
+                          ...theme.colors,
+                          primary25: "#FFCC33",
+                          primary: "#FFCC33",
+                        },
+                      })}
+                      styles={{
+                        control: (baseStyles, state) => ({
+                          ...baseStyles,
+                          borderColor: state.isFocused ? "#FFCC33" : "#D9D9D9",
+                        }),
+                        indicatorSeparator: (base) => ({
+                          ...base,
+                          backgroundColor: "#FFCC33",
+                        }),
+                        dropdownIndicator: (base, state) => ({
+                          ...base,
+                          color: "#FFCC33",
+                        }),
+                        multiValueRemove: (base, state) => ({
+                          ...base,
+                          color: "#FFCC33",
+                          "&:hover": {
+                            backgroundColor: "#FFCC33",
+                            color: "white",
+                          },
+                        }),
+                      }}
+                    />
+                  )}
+                />
+                {errors.gender && (
+                  <Typography
+                    variant="caption"
+                    color="error"
+                    sx={{ marginTop: "0.3rem", fontSize: "0.875rem" }}
                   >
-                    <MenuItem value=" ">Select Gender</MenuItem>
-                    <MenuItem value="MALE">Male</MenuItem>
-                    <MenuItem value="FEMALE">Female</MenuItem>
-                    <MenuItem value="OTHER">Others</MenuItem>
-                  </CustomTextField>
+                    {errors.gender.message}
+                  </Typography>
                 )}
-              />
+              </Box>
             </Box>
             <Box
               sx={{
                 width: "30.9rem",
+                marginTop: "1rem",
               }}
             >
               <Box
@@ -248,6 +300,9 @@ const CreatorsForm = ({ handleTab }) => {
                   fontWeight: 600,
                   textTransform: "none",
                   borderColor: "black",
+                }}
+                onClick={() => {
+                  handleTab(4);
                 }}
               >
                 Previous

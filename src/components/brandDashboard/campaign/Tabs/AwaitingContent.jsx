@@ -6,7 +6,7 @@ import { useParams } from "next/navigation";
 import { useToastMessages } from "@/components/lib/messages/useToastMessages";
 import { getCampaignRequest } from "../../../../../store/campaign_request/campaignRequest.slice";
 
-const AwaitingContent = () => {
+const AwaitingContent = ({ fetchCampaignStatistics }) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const dispatch = useDispatch();
@@ -56,36 +56,6 @@ const AwaitingContent = () => {
       numeric: true,
       disablePadding: false,
       label: "Campign Name",
-    },
-    {
-      id: "tracking",
-      numeric: true,
-      disablePadding: false,
-      label: "Tracking",
-      renderCell: (item, index) => {
-        return (
-          <Button
-            variant="outlined"
-            type="button"
-            sx={{
-              border: "none !important",
-              color: "#212121",
-              // height: "40px",
-              // width: "118px",
-              borderRadius: "50px",
-              fontSize: "14px",
-              fontWeight: 500,
-              textTransform: "none",
-              color: "secondary.main",
-              opacity: "0.7",
-              whiteSpace: "nowrap",
-              // p:0
-            }}
-          >
-            + &nbsp;Add Tracking
-          </Button>
-        );
-      },
     },
     {
       id: "action",
@@ -156,59 +126,29 @@ const AwaitingContent = () => {
 
   return (
     <Box>
-      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: "20px" }}>
-        <Stack direction={"row"} spacing={"30px"}>
-          <Button
-            variant="outlined"
-            type="button"
-            size="large"
-            sx={{
-              border: "1px solid #212121",
-              color: "#212121",
-              // width: "168px",
-              borderRadius: "50px",
-              fontSize: "14px",
-              fontWeight: 600,
-              textTransform: "none",
-            }}
-          >
-            Upload Tracking
-          </Button>
-          <Button
-            variant="outlined"
-            type="button"
-            size="large"
-            sx={{
-              border: "1px solid #212121",
-              color: "#212121",
-              // width: "168px",
-              borderRadius: "50px",
-              fontSize: "14px",
-              fontWeight: 600,
-              textTransform: "none",
-            }}
-          >
-            Shipping Export
-          </Button>
-          <Button
-            variant="contained"
-            type="button"
-            size="large"
-            sx={{
-              background: "#FFCC33",
-              color: "#212121",
-              // width: "206px",
-              borderRadius: "50px",
-              fontSize: "14px",
-              fontWeight: 600,
-              textTransform: "none",
-              boxShadow: "none",
-            }}
-          >
-            Message All Creators
-          </Button>
-        </Stack>
-      </Box>
+      {rows?.length > 0 && (
+        <Box sx={{ display: "flex", justifyContent: "flex-end", mb: "20px" }}>
+          <Stack direction={"row"} spacing={"30px"}>
+            <Button
+              variant="contained"
+              type="button"
+              size="large"
+              sx={{
+                background: "#FFCC33",
+                color: "#212121",
+                // width: "206px",
+                borderRadius: "50px",
+                fontSize: "14px",
+                fontWeight: 600,
+                textTransform: "none",
+                boxShadow: "none",
+              }}
+            >
+              Message All Creators
+            </Button>
+          </Stack>
+        </Box>
+      )}
 
       {rows && (
         <Box sx={{ "& .MuiTableContainer-root": { borderRadius: "10px" } }}>
@@ -222,7 +162,7 @@ const AwaitingContent = () => {
             onChangeRowsPerPage={handleChangeRowsPerPage}
             pagination={awaitingContentData.pagination}
             onChangePagePagination={handleChangePageForPagination}
-            isCheckbox={true}
+            isCheckbox={false}
           />
         </Box>
       )}

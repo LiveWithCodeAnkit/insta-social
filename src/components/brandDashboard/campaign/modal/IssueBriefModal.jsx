@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { Avatar, Box, Button, Grid, Modal, Typography } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Button,
+  Grid,
+  Modal,
+  Stack,
+  Typography,
+} from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { FaDownload } from "react-icons/fa";
@@ -34,6 +42,7 @@ const arrowLeft = () => {
         top: "35%",
         left: 0,
         zIndex: 1,
+        cursor: "pointer",
       }}
     >
       <ArrowBackIcon fontSize="small" sx={{ fontWeight: "bold" }} />
@@ -55,6 +64,7 @@ const arrowRight = () => {
         top: "35%",
         right: 0,
         zIndex: 1,
+        cursor: "pointer",
       }}
     >
       <ArrowForwardIcon fontSize="small" sx={{ fontWeight: "bold" }} />
@@ -62,8 +72,26 @@ const arrowRight = () => {
   );
 };
 
-const IssueBriefModal = ({ imageSmallUrls, open, handleClose }) => {
+const IssueBriefModal = ({ open, allData, handleClose }) => {
   const [bigImageIdx, setBigImageIdx] = useState(0);
+  console.log(allData, "allData");
+
+  const creatorId = allData?.viewIssue?.creatorId || "";
+  const moodBoardImgs =
+    allData?.viewIssue?.campaignId?.campaignDetails?.moodBoardDocs || [];
+  const campaignDetails = allData?.campaignId?.campaignDetails || "";
+
+  const productType = () => {
+    switch (allData?.issueType) {
+      case "PRODUCT_ISSUE":
+        return "Product Issue";
+      case "SHIPPING_ISSUE":
+        return "Shipping Issue";
+      default:
+        return "Other Issue";
+    }
+  };
+
   return (
     <Modal
       open={open}
@@ -81,11 +109,12 @@ const IssueBriefModal = ({ imageSmallUrls, open, handleClose }) => {
         >
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <Avatar
+              alt="Remy Sharp"
               src="/images/dummy/profilephoto.png"
               sx={{ width: 35, height: 35 }}
             />
             <Typography variant="h6" sx={{ ml: 2, fontWeight: "bold" }}>
-              neatandsocial
+              {allData?.handle}
             </Typography>
           </Box>
           <CloseIcon sx={{ cursor: "pointer" }} onClick={handleClose} />
@@ -94,7 +123,7 @@ const IssueBriefModal = ({ imageSmallUrls, open, handleClose }) => {
           <Grid item xs={5}>
             <Box sx={{ mb: 2 }}>
               <Image
-                src={imageSmallUrls[bigImageIdx]}
+                src={moodBoardImgs?.contents?.[bigImageIdx]}
                 alt="image"
                 width={400}
                 height={400}
@@ -114,7 +143,7 @@ const IssueBriefModal = ({ imageSmallUrls, open, handleClose }) => {
               arrowLeft={arrowLeft}
               arrowRight={arrowRight}
             >
-              {imageSmallUrls.map((imageUrl, idx) => {
+              {moodBoardImgs?.contents?.map((imageUrl, idx) => {
                 return (
                   <Carousel.Item key={idx}>
                     <Box
@@ -127,6 +156,8 @@ const IssueBriefModal = ({ imageSmallUrls, open, handleClose }) => {
                           border: idx !== bigImageIdx && "1px solid #FFCC33",
                         },
                         display: "flex",
+                        cursor: "pointer",
+                        overflow: "hidden",
                       }}
                     >
                       <Image
@@ -169,23 +200,37 @@ const IssueBriefModal = ({ imageSmallUrls, open, handleClose }) => {
           </Grid>
           <Grid item xs={7}>
             <Box sx={{ maxWidth: "400px" }}>
-              <Typography variant="h4">Product Issue</Typography>
+              <Typography variant="h4">
+                {productType(allData?.issueType)}
+              </Typography>
               <Typography
                 variant="subtitle2"
                 sx={{ color: "#777777", mt: "15px" }}
               >
-                Lorem Ipsum is simply dummy text of the printing and typesetting
-                industry.
+                {allData?.notes}
               </Typography>
-              <Typography variant="subtitle2" sx={{ mt: "20px" }}>
-                John Doe, 1216 Broadway, Fl 2, New York, NY 10001 United States
+              <Typography variant="subtitle2" sx={{ mt: "10px" }}>
+                {creatorId?.firstName + " " + creatorId?.lastName}
               </Typography>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  mt: "20px",
-                }}
+              <Typography variant="subtitle2" sx={{ mt: "10px" }}>
+                {creatorId?.address1}
+              </Typography>
+              <Typography variant="subtitle2" sx={{ mt: "10px" }}>
+                {creatorId?.address2}
+              </Typography>
+              <Typography variant="subtitle2" sx={{ mt: "10px" }}>
+                {creatorId?.postalCode}
+              </Typography>
+              <Typography variant="subtitle2" sx={{ mt: "10px" }}>
+                {creatorId?.city} , {creatorId?.state}
+              </Typography>
+              <Typography variant="subtitle2" sx={{ mt: "10px" }}>
+                {creatorId?.country}
+              </Typography>
+              <Stack
+                direction="row"
+                sx={{ mt: "10px" }}
+                spacing={{ xs: 1, sm: 1.5, md: 2 }}
               >
                 <Button
                   variant="outlined"
@@ -204,45 +249,53 @@ const IssueBriefModal = ({ imageSmallUrls, open, handleClose }) => {
                 >
                   Message Creator
                 </Button>
-                <Button
-                  variant="contained"
-                  type="button"
-                  size="large"
-                  sx={{
-                    background: "#FFCC33",
-                    color: "#212121",
-                    // height: "40px",
-                    // width: "72px",
-                    borderRadius: "50px",
-                    fontSize: "14px",
-                    fontWeight: 500,
-                    textTransform: "none",
-                    boxShadow: "none",
-                  }}
-                >
-                  Reship
-                </Button>
-                <Button
-                  variant="outlined"
-                  type="button"
-                  size="large"
-                  sx={{
-                    "&:hover": {
-                      backgroundColor: "info.lighter",
-                    },
-                    border: "none !important",
-                    color: "#00B2F7",
-                    // height: "40px",
-                    // width: "105px",
-                    borderRadius: "50px",
-                    fontSize: "14px",
-                    fontWeight: 500,
-                    textTransform: "none",
-                  }}
-                >
-                  Close
-                </Button>
-              </Box>
+                {allData?.status === "RESHIPPED" ||
+                allData?.status === "CLOSED" ? (
+                  ""
+                ) : (
+                  <>
+                    {allData?.status === "PENDING" &&
+                      allData?.product !== "-" && (
+                        <Button
+                          variant="contained"
+                          type="button"
+                          sx={{
+                            background: "#FFCC33",
+                            color: "#212121",
+                            // height: "40px",
+                            width: "72px",
+                            borderRadius: "50px",
+                            fontSize: "14px",
+                            fontWeight: 500,
+                            textTransform: "none",
+                            boxShadow: "none",
+                          }}
+                        >
+                          Reship
+                        </Button>
+                      )}
+                    <Button
+                      variant="outlined"
+                      type="button"
+                      sx={{
+                        "&:hover": {
+                          backgroundColor: "info.lighter",
+                        },
+                        border: "none !important",
+                        color: "#00B2F7",
+                        // height: "40px",
+                        // width: "105px",
+                        borderRadius: "50px",
+                        fontSize: "14px",
+                        fontWeight: 500,
+                        textTransform: "none",
+                      }}
+                    >
+                      Close
+                    </Button>
+                  </>
+                )}
+              </Stack>
             </Box>
           </Grid>
         </Grid>

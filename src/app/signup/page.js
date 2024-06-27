@@ -13,7 +13,7 @@ const page = () => {
   }
   useEffect(() => {
     if (status === "authenticated") {
-      const redirectPath = session.role === "BRAND" ? "/brief-builder" : "/404";
+      const redirectPath = session.role === "BRAND" ? "/brief_builder" : "/404";
       router.push(redirectPath);
     } else if (status === "unauthenticated") {
       router.push("/signup");

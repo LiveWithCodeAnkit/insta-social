@@ -16,8 +16,8 @@ import {
   TextField,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import React from "react";
-import { useState } from "react";
+import React, { useContext } from "react";
+import { useState, useEffect } from "react";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { signIn } from "next-auth/react";
@@ -27,6 +27,9 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useToastMessages } from "@/components/lib/messages/useToastMessages";
+import { SocketContext } from "@/components/scoketProvider/socket";
+import { connectToSocket } from "../../../../store/chat_scoket/appSlice";
+import { useDispatch } from "react-redux";
 
 const schema = yup.object().shape({
   email: yup
@@ -37,6 +40,7 @@ const schema = yup.object().shape({
 });
 const LoginForm = ({ role }) => {
   const router = useRouter();
+  const dispatch = useDispatch();
   const { Success, Error } = useToastMessages();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -73,14 +77,70 @@ const LoginForm = ({ role }) => {
     resolver: yupResolver(schema),
   });
 
+  // useEffect(() => {
+  //   dispatch(connectToSocket());
+
+  //   return () => {
+  //     if (connectionStatus === 'connected') {
+  //       dispatch(disconnectFromSocket());
+  //     }
+  //   };
+  //   //eslint-disable-next-line
+  // }, [dispatch]);
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL_SO;
+  // const { SocketConnection } = useContext(SocketContext);
+  // const handleLogin = async (value) => {
+  //   try {
+  //     setLoading(true);
+  //     const values = {
+  //       email: value.email,
+  //       password: value.password,
+  //       role: role,
+  //     };
+  //     const signInRes = await signIn("credentials", {
+  //       ...values,
+  //       redirect: false,
+  //     });
+
+  //     if (signInRes.error) {
+  //       Error("We are not aware of this user.");
+  //       router.push("/");
+  //     } else {
+  //       Success("Successfully logged in!");
+  //       await new Promise((resolve) => {
+  //         const checkToken = () => {
+  //           const token = localStorage.getItem("adminToken");
+  //           if (token) {
+  //             resolve();
+  //           } else {
+  //             setTimeout(checkToken, 100); // Check again after a short delay
+  //           }
+  //         };
+  //         checkToken();
+  //       });
+  //       dispatch(connectToSocket(token));
+  //       if (role === "BRAND") {
+  //         router.push("/brief_builder");
+  //       } else {
+  //         router.push("/creator/dashboard/my-campaign");
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error("Error during login:", error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleLogin = async (value) => {
     try {
       setLoading(true);
       const values = {
         email: value.email,
         password: value.password,
-        role: role,
+        role: role, // Ensure role is part of the value object or set it explicitly
       };
+
       const signInRes = await signIn("credentials", {
         ...values,
         redirect: false,
@@ -91,18 +151,36 @@ const LoginForm = ({ role }) => {
         router.push("/");
       } else {
         Success("Successfully logged in!");
-        if (role === "BRAND") {
-          router.push("/brief-builder");
-        } else {
-          router.push("/creator/dashboard/my-campaign");
-        }
+
+        await new Promise((resolve) => {
+          const checkToken = () => {
+            const token = localStorage.getItem("adminToken");
+            if (token) {
+              resolve(token); // Resolve with the token
+            } else {
+              setTimeout(checkToken, 100); // Check again after a short delay
+            }
+          };
+          checkToken();
+        }).then((token) => {
+          
+          dispatch(connectToSocket(token));
+
+          if (values.role === "BRAND") {
+            router.push("/brief_builder");
+          } else {
+            router.push("/creator/dashboard/my-campaign");
+          }
+        });
       }
     } catch (error) {
       console.error("Error during login:", error);
+      Error("An unexpected error occurred during login. Please try again.");
     } finally {
       setLoading(false);
     }
   };
+
   return (
     <form onSubmit={handleSubmit(handleLogin)}>
       <Box>
@@ -218,7 +296,17 @@ const LoginForm = ({ role }) => {
           justifyContent="space-between"
           sx={{ my: 2 }}
         >
-          <FormControlLabel control={<Checkbox />} label="Keep me logged in" />
+          <Controller
+            name="keepLoggedIn"
+            control={control}
+            defaultValue={false}
+            render={({ field }) => (
+              <FormControlLabel
+                control={<Checkbox {...field} />}
+                label="Keep me logged in"
+              />
+            )}
+          />
           <Link variant="subtitle2" color={"#FFCC33"}>
             Forgot password?
           </Link>

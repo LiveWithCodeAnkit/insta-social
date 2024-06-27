@@ -4,4 +4,3 @@ export { useContentForm } from "./useContentForm";
 export { useOfferForm } from "./useOfferForm";
 export { useCreatorsForm } from "./useCreatorsForm";
 export { useTimingForm } from "./useTimingForm";
-export { useProductsForm } from "./useProductsForm";

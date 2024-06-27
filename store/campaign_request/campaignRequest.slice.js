@@ -59,7 +59,8 @@ export const campaignApproveReject = createAsyncThunk(
       const response = await POST(
         "campaign-request/campaign-approval-by-brand",
         {
-          campaignRequestId: payload.campaignId,
+          campaignId: payload.campaignId,
+          campaignRequestIds: payload.campaignRequestIds,
           status: payload.status,
         }
       );
@@ -118,10 +119,8 @@ export const contentIsFavoritebyBrand = createAsyncThunk(
       );
       // return response.data;
       if (response.success) {
-        Success(response.message);
         return response;
       } else {
-        Error(response.message);
         return response;
       }
     } catch (error) {
@@ -154,13 +153,38 @@ export const likeDislikeContent = createAsyncThunk(
   }
 );
 
+export const trackingDetails = createAsyncThunk(
+  "tracking-content",
+  async (payload) => {
+    try {
+      const response = await POST(
+        "campaign-request/tracking-details",
+        {
+          campaignRequestId: payload.campaignRequestId,
+          trackingNumber: payload.trackingNumber
+        }
+      );
+      if (response.success) {
+        Success(response.message);
+        return response;
+      } else {
+        Error(response.message);
+        return response;
+      }
+    } catch (error) {
+      Error(error.message);
+      throw error;
+    }
+  }
+);
+
 export const allOrderShippedinBulk = createAsyncThunk(
   "all-order-shipped-in-bulk",
   async (payload) => {
     try {
       const response = await POST(
         "campaign-request/update-shipping-status-bulk",
-        { campaignId: payload.campaignId }
+        { campaignRequestIds: payload.campaignRequestIds }
       );
       console.log("response:-", response);
       if (response.success) {
@@ -216,6 +240,23 @@ export const getCampaignRequestByCreator = createAsyncThunk(
   }
 );
 
+// All tab handle into this statistics API
+export const getStatisticsByCreator = createAsyncThunk(
+  "get-statisticsByCreator",
+  async (payload) => {
+    console.log("payload:-", payload);
+    try {
+      const response = await GET(
+        `/campaign-request/campaign-request-statistics-creator`
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+)
+
+
 // Todo-table into issue form Post API
 export const postTodoIssueByCreator = createAsyncThunk(
   "add-todoIssueByCreator",
@@ -233,6 +274,30 @@ export const postTodoIssueByCreator = createAsyncThunk(
         return response;
       }
     } catch (error) {
+      Warn(error);
+      throw error;
+    }
+  }
+)
+
+// Content rejected by brand Post API
+export const postContentRejectModalByCreator = createAsyncThunk(
+  "add-contentRejectModalByCreator",
+  async (payload) => {
+    // console.log("payload postContentRejectModalByCreator :-", payload);
+    try {
+      const response = await POST("campaign/get-uploaded-content-creator", payload);
+
+      if (response.success) {
+        Success(response.message);
+        return response;
+      }
+      else {
+        Warn("Error occurred while creating submitted");
+        return response;
+      }
+    }
+    catch (error) {
       Warn(error);
       throw error;
     }
@@ -276,7 +341,7 @@ export const postContentLinkByCreator = createAsyncThunk(
         return response;
       }
       else {
-        Warn("Error occurred while creating submitted");
+        Warn(response.message);
         return response;
       }
 
@@ -302,7 +367,6 @@ export const getCreatorIssuesbyId = createAsyncThunk(
     }
   }
 );
-
 
 // Setting form Post API
 export const postCampaignByCreator = createAsyncThunk(
@@ -392,6 +456,11 @@ export const campaignRequestSlice = createSlice({
       campaignRequestByCreatorData: [],
       error: null,
     },
+    campaignAllTabByCreator: {
+      loading: false,
+      campaignAllTabByCreatorData: [],
+      error: null,
+    },
     campaignTodoIssuesByCreator: {
       loading: false,
       campaignTodoIssuesByCreatorData: [],
@@ -432,6 +501,12 @@ export const campaignRequestSlice = createSlice({
       optionCampaignRequestByCreatorData: {},
       error: "null",
     },
+    // content rejected by creator
+    contentRejectedModalByCreator: {
+      loading: false,
+      contentRejectedModalByCreatorData: {},
+      error: "null",
+    }
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -448,7 +523,18 @@ export const campaignRequestSlice = createSlice({
         state.campaignRequest.loading = false;
         state.campaignRequest.error = action.payload?.message;
       })
-
+      .addCase(getStatisticsByCreator.pending, (state) => {
+        state.campaignAllTabByCreator.loading = true;
+      })
+      .addCase(getStatisticsByCreator.fulfilled, (state, action) => {
+        state.campaignAllTabByCreator.loading = false;
+        state.campaignAllTabByCreator.campaignAllTabByCreatorData =
+          action.payload;
+      })
+      .addCase(getStatisticsByCreator.rejected, (state, action) => {
+        state.campaignAllTabByCreator.loading = false;
+        state.campaignAllTabByCreator.error = action.payload?.message;
+      })
       .addCase(getCampaignIssuesbyId.pending, (state) => {
         state.campaignRequest.loading = true;
       })
@@ -582,7 +668,19 @@ export const campaignRequestSlice = createSlice({
         state.optionCampaignRequestByCreator.loading = false;
         state.optionCampaignRequestByCreator.error =
           action.payload.errorMessage;
-      });
+      })
+      .addCase(postContentRejectModalByCreator.pending, (state) => {
+        state.contentRejectedModalByCreator.loading = true;
+      })
+      .addCase(postContentRejectModalByCreator.fulfilled, (state, action) => {
+        state.contentRejectedModalByCreator.loading = false;
+        state.contentRejectedModalByCreator.contentRejectedModalByCreatorData =
+          action.payload;
+      })
+      .addCase(postContentRejectModalByCreator.rejected, (state, action) => {
+        state.contentRejectedModalByCreator.loading = false;
+        state.contentRejectedModalByCreator.error = action.payload?.message;
+      })
   },
 });
 

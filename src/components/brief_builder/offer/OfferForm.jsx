@@ -1,41 +1,88 @@
-"use client";
-import React, { useState } from "react";
-import { Box, Typography, Tab, Tabs } from "@mui/material";
+import { Box, Typography } from "@mui/material";
+import { useParams } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getCampaignbyId } from "../../../../store/brief_builder/campaign/campaign.slice";
 import GiftPage from "./gift/GiftPage";
 import PaidForm from "./paid/PaidForm";
 
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      style={{ width: "100%" }}
-      hidden={value !== index}
-      id={`full-width-tabpanel-${index}`}
-      aria-labelledby={`full-width-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ mt: "30px" }}>
-          <>{children}</>
-        </Box>
-      )}
-    </div>
-  );
-}
-function a11yProps(index) {
-  return {
-    id: `full-width-tab-${index}`,
-    "aria-controls": `full-width-tabpanel-${index}`,
-  };
-}
 const OfferForm = ({ handleTab }) => {
-  const [value, setValue] = useState(0);
+  //fecth data for show hide tab
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
+  const infoCam = useSelector(
+    (state) => state.Campaign.addCampaignDetails?.campaign
+  );
+  const dispatch = useDispatch();
+  const { brief_builder } = useParams();
+
+  const campaignData = useSelector(
+    (state) => state.Campaign.getCampaignbyId.campaignData
+  );
+
+  useEffect(() => {
+    if (infoCam?._id) {
+      dispatch(getCampaignbyId({ campaignId: infoCam._id }));
+    }
+  }, [dispatch, infoCam?._id]);
+
+  useEffect(() => {
+    if (brief_builder && brief_builder.length > 0) {
+      dispatch(getCampaignbyId({ campaignId: brief_builder[0] }));
+    }
+  }, [dispatch, brief_builder]);
+
+  /// new
+
+  const shouldShowBothTabs =
+    campaignData?.campaignDetails?.campaignType === "Pro" &&
+    campaignData?.campaignDetails?.offerType === "";
+
+  const shouldShowGiftingTab =
+    campaignData?.campaignDetails?.campaignType === "Standard" &&
+    campaignData?.campaignDetails?.offerType === "Gifting";
+
+  const shouldShowPaidTab =
+    campaignData?.campaignDetails?.campaignType === "Standard" &&
+    campaignData?.campaignDetails?.offerType === "Paid";
+
+  const shouldShowDefault =
+    !campaignData ||
+    !campaignData?.campaignDetails ||
+    (campaignData?.campaignDetails?.campaignType === "" &&
+      campaignData?.campaignDetails?.offerType === "");
+  //new end
+
+  //
+  const [activeTab, setActiveTab] = useState(1);
+
+  useEffect(() => {
+    if (shouldShowBothTabs && activeTab !== 0 && activeTab !== 1) {
+      setActiveTab(0); // Show both tabs
+    } else if (shouldShowGiftingTab && activeTab !== 1) {
+      setActiveTab(1); // Show Gifting tab only
+    } else if (shouldShowPaidTab && activeTab !== 0 && activeTab !== 1) {
+      setActiveTab(0); // Show Paid tab only
+    }
+  }, [campaignData]);
+
+  const handleTabInside = (index) => {
+    setActiveTab(index);
   };
+
+  const tabComponents = [
+    {
+      Component: PaidForm,
+      handleTab: handleTab,
+      handleTabInside: handleTabInside,
+    },
+    {
+      Component: GiftPage,
+      handleTab: handleTab,
+      handleTabInside: handleTabInside,
+    },
+  ];
+
+  const SelectedComponent = tabComponents[activeTab].Component;
 
   return (
     <>
@@ -81,36 +128,207 @@ const OfferForm = ({ handleTab }) => {
             borderRadius: "3rem",
           }}
         >
-          <Tabs
-            value={value}
-            onChange={handleChange}
-            indicatorColor="secondary"
-            textColor="secondary"
-            sx={{
-              "& .MuiTab-root": {
-                color: "text.primary",
-              },
-              "& .Mui-selected": {
-                backgroundColor: "#FFCC33",
+          {shouldShowDefault && (
+            <>
+              <Box
+                as="div"
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  background: activeTab === 0 ? "#FFCC33" : "",
+                  borderRadius: "50px",
+                  padding: "12px",
+                  cursor: "pointer",
+                }}
+                onClick={() => handleTabInside(0)}
+              >
+                <Typography
+                  variant="label"
+                  sx={{
+                    fontSize: " 0.875rem",
+                    color: "#212121",
+                    fontWeight: "600",
+                  }}
+                >
+                  Paid
+                </Typography>
+              </Box>
+              <Box
+                as="div"
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  background: activeTab === 1 ? "#FFCC33" : "",
+                  borderRadius: "50px",
+                  padding: "12px",
+                  cursor: "pointer",
+                }}
+                onClick={() => handleTabInside(1)}
+              >
+                <Typography
+                  variant="label"
+                  sx={{
+                    fontSize: " 0.875rem",
+                    color: "#212121",
+                    fontWeight: "600",
+                  }}
+                >
+                  Gifting
+                </Typography>
+              </Box>
+            </>
+          )}
+          {shouldShowBothTabs && (
+            <>
+              <Box
+                as="div"
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  background: activeTab === 0 ? "#FFCC33" : "",
+                  borderRadius: "50px",
+                  padding: "12px",
+                  cursor: "pointer",
+                }}
+                onClick={() => handleTabInside(0)}
+              >
+                <Typography
+                  variant="label"
+                  sx={{
+                    fontSize: " 0.875rem",
+                    color: "#212121",
+                    fontWeight: "600",
+                  }}
+                >
+                  Paid
+                </Typography>
+              </Box>
+              <Box
+                as="div"
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  background: activeTab === 1 ? "#FFCC33" : "",
+                  borderRadius: "50px",
+                  padding: "12px",
+                  cursor: "pointer",
+                }}
+                onClick={() => handleTabInside(1)}
+              >
+                <Typography
+                  variant="label"
+                  sx={{
+                    fontSize: " 0.875rem",
+                    color: "#212121",
+                    fontWeight: "600",
+                  }}
+                >
+                  Gifting
+                </Typography>
+              </Box>
+            </>
+          )}
+          {shouldShowGiftingTab && (
+            <Box
+              as="div"
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                background: activeTab === 1 ? "#FFCC33" : "",
                 borderRadius: "50px",
-              },
-              "& .MuiTabs-indicator": {
-                display: "none",
-              },
-            }}
-          >
-            <Tab label="Gifting" {...a11yProps(0)} />
-            <Tab label="Paid" {...a11yProps(1)} />
-          </Tabs>
+                padding: "12px",
+                cursor: "pointer",
+              }}
+              onClick={() => handleTabInside(1)}
+            >
+              <Typography
+                variant="label"
+                sx={{
+                  fontSize: " 0.875rem",
+                  color: "#212121",
+                  fontWeight: "600",
+                }}
+              >
+                Gifting
+              </Typography>
+            </Box>
+          )}
+          {shouldShowPaidTab && (
+            <>
+              <Box
+                as="div"
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  background: activeTab === 0 ? "#FFCC33" : "",
+                  borderRadius: "50px",
+                  padding: "12px",
+                  cursor: "pointer",
+                }}
+                onClick={() => handleTabInside(0)}
+              >
+                <Typography
+                  variant="label"
+                  sx={{
+                    fontSize: " 0.875rem",
+                    color: "#212121",
+                    fontWeight: "600",
+                  }}
+                >
+                  Paid
+                </Typography>
+              </Box>
+              <Box
+                as="div"
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  background: activeTab === 1 ? "#FFCC33" : "",
+                  borderRadius: "50px",
+                  padding: "12px",
+                  cursor: "pointer",
+                }}
+                onClick={() => handleTabInside(1)}
+              >
+                <Typography
+                  variant="label"
+                  sx={{
+                    fontSize: " 0.875rem",
+                    color: "#212121",
+                    fontWeight: "600",
+                  }}
+                >
+                  Gifting
+                </Typography>
+              </Box>
+            </>
+          )}
         </Box>
       </Box>
 
-      <TabPanel value={value} index={0}>
-        <GiftPage handleChange={handleChange} />
-      </TabPanel>
-      <TabPanel value={value} index={1}>
-        <PaidForm handleTab={handleTab} />
-      </TabPanel>
+      <Box
+        as="div"
+        sx={{
+          marginTop: "2rem",
+        }}
+      >
+        {(shouldShowBothTabs ||
+          shouldShowGiftingTab ||
+          shouldShowPaidTab ||
+          shouldShowDefault) && (
+          <SelectedComponent
+            handleTab={handleTab}
+            handleTabInside={handleTabInside}
+          />
+        )}
+      </Box>
     </>
   );
 };

@@ -1,14 +1,19 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Button from "@mui/material/Button";
 import { FormControlLabel, Checkbox } from "@mui/material";
 import { Box, Tab, Tabs, Typography, Card } from "@mui/material";
 import { CgArrowLongLeft, CgArrowLongRight } from "react-icons/cg";
 import { useForm, Controller } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { createCampaign } from "../../../../store/brief_builder/campaign/campaign.slice";
+import {
+  createCampaign,
+  getCampaignbyId,
+} from "../../../../store/brief_builder/campaign/campaign.slice";
 import TiktokForm from "./tiktok/TiktokForm";
 import NopostForm from "./nopost/NopostForm";
+import { useParams } from "next/navigation";
+import { debounce } from "lodash";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -38,17 +43,75 @@ function a11yProps(index) {
 }
 const AskForm = ({ handleTab }) => {
   const dispatch = useDispatch();
+  const { brief_builder } = useParams();
+
   const [value, setValue] = useState(0);
   const [loading, setLoading] = useState(false);
-  const { control, handleSubmit } = useForm();
+
+  const infoCam = useSelector(
+    (state) => state.Campaign.addCampaignDetails?.campaign
+  );
+
+  const campaignData = useSelector(
+    (state) => state.Campaign.getCampaignbyId.campaignData
+  );
+
+  const fetchCampaignByIdDebounced = debounce((id) => {
+    dispatch(getCampaignbyId({ campaignId: id }));
+  }, 300);
+
+  useEffect(() => {
+    if (infoCam?._id) {
+      fetchCampaignByIdDebounced(infoCam._id);
+    }
+    return () => {
+      fetchCampaignByIdDebounced.cancel();
+    };
+  }, [dispatch, infoCam?._id]);
+
+  useEffect(() => {
+    if (brief_builder && brief_builder.length > 0) {
+      fetchCampaignByIdDebounced(brief_builder[0]);
+    }
+    return () => {
+      fetchCampaignByIdDebounced.cancel();
+    };
+  }, [dispatch, brief_builder]);
+  const postTypes = campaignData?.campaignDetails?.postType;
+
+  const initialValues = {
+    feedPost: postTypes ? postTypes.includes("FEED") : true,
+    reel: postTypes ? postTypes.includes("REEL") : false,
+    story: postTypes ? postTypes.includes("STORY") : false,
+  };
+
+  const {
+    reset,
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: initialValues,
+    mode: "onChange",
+  });
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
-  const infoCam = useSelector(
-    (state) => state.Campaign.addCampaignDetails?.campaign
-  );
+  useEffect(() => {
+    const platform = campaignData?.campaignDetails?.campaigningPlatform;
+
+    if (platform === "Tiktok") {
+      setValue(1);
+    } else if (platform === "Only Content") {
+      setValue(2); // Set value to 2 if Only Content
+    } else {
+      setValue(0); // Set value to 0 (default) if Instagram or other platforms
+    }
+  }, [campaignData?.campaignDetails?.campaigningPlatform]);
+
+  const campaignId = infoCam?._id || (brief_builder && brief_builder[0]);
 
   const onSubmit = async (values) => {
     setLoading(true);
@@ -73,7 +136,7 @@ const AskForm = ({ handleTab }) => {
 
     const campaignDetails = {
       campaignDetails: {
-        campaignId: infoCam?._id,
+        campaignId: campaignId,
         details: {
           campaigningPlatform: "Instagram",
           postType: postTypes,
@@ -169,19 +232,19 @@ const AskForm = ({ handleTab }) => {
                   <Controller
                     name="feedPost"
                     control={control}
-                    defaultValue={true}
                     render={({ field }) => (
                       <FormControlLabel
                         control={
                           <Checkbox
                             {...field}
+                            checked={field.value}
+                            onChange={(e) => field.onChange(e.target.checked)}
                             sx={{
                               color: "#FFCC33",
                               "&.Mui-checked": {
                                 color: "#FFCC33",
                               },
                             }}
-                            defaultChecked
                           />
                         }
                         label="Feed Post"
@@ -191,12 +254,13 @@ const AskForm = ({ handleTab }) => {
                   <Controller
                     name="reel"
                     control={control}
-                    defaultValue={false}
                     render={({ field }) => (
                       <FormControlLabel
                         control={
                           <Checkbox
                             {...field}
+                            checked={field.value}
+                            onChange={(e) => field.onChange(e.target.checked)}
                             sx={{
                               color: "#FFCC33",
                               "&.Mui-checked": {
@@ -212,12 +276,13 @@ const AskForm = ({ handleTab }) => {
                   <Controller
                     name="story"
                     control={control}
-                    defaultValue={false}
                     render={({ field }) => (
                       <FormControlLabel
                         control={
                           <Checkbox
                             {...field}
+                            checked={field.value}
+                            onChange={(e) => field.onChange(e.target.checked)}
                             sx={{
                               color: "#FFCC33",
                               "&.Mui-checked": {
@@ -245,6 +310,9 @@ const AskForm = ({ handleTab }) => {
                       fontWeight: 600,
                       textTransform: "none",
                       borderColor: "black",
+                    }}
+                    onClick={() => {
+                      handleTab(2);
                     }}
                   >
                     Previous

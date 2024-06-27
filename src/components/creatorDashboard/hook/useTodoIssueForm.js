@@ -28,13 +28,13 @@ export const useTodoIssueForm = ({ allData, handleClose, updatingFunction = () =
 
         const issueDetailsbyCreator = {
             // campaignsName: campaignsName,
-            campaignId: allData?.campaignDetails,
+            campaignId: allData?.campaignDetails?._id,
             campaignRequestId: allData?.id,
             issueType: issueType,
             issueInfo: issueInfo,
         }
 
-        // console.log("issueDetailsbyCreator", issueDetailsbyCreator);
+        console.log("issueDetailsbyCreator", issueDetailsbyCreator);
 
         const res = await dispatch(postTodoIssueByCreator(issueDetailsbyCreator));
         if (res.payload?.success) {

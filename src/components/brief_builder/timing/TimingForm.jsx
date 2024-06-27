@@ -15,26 +15,11 @@ import { DemoItem } from "@mui/x-date-pickers/internals/demo";
 import { useTimingForm } from "../hook";
 import { useDispatch, useSelector } from "react-redux";
 import { getCampaignbyId } from "../../../../store/brief_builder/campaign/campaign.slice";
+import dayjs from "dayjs";
 
 const TimingForm = ({ handleTab }) => {
-  const dispatch = useDispatch();
-  const infoCam = useSelector(
-    (state) => state.Campaign.addCampaignDetails?.campaign
-  );
-
-  useEffect(() => {
-    if (infoCam?._id) {
-      dispatch(getCampaignbyId({ campaignId: infoCam._id }));
-    }
-  }, [dispatch, infoCam?._id]);
-
-  const campaignData = useSelector(
-    (state) => state.Campaign.getCampaignbyId.campaignData
-  );
-
   const { initialValues, loading, schema, submit } = useTimingForm({
     handleTab,
-    campaignData,
   });
   const {
     handleSubmit,
@@ -94,7 +79,7 @@ const TimingForm = ({ handleTab }) => {
                     defaultValue={initialValues.creatorsReadyToReview}
                     render={({ field: { value, onChange } }) => (
                       <DatePicker
-                        value={value}
+                        value={value ? dayjs(value) : null}
                         onChange={onChange}
                         sx={{
                           width: "30rem",
@@ -135,7 +120,7 @@ const TimingForm = ({ handleTab }) => {
                     defaultValue={initialValues.productShipped}
                     render={({ field: { value, onChange } }) => (
                       <DatePicker
-                        value={value}
+                        value={value ? dayjs(value) : null}
                         onChange={onChange}
                         sx={{
                           width: "30rem",
@@ -154,53 +139,48 @@ const TimingForm = ({ handleTab }) => {
                   )}
                 </DemoItem>
               </LocalizationProvider>
-              {campaignData?.campaignDetails?.permissionRequired ? (
-                <>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DemoItem
-                      label={
-                        <Typography
-                          variant="label"
-                          sx={{
-                            fontSize: "14px",
-                            fontWeight: "600",
-                          }}
-                        >
-                          Content Submitted for Approval
-                        </Typography>
-                      }
+
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DemoItem
+                  label={
+                    <Typography
+                      variant="label"
+                      sx={{
+                        fontSize: "14px",
+                        fontWeight: "600",
+                      }}
                     >
-                      <Controller
-                        name="contentSubmitted"
-                        control={control}
-                        defaultValue={initialValues.contentSubmitted}
-                        render={({ field: { value, onChange } }) => (
-                          <DatePicker
-                            value={value}
-                            onChange={onChange}
-                            sx={{
-                              width: "30rem",
-                              "& .MuiOutlinedInput-input": {
-                                padding: "10.5px 14px",
-                              },
-                              borderColor: errors.contentSubmitted
-                                ? "red"
-                                : "black",
-                            }}
-                          />
-                        )}
+                      Content Submitted for Approval
+                    </Typography>
+                  }
+                >
+                  <Controller
+                    name="contentSubmitted"
+                    control={control}
+                    defaultValue={initialValues.contentSubmitted}
+                    render={({ field: { value, onChange } }) => (
+                      <DatePicker
+                        value={value ? dayjs(value) : null}
+                        onChange={onChange}
+                        sx={{
+                          width: "30rem",
+                          "& .MuiOutlinedInput-input": {
+                            padding: "10.5px 14px",
+                          },
+                          borderColor: errors.contentSubmitted
+                            ? "red"
+                            : "black",
+                        }}
                       />
-                      {errors.contentSubmitted && (
-                        <Typography variant="caption" color="error">
-                          {errors.contentSubmitted.message}
-                        </Typography>
-                      )}
-                    </DemoItem>
-                  </LocalizationProvider>
-                </>
-              ) : (
-                ""
-              )}
+                    )}
+                  />
+                  {errors.contentSubmitted && (
+                    <Typography variant="caption" color="error">
+                      {errors.contentSubmitted.message}
+                    </Typography>
+                  )}
+                </DemoItem>
+              </LocalizationProvider>
             </Box>
             <Box
               sx={{
@@ -230,7 +210,7 @@ const TimingForm = ({ handleTab }) => {
                     defaultValue={initialValues.fromDate}
                     render={({ field: { value, onChange } }) => (
                       <DatePicker
-                        value={value}
+                        value={value ? dayjs(value) : null}
                         onChange={onChange}
                         sx={{
                           width: "30rem",
@@ -269,7 +249,7 @@ const TimingForm = ({ handleTab }) => {
                     defaultValue={initialValues.toDate}
                     render={({ field: { value, onChange } }) => (
                       <DatePicker
-                        value={value}
+                        value={value ? dayjs(value) : null}
                         onChange={onChange}
                         sx={{
                           width: "30rem",
@@ -289,7 +269,6 @@ const TimingForm = ({ handleTab }) => {
                 </DemoItem>
               </LocalizationProvider>
             </Box>
-
             <Box sx={{ display: "flex", justifyContent: "end", gap: "0.5rem" }}>
               <Button
                 variant="outlined"
@@ -302,6 +281,9 @@ const TimingForm = ({ handleTab }) => {
                   fontWeight: 600,
                   textTransform: "none",
                   borderColor: "black",
+                }}
+                onClick={() => {
+                  handleTab(5);
                 }}
               >
                 Previous

@@ -1,31 +1,62 @@
 import { offerFormSchema } from "../schema";
 import { useDispatch, useSelector } from "react-redux";
-import { createCampaign } from "../../../../store/brief_builder/campaign/campaign.slice";
-import { useState } from "react";
+import {
+  createCampaign,
+  getCampaignbyId,
+} from "../../../../store/brief_builder/campaign/campaign.slice";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 
-export const useOfferForm = ({ handleChange }) => {
+export const useOfferForm = ({ handleTabInside, handleTab }) => {
   const infoCam = useSelector(
     (state) => state.Campaign.addCampaignDetails?.campaign
   );
   const dispatch = useDispatch();
+  const { brief_builder } = useParams();
+  const campaignData = useSelector(
+    (state) => state.Campaign.getCampaignbyId.campaignData
+  );
+  useEffect(() => {
+    if (infoCam?._id) {
+      dispatch(getCampaignbyId({ campaignId: infoCam._id }));
+    }
+  }, [dispatch, infoCam?._id]);
+
+  useEffect(() => {
+    if (brief_builder && brief_builder.length > 0) {
+      dispatch(getCampaignbyId({ campaignId: brief_builder[0] }));
+    }
+  }, [dispatch, brief_builder]);
   const [loading, setLoading] = useState(false);
-  const initialValues = {
-    gifts: [
-      {
-        offerImage: null,
-        productName: "",
-        description: "",
-        productLink: "",
-        unitsPerCreator: "0",
-        variants: [
-          {
-            variantType: [],
-            variantDes: "",
-          },
-        ],
-      },
-    ],
-  };
+
+  const initialValues =
+    campaignData?.offerDetails && Array.isArray(campaignData.offerDetails)
+      ? {
+          gifts: campaignData.offerDetails
+            .filter((item) => item.offerType !== "PAID")
+            .map((offer) => ({
+              ...(offer._id && { _id: offer._id }),
+              offerImage: [offer.offerImage || ""],
+              productName: offer.productName || "",
+              description: offer.description || "",
+              productLink: offer.productLink || "",
+              variantType: offer.variant?.variantType || [],
+              variantDes: offer.variant?.variantDes || "",
+            })),
+        }
+      : {
+          gifts: [
+            {
+              offerImage: [],
+              productName: "",
+              description: "",
+              productLink: "",
+              variantType: [],
+              variantDes: "",
+            },
+          ],
+        };
+  const campaignId = infoCam?._id || (brief_builder && brief_builder[0]);
 
   const handleOfferForm = async (values) => {
     setLoading(true);
@@ -34,16 +65,16 @@ export const useOfferForm = ({ handleChange }) => {
       const formData = new FormData();
       const offerDetails = {
         offerDetails: {
-          campaignId: infoCam?._id,
+          campaignId: campaignId,
           offers: values.gifts.map((gift) => ({
+            ...(gift._id && { _id: gift._id }),
             productName: gift.productName,
             description: gift.description,
             productLink: gift.productLink,
-            unitsPerCreator: gift.unitsPerCreator,
-            variants: gift.variants.map((variant) => ({
-              variantType: variant.variantType,
-              variantDes: variant.variantDes,
-            })),
+            variant: {
+              variantType: gift.variantType,
+              variantDes: gift.variantDes,
+            },
           })),
         },
       };
@@ -56,7 +87,7 @@ export const useOfferForm = ({ handleChange }) => {
 
       const res = await dispatch(createCampaign(formData));
       if (res.payload?.success) {
-        handleChange(event, 1);
+        handleTab(3);
       }
     } catch (error) {
       // Handle any errors here

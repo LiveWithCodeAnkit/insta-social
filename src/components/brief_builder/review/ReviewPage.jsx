@@ -1,25 +1,33 @@
-import React, { useEffect } from "react";
-import { Box } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
-import BrandAbout from "./brandAbout/BrandAbout";
-import OfferAbout from "./offerAbout/OfferAbout";
-import MoodBond from "./moodBond/MoodBond";
-import MessageAbout from "./messageAbout/MessageAbout";
-import DoPage from "./do_not_do/DoPage";
-import { getCampaignbyId } from "../../../../store/brief_builder/campaign/campaign.slice";
 import Loading from "@/components/common/loader/Loading";
+import { Box } from "@mui/material";
+import { useParams } from "next/navigation";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getCampaignbyId } from "../../../../store/brief_builder/campaign/campaign.slice";
+import BrandAbout from "./brandAbout/BrandAbout";
+import DoPage from "./do_not_do/DoPage";
+import MessageAbout from "./messageAbout/MessageAbout";
+import MoodBond from "./moodBond/MoodBond";
+import OfferAbout from "./offerAbout/OfferAbout";
+import PaidPaymentInfo from "./paidPayment/PaidPaymentInfo";
 
 const ReviewPage = () => {
   const dispatch = useDispatch();
   const infoCam = useSelector(
     (state) => state.Campaign.addCampaignDetails?.campaign
   );
-
+  const { brief_builder } = useParams();
   useEffect(() => {
     if (infoCam?._id) {
       dispatch(getCampaignbyId({ campaignId: infoCam._id }));
     }
   }, [dispatch, infoCam?._id]);
+
+  useEffect(() => {
+    if (brief_builder && brief_builder.length > 0) {
+      dispatch(getCampaignbyId({ campaignId: brief_builder[0] }));
+    }
+  }, [dispatch, brief_builder]);
 
   const campaignData = useSelector(
     (state) => state.Campaign.getCampaignbyId.campaignData
@@ -30,6 +38,14 @@ const ReviewPage = () => {
   const error = useSelector((state) => state.Campaign.getCampaignbyId.error);
 
   const isEmptyData = !campaignData;
+
+  const filteredData = campaignData?.offerDetails?.filter(
+    (item) => item.offerType !== "PAID"
+  );
+
+  const filteredPaidData = campaignData?.offerDetails?.filter(
+    (item) => item.offerType === "PAID"
+  );
 
   return (
     <>
@@ -54,7 +70,8 @@ const ReviewPage = () => {
         {!isLoading && !error && !isEmptyData && (
           <>
             <BrandAbout brandDeatils={campaignData?.brandDetails} />
-            <OfferAbout offerDetails={campaignData?.offerDetails} />
+            <PaidPaymentInfo filteredPaidData={filteredPaidData} />
+            <OfferAbout offerDetails={filteredData} />
             <MoodBond
               moodDeatils={campaignData?.campaignDetails?.moodBoardDocs}
             />

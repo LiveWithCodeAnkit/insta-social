@@ -27,6 +27,7 @@ import { IoClose } from "react-icons/io5";
 import { yupResolver } from "@hookform/resolvers/yup";
 import CustomTextField from "@/components/common/text-field";
 import { useContentModalForm } from "../../hook";
+import FileUploaderMultiple from "@/components/common/fileuploader/FileUploaderMultiple";
 
 const style = {
   position: "absolute",
@@ -101,7 +102,6 @@ const UploadContentModal = ({
   open,
   allData,
   handleClose,
-  imageSmallUrls,
   updatingFunction,
 }) => {
   const [bigImageIdx, setBigImageIdx] = useState(0);
@@ -117,8 +117,8 @@ const UploadContentModal = ({
     updatingFunction,
   });
 
+  // const [initial, setInitial] = useState(initialValues);
   const [images, setImages] = React.useState([]);
-  const maxNumber = 3;
   const onImageChange = (imageList, addUpdateIndex) => {
     // data for submit
     console.log(imageList, addUpdateIndex);
@@ -130,7 +130,10 @@ const UploadContentModal = ({
     allData?.campaignDetails?.campaignDetails?.moodBoardDocs || [];
 
   // console.log(moodboadImages, "moodboadImages");
-
+  // useEffect(() => {
+  //   setInitial(initialValues);
+  // }, [initialValues]);
+  console.log(allData, "allData into uplaodContent");
   const {
     reset,
     control,
@@ -143,10 +146,10 @@ const UploadContentModal = ({
   });
 
   useEffect(() => {
-    if (allData) {
-      reset();
+    if (initialValues) {
+      reset(initialValues);
     }
-  }, [allData]);
+  }, [initialValues]);
 
   const handleAllDownload = async (e, image) => {
     e.preventDefault();
@@ -180,7 +183,7 @@ const UploadContentModal = ({
                     sx={{ width: 35, height: 35 }}
                   />
                   <Typography variant="h6" sx={{ ml: 2, fontWeight: "bold" }}>
-                    neatandsocial
+                    {allData?.campaignsName}
                   </Typography>
                 </Box>
                 <CloseIcon sx={{ cursor: "pointer" }} onClick={handleClose} />
@@ -198,9 +201,9 @@ const UploadContentModal = ({
                     <Image
                       src={moodboadImages?.contents?.[bigImageIdx]}
                       alt="image"
-                      width={500}
+                      width={450}
                       height={500}
-                      layout="responsive"
+                      // layout="responsive"
                     />
                     <Avatar
                       sx={{
@@ -285,7 +288,7 @@ const UploadContentModal = ({
                               alt=""
                               height={100}
                               width={100}
-                              layout="responsive"
+                              // layout="responsive"
                             />
                           </Box>
                         </Carousel.Item>
@@ -341,7 +344,7 @@ const UploadContentModal = ({
                       }}
                     >
                       <Typography variant="h4">Content Submission</Typography>
-                      <Box sx={{ mt: "10px" }}>
+                      {/* <Box sx={{ mt: "10px" }}>
                         <Box
                           sx={{
                             border: "2px dotted #FFCC33",
@@ -528,6 +531,23 @@ const UploadContentModal = ({
                             </span>
                           </Typography>
                         </Box>
+                      </Box> */}
+                      <Box sx={{ mt: "10px" }}>
+                        <Controller
+                          name={"images"}
+                          control={control}
+                          render={({ field: { value, onChange } }) => (
+                            <FileUploaderMultiple
+                              name={"images"}
+                              value={value}
+                              onChange={onChange}
+                              errors={errors}
+                              imgHeight={100}
+                              imgWidth={100}
+                              maxFileNum={2}
+                            />
+                          )}
+                        />
                       </Box>
                       <Box sx={{ mt: "20px" }}>
                         <Controller

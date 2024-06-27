@@ -1,21 +1,46 @@
 import { timingFormSchema, timingFormSchemaOne } from "../schema";
 import { useDispatch, useSelector } from "react-redux";
-import { createCampaign } from "../../../../store/brief_builder/campaign/campaign.slice";
-import { useState } from "react";
+import {
+  createCampaign,
+  getCampaignbyId,
+} from "../../../../store/brief_builder/campaign/campaign.slice";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 
-export const useTimingForm = ({ handleTab, campaignData }) => {
+export const useTimingForm = ({ handleTab }) => {
+  const dispatch = useDispatch();
   const infoCam = useSelector(
     (state) => state.Campaign.addCampaignDetails?.campaign
   );
   const [loading, setLoading] = useState(false);
+  const { brief_builder } = useParams();
 
-  const dispatch = useDispatch();
+  const campaignDatainfo = useSelector(
+    (state) => state.Campaign.getCampaignbyId.campaignData
+  );
+
+  useEffect(() => {
+    if (infoCam?._id) {
+      dispatch(getCampaignbyId({ campaignId: infoCam._id }));
+    }
+  }, [dispatch, infoCam?._id]);
+
+  useEffect(() => {
+    if (brief_builder && brief_builder.length > 0) {
+      dispatch(getCampaignbyId({ campaignId: brief_builder[0] }));
+    }
+  }, [dispatch, brief_builder]);
+
   const initialValues = {
-    creatorsReadyToReview: null,
-    productShipped: null,
-    contentSubmitted: null,
-    fromDate: null,
-    toDate: null,
+    creatorsReadyToReview:
+      campaignDatainfo?.campaignDetails?.readyToReviewDate || null,
+    productShipped: campaignDatainfo?.campaignDetails?.shippingDate || null,
+    contentSubmitted:
+      campaignDatainfo?.campaignDetails?.contentUploadDeadline || null,
+    fromDate:
+      campaignDatainfo?.campaignDetails?.contentPostingDate?.minDate || null,
+    toDate:
+      campaignDatainfo?.campaignDetails?.contentPostingDate?.maxDate || null,
   };
 
   const convertToUTC = (date) => {
@@ -24,6 +49,8 @@ export const useTimingForm = ({ handleTab, campaignData }) => {
     }
     return null;
   };
+
+  const campaignId = infoCam?._id || (brief_builder && brief_builder[0]);
 
   const handleTimingForm = async (values) => {
     setLoading(true);
@@ -47,7 +74,7 @@ export const useTimingForm = ({ handleTab, campaignData }) => {
 
     const campaignDetails = {
       campaignDetails: {
-        campaignId: infoCam?._id,
+        campaignId: campaignId,
         details: {
           readyToReviewDate: creatorsReadyToReview,
           shippingDate: productShipped,
@@ -71,9 +98,7 @@ export const useTimingForm = ({ handleTab, campaignData }) => {
   return {
     initialValues,
     loading,
-    schema: campaignData?.campaignDetails?.permissionRequired
-      ? timingFormSchema
-      : timingFormSchemaOne,
+    schema: timingFormSchema,
     submit: handleTimingForm,
   };
 };

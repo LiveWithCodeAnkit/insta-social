@@ -7,7 +7,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "next/navigation";
 import CommonTable from "../../../common/commonTable/CommonTable";
@@ -18,6 +18,7 @@ import {
   contentIsFavoritebyBrand,
   getCampaignRequest,
 } from "../../../../../store/campaign_request/campaignRequest.slice";
+import { useToastMessages } from "@/components/lib/messages/useToastMessages";
 
 const imageSmallUrls = [
   "/images/dummy/small_pic_1.png",
@@ -27,27 +28,42 @@ const imageSmallUrls = [
   "/images/dummy/small_pic_3.png",
 ];
 
-const ApproveCreators = () => {
+const ApproveCreators = ({ fetchCampaignStatistics }) => {
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [modalData, setModalData] = useState({});
+  const [selected, setSelected] = useState([]);
+
   const dispatch = useDispatch();
   const params = useParams();
+  const { Success, Warn, Error } = useToastMessages();
   const approveCreatorsData = useSelector(
     (state) => state.CampaignRequest.campaignRequest.campaignRequestData
   );
   console.log(approveCreatorsData, "approveCreatorsData");
-
-  useEffect(() => {
+  const getCampaignRequestList=useMemo(()=>(payload)=>{
     dispatch(
       getCampaignRequest({
-        campaignId: params.campaignId,
+        campaignId: payload?.campaignId||params?.campaignId,
         requestStatus: ["Request_Approved"],
         page: page + 1,
         pageSize: rowsPerPage,
       })
     );
+  },[params.campaignId,page,rowsPerPage])
+
+
+  useEffect(() => {
+    // dispatch(
+    //   getCampaignRequest({
+    //     campaignId: params.campaignId,
+    //     requestStatus: ["Request_Approved"],
+    //     page: page + 1,
+    //     pageSize: rowsPerPage,
+    //   })
+    // );
+    getCampaignRequestList();
   }, [page, rowsPerPage]);
 
   const handleOpen = () => setOpen(true);
@@ -68,27 +84,19 @@ const ApproveCreators = () => {
       item._id,
       item.creatorId?.firstName + " " + item.creatorId?.lastName,
       item.isFavoriteByBrand,
-      item.product,
+      item.selectedOfferVariants
+        ?.filter((data) => data?.offerId?.offerType === "GIFT")
+        ?.map(
+          (data) =>
+            `${data?.offerId?.productName || "-"}${
+              `(${data?.variant})` || data?.variant
+            }`
+        )
+        .join(", ") || "-",
       item.action,
       item.status
     );
   });
-
-  // const rows = [
-  //   createData(1, "neatandsocial", "", "Tangerine & Citrus Blossom"),
-  //   createData(2, "Our.littlehome", "", "Classic Pack"),
-  //   createData(3, "Mamatoflowers", "", "Plastic Free Pack"),
-  //   createData(4, "liveymonte", "", "Plastic Free Pack"),
-  //   createData(5, "Threebowsandablonde", "", "Classic Pack"),
-  //   createData(6, "Mumingfrom.ito.z", "", "Herbal Pack"),
-  //   createData(7, "Ice cream sandwich", "", 237, 9.0, 37),
-  //   createData(8, "Jelly Bean", 375, 0.0, 94),
-  //   createData(9, "KitKat", 518, 26.0, 65),
-  //   createData(10, "Lollipop", 392, 0.2, 98),
-  //   createData(11, "Marshmallow", 318, 0, 81),
-  //   createData(12, "Nougat", 360, 19.0, 9),
-  //   createData(13, "Oreo", 437, 18.0, 63),
-  // ];
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -107,27 +115,28 @@ const ApproveCreators = () => {
     handleOpen();
   };
 
-  const approveRejectHandler = (item, status, e) => {
+  const approveRejectHandler = (selectedItems, status, e) => {
     e.stopPropagation();
-    dispatch(
-      campaignApproveReject({ campaignId: item.id, status: status })
-    ).then(() => {
+
+    if (selectedItems.length > 0) {
       dispatch(
-        getCampaignRequest({
+        campaignApproveReject({
           campaignId: params.campaignId,
-          requestStatus: ["Request_Approved"],
-          page: page + 1,
-          pageSize: rowsPerPage,
+          campaignRequestIds: selectedItems,
+          status: status,
         })
-      );
-    });
+      ).then(() => {
+        getCampaignRequestList();
+        fetchCampaignStatistics();
+      });
+    } else {
+      Warn("Please select atleast one item");
+    }
   };
 
   const isFavoriteHandler = (item, e) => {
     e.stopPropagation();
-    console.log(item, "item");
     const newFavoriteStatus = !item.favorites;
-    console.log(item, "item");
     dispatch(
       contentIsFavoritebyBrand({
         campaignRequestId: item.id,
@@ -145,12 +154,58 @@ const ApproveCreators = () => {
     });
   };
 
+  const handleSelectAllClick = (event) => {
+    event.stopPropagation();
+    if (event.target.checked) {
+      const newSelected = rows.map((n) => n.id);
+      setSelected(newSelected);
+      return;
+    }
+    setSelected([]);
+  };
+
+  const handleClickOnCheckbox = (event, id) => {
+    const selectedIndex = selected.indexOf(id);
+    let newSelected = [];
+
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selected, id);
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(selected.slice(1));
+    } else if (selectedIndex === selected.length - 1) {
+      newSelected = newSelected.concat(selected.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        selected.slice(0, selectedIndex),
+        selected.slice(selectedIndex + 1)
+      );
+    }
+    setSelected(newSelected);
+  };
+
   const headCells = [
     {
       id: "handle",
       numeric: false,
       disablePadding: true,
       label: "Handle",
+      renderCell: (item, index) => {
+        return (
+          <Button
+            variant="text"
+            type="button"
+            onClick={(e) => onRowClickHandler(item, index)}
+            sx={{
+              color: "#212121",
+              fontSize: "14px",
+              fontWeight: 500,
+              textTransform: "none",
+            }}
+          >
+            {item.handle}
+          </Button>
+        );
+      },
     },
     {
       id: "favorites",
@@ -166,7 +221,7 @@ const ApproveCreators = () => {
             onClick={(e) => isFavoriteHandler(item, e)}
             sx={{
               border: item.favorites ? "none" : "1px solid #212121",
-              color: item.favorites === true ? "#fff" : "#212121",
+              color: item.favorites ? "#fff" : "#212121",
               backgroundColor: item.favorites ? "#FFCC33" : "#fff",
               // height: "35px",
               width: "118px",
@@ -201,7 +256,7 @@ const ApproveCreators = () => {
             <Button
               variant="contained"
               type="button"
-              onClick={(e) => approveRejectHandler(item, "approve", e)}
+              onClick={(e) => approveRejectHandler([item.id], "approve", e)}
               sx={{
                 "&:hover": { background: "#FFCC33" },
                 background: "#FFCC33",
@@ -220,7 +275,7 @@ const ApproveCreators = () => {
             <Button
               variant="outlined"
               type="button"
-              onClick={(e) => approveRejectHandler(item, "reject", e)}
+              onClick={(e) => approveRejectHandler([item.id], "reject", e)}
               sx={{
                 "&:hover": {
                   borderColor: "info.main",
@@ -269,36 +324,39 @@ const ApproveCreators = () => {
 
   return (
     <Box>
-      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: "20px" }}>
-        <Stack direction={"row"} spacing={"30px"}>
-          <Button
-            variant="contained"
-            type="button"
-            // size="large"
-            sx={{
-              "&:hover": { background: "#FFCC33" },
-              background: "#FFCC33",
-              color: "#212121",
-              height: "40px",
-              width: "130px",
-              borderRadius: "50px",
-              fontSize: "14px",
-              fontWeight: 600,
-              textTransform: "none",
-              boxShadow: "none",
-            }}
-          >
-            Approve All
-          </Button>
-        </Stack>
-      </Box>
+      {rows?.length > 0 && (
+        <Box sx={{ display: "flex", justifyContent: "flex-end", mb: "20px" }}>
+          <Stack direction={"row"} spacing={"30px"}>
+            <Button
+              variant="contained"
+              type="button"
+              // size="large"
+              onClick={(e) => approveRejectHandler(selected, "approve", e)}
+              // disabled={selected.length === 0}
+              sx={{
+                "&:hover": { background: "#FFCC33" },
+                background: "#FFCC33",
+                color: "#212121",
+                height: "40px",
+                width: "130px",
+                borderRadius: "50px",
+                fontSize: "14px",
+                fontWeight: 600,
+                textTransform: "none",
+                boxShadow: "none",
+              }}
+            >
+              Approve All
+            </Button>
+          </Stack>
+        </Box>
+      )}
 
       {rows && (
         <Box sx={{ "& .MuiTableContainer-root": { borderRadius: "10px" } }}>
           <CommonTable
             rows={rows}
             headCells={headCells}
-            onclickHandler={onRowClickHandler}
             page={page}
             rowsPerPage={rowsPerPage}
             onChangePage={handleChangePage}
@@ -306,6 +364,9 @@ const ApproveCreators = () => {
             pagination={approveCreatorsData.pagination}
             onChangePagePagination={handleChangePageForPagination}
             isCheckbox={true}
+            selected={selected}
+            handleSelectAllClick={handleSelectAllClick}
+            handleClickOnCheckbox={handleClickOnCheckbox}
           />
         </Box>
       )}
@@ -318,6 +379,8 @@ const ApproveCreators = () => {
         campaignId={params.campaignId}
         page={page}
         rowsPerPage={rowsPerPage}
+        fetchCampaignStatistics={fetchCampaignStatistics}
+        getCampaignRequestList={getCampaignRequestList}
       />
     </Box>
   );

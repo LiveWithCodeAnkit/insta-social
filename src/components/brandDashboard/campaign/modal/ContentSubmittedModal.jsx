@@ -33,6 +33,8 @@ import { useDispatch } from "react-redux";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import JSZip from "jszip";
+import * as Yup from "yup";
+
 // import axios from "axios";
 
 const style = {
@@ -98,6 +100,10 @@ const initialValues = {
   feedback: "",
 };
 
+export const brandFormSchema = Yup.object().shape({
+  feedback: Yup.string().required("Feedback is required"),
+});
+
 const ContentSubmittedModal = ({
   open,
   handleClose,
@@ -110,7 +116,6 @@ const ContentSubmittedModal = ({
   const dispatch = useDispatch();
   const [bigImageIdx, setBigImageIdx] = useState(0);
   const [openFeedback, setOpenFeedback] = useState(false);
-  // const handleOpenFeedback = () => setOpenFeedback(true);
 
   console.log("infoModel", infoModel);
 
@@ -122,15 +127,22 @@ const ContentSubmittedModal = ({
   } = useForm({
     defaultValues: initialValues,
     mode: "onChange",
-    // resolver: yupResolver(schema),
+    resolver: yupResolver(brandFormSchema),
   });
 
   const handleFeedback = async (values) => {
-    setOpenFeedback(true);
-    const { feedback } = values;
-    if (openFeedback) {
-      handleApproveOrNot("REJECTED", feedback);
+    // handleOpenFeedback();
+    // const { feedback } = values;
+    // console.log("openFeedback", openFeedback);
+    if (!values && !openFeedback) {
+      setOpenFeedback((prevState) => !prevState);
     }
+    if (values && openFeedback) {
+      handleApproveOrNot("REJECTED", values.feedback);
+    }
+    // if (openFeedback) {
+    //   handleApproveOrNot("REJECTED", feedback);
+    // }
   };
 
   const handleApproveOrNot = async (statusInfo, rejectMessage = "") => {
@@ -152,7 +164,6 @@ const ContentSubmittedModal = ({
     });
   };
 
-  //end of ank date 29 march
 
   const handleOpenFeedback = () => {
     setOpenFeedback((prevState) => !prevState);
@@ -210,7 +221,7 @@ const ContentSubmittedModal = ({
     const zip = new JSZip();
 
     const addFileToZip = async (url) => {
-      const fileName = url.substring(url.lastIndexOf("/") + 1);
+      const fileName = url?.substring(url.lastIndexOf("/") + 1);
       const response = await fetch(url);
 
       const fileContent = await response.blob(); // Get blob data from response
@@ -225,6 +236,40 @@ const ContentSubmittedModal = ({
       link.download = "images.zip";
       link.click();
     });
+  };
+
+  // Using rendering carousel item img or video
+  const renderCarouselItem = (imageUrl, idx) => {
+    if (imageUrl.endsWith(".mp4")) {
+      return (
+        <video
+          // controls
+          key={idx}
+          onClick={() => setBigImageIdx(idx)}
+          style={{
+            objectFit: "cover",
+            width: "100%",
+            height: "100%",
+            borderRadius: "20px",
+          }}
+        >
+          <source src={imageUrl} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      );
+    } else {
+      return (
+        <Image
+          key={idx}
+          src={imageUrl}
+          onClick={() => setBigImageIdx(idx)}
+          alt=""
+          height={100}
+          width={100}
+          layout="responsive"
+        />
+      );
+    }
   };
 
   return (
@@ -271,13 +316,37 @@ const ContentSubmittedModal = ({
                     overflow: "hidden",
                   }}
                 >
-                  <Image
-                    src={infoModel?.uploadedContent?.[bigImageIdx]?.content}
+                  {/* <Image
+                    src={infoModel?.uploadedContent?.[bigImageIdx]}
                     alt="image"
                     width={400}
                     height={400}
                     layout="responsive"
-                  />
+                  /> */}
+                  {infoModel?.uploadedContent?.[bigImageIdx]?.endsWith(
+                    ".mp4"
+                  ) ? (
+                    <video
+                      controls
+                      width={400}
+                      height={400}
+                      style={{ borderRadius: "20px" }}
+                    >
+                      <source
+                        src={infoModel?.uploadedContent?.[bigImageIdx]}
+                        type="video/mp4"
+                      />
+                      Your browser does not support the video tag.
+                    </video>
+                  ) : (
+                    <Image
+                      src={infoModel?.uploadedContent?.[bigImageIdx]}
+                      alt="image"
+                      width={400}
+                      height={400}
+                      layout="responsive"
+                    />
+                  )}
                   <Avatar
                     sx={{
                       position: "absolute",
@@ -292,7 +361,7 @@ const ContentSubmittedModal = ({
                     onClick={(e) =>
                       handleBigImgDownload(
                         e,
-                        infoModel?.uploadedContent?.[bigImageIdx]?.content
+                        infoModel?.uploadedContent?.[bigImageIdx]
                       )
                     }
                   >
@@ -329,10 +398,12 @@ const ContentSubmittedModal = ({
                             },
                             display: "flex",
                             overflow: "hidden",
+                            width: "100%",
+                            height: "100%",
                           }}
                         >
-                          <Image
-                            src={imageUrl?.content}
+                          {/* <Image
+                            src={imageUrl}
                             onClick={() => {
                               setBigImageIdx(idx);
                               // onClickBigImage();
@@ -341,7 +412,8 @@ const ContentSubmittedModal = ({
                             height={100}
                             width={100}
                             layout="responsive"
-                          />
+                          /> */}
+                          {renderCarouselItem(imageUrl, idx)}
                         </Box>
                       </Carousel.Item>
                     );
@@ -442,7 +514,7 @@ const ContentSubmittedModal = ({
                     </Grid>
                   </Box>
 
-                  {/* <Box sx={{ display: "flex", gap: "10px", alignItems:"center" }}> */}
+                  <Box sx={{ display: infoModel?.contentApprovalStatus==="PENDING" && infoModel?.campaignId?.campaignDetails?.permissionRequired ? "block" : "none" }}>
                   <Button
                     variant="contained"
                     type="button"
@@ -464,7 +536,12 @@ const ContentSubmittedModal = ({
                   >
                     Approve
                   </Button>
-                  <Typography variant="subtitle1" sx={{ textAlign: "center" }}>
+                  <Typography
+                    variant="subtitle1"
+                    sx={{
+                      textAlign: "center",
+                    }}
+                  >
                     Or
                   </Typography>
                   {openFeedback && (
@@ -480,11 +557,11 @@ const ContentSubmittedModal = ({
                           value={value}
                           // label="Brand Name"
                           onChange={onChange}
-                          // placeholder="Brand Name"
-                          // error={Boolean(errors.feedback)}
-                          // {...(errors.feedback && {
-                          //   helperText: errors.feedback.message,
-                          // })}
+                          placeholder="Enter a Feedback"
+                          error={Boolean(errors.feedback)}
+                          {...(errors.feedback && {
+                            helperText: errors.feedback.message,
+                          })}
                         />
                       )}
                     />
@@ -492,6 +569,7 @@ const ContentSubmittedModal = ({
                   <Button
                     variant="outlined"
                     type="submit"
+                    onClick={() => handleFeedback()}
                     sx={{
                       border: "1px solid #212121",
                       color: "#212121",
@@ -506,7 +584,7 @@ const ContentSubmittedModal = ({
                   >
                     Decline With Feedback
                   </Button>
-                  {/* </Box> */}
+                  </Box>
                 </Box>
               </Grid>
             </Grid>

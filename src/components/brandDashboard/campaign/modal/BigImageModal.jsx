@@ -20,7 +20,13 @@ const style = {
   p: "30px",
   borderRadius: "50px",
 };
-
+const handleBigImgDownloads = async (e, image) => {
+  e.preventDefault();
+  const link = document.createElement("a");
+  link.href = image;
+  link.download = image.split("/").pop();
+  link.click();
+};
 const arrowLeft = () => {
   return (
     <Box
@@ -64,7 +70,7 @@ const arrowRight = () => {
   );
 };
 
-const BigImageModal = ({ open, handleClose, imageSmallUrls, bigImageIdx }) => {
+const BigImageModal = ({ open, handleClose, imageSmallUrls, bigImageIdx,handleBigImgDownload }) => {
   return (
     <Modal
       open={open}
@@ -141,6 +147,12 @@ const BigImageModal = ({ open, handleClose, imageSmallUrls, bigImageIdx }) => {
                       width: 30,
                       cursor: "pointer",
                     }}
+                    onClick={(e) =>
+                      handleBigImgDownloads(
+                        e,
+                        handleBigImgDownload
+                      )
+                    }
                   >
                     <FaDownload fontSize="14px" />
                   </Avatar>

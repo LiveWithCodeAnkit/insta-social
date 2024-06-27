@@ -42,14 +42,12 @@ export default function CommonTable({
   onChangePagePagination,
   pagination,
   isCheckbox = false,
+  selected = [],
+  handleSelectAllClick,
+  handleClickOnCheckbox
 }) {
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("calories");
-  const [selected, setSelected] = useState([]);
-  // const [page, setPage] = useState(0);
-  // const [rowsPerPage, setRowsPerPage] = useState(5);
-  // console.log(rows, "rows");
-  // console.log(pagination, "pagination");
 
   function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -79,6 +77,7 @@ export default function CommonTable({
     return stabilizedThis.map((el) => el[0]);
   }
 
+  console.log(selected, "selected");
   function EnhancedTableHead(props) {
     const {
       onSelectAllClick,
@@ -87,7 +86,10 @@ export default function CommonTable({
       numSelected,
       rowCount,
       onRequestSort,
+      rows
     } = props;
+
+
     const createSortHandler = (property) => (event) => {
       onRequestSort(event, property);
     };
@@ -105,9 +107,8 @@ export default function CommonTable({
             <TableCell padding="checkbox">
               <Checkbox
                 color="primary"
-                // indeterminate={numSelected > 0 && numSelected < rowCount}
-                // checked={rowCount > 0 && numSelected === rowCount}
-                // onChange={onSelectAllClick}
+                checked={numSelected === rows.length}
+                onChange={handleSelectAllClick}
                 inputProps={{
                   "aria-label": "select all desserts",
                 }}
@@ -117,7 +118,6 @@ export default function CommonTable({
           {headCells.map((headCell) => (
             <TableCell
               key={headCell.id}
-              // align={headCell.numeric ? "right" : "left"}
               padding="normal"
               sortDirection={orderBy === headCell.id ? order : false}
               sx={{ fontSize: "14px", p: "12px 16px" }}
@@ -146,7 +146,7 @@ export default function CommonTable({
   EnhancedTableHead.propTypes = {
     numSelected: PropTypes.number.isRequired,
     onRequestSort: PropTypes.func.isRequired,
-    onSelectAllClick: PropTypes.func.isRequired,
+    // onSelectAllClick: PropTypes.func.isRequired,
     order: PropTypes.oneOf(["asc", "desc"]).isRequired,
     orderBy: PropTypes.string.isRequired,
     rowCount: PropTypes.number.isRequired,
@@ -158,46 +158,8 @@ export default function CommonTable({
     setOrderBy(property);
   };
 
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelected = rows.map((n) => n.id);
-      setSelected(newSelected);
-      return;
-    }
-    setSelected([]);
-  };
-
-  const handleClick = (event, id) => {
-    const selectedIndex = selected.indexOf(id);
-    let newSelected = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
-    setSelected(newSelected);
-  };
-
-  // const handleChangePage = (event, newPage) => {
-  //   setPage(newPage);
-  // };
-
-  // const handleChangeRowsPerPage = (event) => {
-  //   setRowsPerPage(parseInt(event.target.value, 10));
-  //   setPage(0);
-  // };
-
   const isSelected = (id) => selected.indexOf(id) !== -1;
 
-  // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
@@ -212,14 +174,6 @@ export default function CommonTable({
 
   return (
     <Box sx={{ width: "100%" }}>
-      {/* <Paper
-        sx={{
-          width: "100%",
-          mb: 2,
-          borderRadius: "30px",
-          boxShadow: "0px 0px 30px 0px #0000000D",
-        }}
-      > */}
       <TableContainer sx={{}}>
         <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle">
           <EnhancedTableHead
@@ -229,6 +183,7 @@ export default function CommonTable({
             onSelectAllClick={handleSelectAllClick}
             onRequestSort={handleRequestSort}
             rowCount={rows.length}
+            rows={rows}
           />
           <TableBody>
             {rows.length > 0 ? (
@@ -252,7 +207,8 @@ export default function CommonTable({
                       <TableCell padding="checkbox">
                         <Checkbox
                           color="primary"
-                          // checked={isItemSelected}
+                          checked={isItemSelected}
+                          onChange={(event) => handleClickOnCheckbox(event, row.id)}
                           inputProps={
                             {
                               // "aria-labelledby": labelId,
@@ -316,8 +272,6 @@ export default function CommonTable({
           onChangePagePagination={onChangePagePagination}
         />
       )}
-
-      {/* </Paper> */}
     </Box>
   );
 }

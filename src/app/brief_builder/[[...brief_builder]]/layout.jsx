@@ -10,14 +10,10 @@ import Loading from "@/components/common/loader/Loading";
 const Layout = (props) => {
   const router = useRouter();
   const { data: session, status, update } = useSession();
-  if (typeof window !== "undefined") {
-    console.log("status:-");
-  }
+
   useEffect(() => {
-    if (status === "authenticated") {
-      const redirectPath =
-        session?.role === "BRAND" ? "/brief-builder" : "/404";
-      router.push(redirectPath);
+    if (status === "authenticated" && session?.role !== "BRAND") {
+      router.push("/404");
     } else if (status === "unauthenticated") {
       router.push("/");
     }

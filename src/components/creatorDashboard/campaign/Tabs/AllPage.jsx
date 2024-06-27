@@ -8,6 +8,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
 import React, { useEffect, useState } from "react";
 import ViewCampaignCreator from "../modal/ViewCampaignCreator";
 import CampaignCard from "../Cards/CampaignCard";
@@ -51,6 +52,12 @@ const AllPage = () => {
       state.CampaignRequest?.campaignRequestByCreator
         ?.campaignRequestByCreatorData
   );
+
+  const loading = useSelector(
+    (state) => state.CampaignRequest?.campaignRequestByCreator?.loading
+  );
+
+  console.log(loading, "loading");
 
   // console.log("selectedItem", selectedItem);
   // console.log("campaignByCreator", campaignByCreator);
@@ -127,18 +134,40 @@ const AllPage = () => {
         </Stack>
       </Box>
 
-      <Grid container spacing={4}>
-        {campaignByCreator?.data?.map((item) => (
-          <Grid item xs={3}>
-            <CampaignCard
-              item={item}
-              onCardClickHandler={() => onRowClickHandler(item)}
-            />
-          </Grid>
-        ))}
-      </Grid>
+      {loading ? (
+        <>
+          <Box sx={{ display: "flex", justifyContent: "center" }}>
+            <CircularProgress />
+          </Box>
+        </>
+      ) : campaignByCreator?.data?.length > 0 ? (
+        <Grid
+          container
+          spacing={4}
+          sx={{
+            mt: "30px",
+            overflowY: "auto",
+            maxHeight: "400px",
+            height: "400px",
+            scrollbarWidth: "thin",
+          }}
+        >
+          {campaignByCreator?.data?.map((item) => (
+            <Grid item xs={3}>
+              <CampaignCard
+                item={item}
+                onCardClickHandler={() => onRowClickHandler(item)}
+              />
+            </Grid>
+          ))}
+        </Grid>
+      ) : (
+        <Typography variant="h4" sx={{ textAlign: "center", mt: "30px" }}>
+          No data found
+        </Typography>
+      )}
 
-      {campaignByCreator?.data?.length > 0 && (
+      {campaignByCreator?.data?.length > 4 && (
         <Box sx={{ display: "flex", justifyContent: "center" }}>
           <Button
             variant="contained"

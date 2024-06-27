@@ -13,9 +13,9 @@ import { CgArrowLongRight, CgArrowLongLeft } from "react-icons/cg";
 
 import { usePaidFrom } from "../../hook";
 
-const PaidForm = ({ handleTab }) => {
+const PaidForm = ({ handleTab,handleTabInside }) => {
   const [isSampleRequired, setIsSampleRequired] = useState(false);
-  const { initialValues, loading, schema, submit } = usePaidFrom({ handleTab });
+  const { initialValues, loading, schema, submit } = usePaidFrom({ handleTab,handleTabInside });
 
   const {
     reset,
@@ -170,6 +170,9 @@ const PaidForm = ({ handleTab }) => {
             fontWeight: 600,
             textTransform: "none",
             borderColor: "black",
+          }}
+          onClick={() => {
+            handleTab(1);
           }}
         >
           Previous

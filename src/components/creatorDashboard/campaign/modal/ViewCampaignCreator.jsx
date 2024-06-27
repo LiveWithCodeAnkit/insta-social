@@ -1,3 +1,4 @@
+"use client";
 import Image from "next/image";
 import React, { useState } from "react";
 import Carousel from "react-grid-carousel";
@@ -19,6 +20,7 @@ import { FaDownload } from "react-icons/fa";
 import { FaEye } from "react-icons/fa";
 import { FaComment } from "react-icons/fa";
 import { CgMaximize } from "react-icons/cg";
+import { useRouter } from "next/navigation";
 
 const style = {
   position: "absolute",
@@ -47,6 +49,7 @@ const ViewCampaignCreator = ({
   // console.log(campaignData, "campaignData");
 
   const campaignModalDetails = campaignData?.campaignId?.campaignDetails || "";
+  // const campaignModalId = campaignData?.campaignId?.brandDetails?._id || "";
 
   const campaignModalImages =
     campaignData?.campaignId?.campaignDetails?.moodBoardDocs || [];
@@ -73,6 +76,10 @@ const ViewCampaignCreator = ({
   // const listItemsOfMessage = ulMessageContent
   //   ? ulMessageContent.match(/<li>(.*?)<\/li>/gs)
   //   : [];
+
+  const router = useRouter();
+
+
 
   return (
     <Box>
@@ -119,6 +126,10 @@ const ViewCampaignCreator = ({
                 fontWeight: "fontWeightRegular",
                 fontSize: "16px",
                 width: "500px",
+                overflowY: "auto",
+                maxHeight: "80px",
+                height: "100px",
+                scrollbarWidth: "thin",
               }}
             >
               {/* {MessageParagraphs} */}
@@ -171,6 +182,7 @@ const ViewCampaignCreator = ({
                   boxShadow: "none",
                   ml: "15px",
                 }}
+                onClick={() => router.push(`/creator/message-creator`)}
               >
                 Message Brand
               </Button>

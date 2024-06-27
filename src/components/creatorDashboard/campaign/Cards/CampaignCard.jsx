@@ -2,6 +2,7 @@ import Image from "next/image";
 import React from "react";
 import { Avatar, Box, Button, Typography } from "@mui/material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import { statusColorMap, statusMap } from "@/helper/fn";
 
 const CampaignCard = ({ item, onCardClickHandler }) => {
   // console.log(item, "CamapignCarditem");
@@ -48,7 +49,12 @@ const CampaignCard = ({ item, onCardClickHandler }) => {
               src={item.profilephoto}
               sx={{ width: "30px", height: "30px", mr: "10px" }}
             />
-            <Typography variant="subtitle1">
+            <Typography variant="subtitle1"   style={{
+            overflow: "hidden",
+            display: "-webkit-box",
+            WebkitLineClamp: 1,
+            WebkitBoxOrient: "vertical",
+          }}>
               {campaignCardDetails.campaignName}
             </Typography>
           </Box>
@@ -57,23 +63,29 @@ const CampaignCard = ({ item, onCardClickHandler }) => {
           sx={{
             borderRadius: "15px",
             my: "10px",
-            maxHeight: "250px",
+            maxHeight: "330px",
+            height:"330px",
             overflow: "hidden",
           }}
         >
           <Image
             src={
-              moodImages?.contents?.length > 0 ? moodImages?.contents[0] : ""
+              moodImages?.contents?.length > 0
+                ? moodImages?.contents[0]
+                : "/images/spinner.gif"
             }
-            alt=""
+            style={{borderRadius: "15px",}}
+            alt={"moodboard"}
             layout="responsive"
-            width={250}
-            height={250}
-            objectFit="cover"
-            // fill={true}
+            width={330}
+            height={330}
+            // objectFit={
+            //   moodImages?.contents[0] &&
+            //   (moodImages?.contents[0].aspectRatio > 1 ? "cover" : "contain")
+            // }
           />
         </Box>
-        <Typography
+        {/* <Typography
           variant="body1"
           sx={{
             overflowY: "auto",
@@ -83,7 +95,24 @@ const CampaignCard = ({ item, onCardClickHandler }) => {
           }}
         >
           {MessageParagraphs}
-        </Typography>
+        </Typography> */}
+        <div
+          className="parent"
+          style={{
+            overflow: "hidden",
+            display: "-webkit-box",
+            WebkitLineClamp: 3,
+            WebkitBoxOrient: "vertical",
+            height:"72px"
+          }}
+        >
+          <div
+            dangerouslySetInnerHTML={{
+              __html: campaignCardDetails.campaignMessage,
+            }}
+          ></div>
+        </div>
+
         <Box
           sx={{
             display: "flex",
@@ -100,16 +129,18 @@ const CampaignCard = ({ item, onCardClickHandler }) => {
               height: "30px",
               width: "190px",
               backgroundColor:
-                item?.requestStatus === "Request_Rejected" ||
-                item?.requestStatus === "Cancelled" ||
-                item?.requestStatus === "Content_Rejected"
-                  ? "#F2424C"
-                  : "#A4E504",
+                // item?.requestStatus === "Request_Rejected" ||
+                // item?.requestStatus === "Cancelled" ||
+                // item?.requestStatus === "Content_Rejected"
+                //   ? "#F2424C"
+                //   : "#A4E504",
+                statusColorMap[item?.requestStatus],
               borderRadius: "8px",
             }}
           >
             <Typography variant="body1">
-              {item?.requestStatus === "Awaiting_Content_Approval"
+              {statusMap[item?.requestStatus]}
+              {/* {item?.requestStatus === "Awaiting_Content_Approval"
                 ? "Awaiting Content Approval"
                 : item?.requestStatus === "Content_Approved"
                 ? "Content Approved"
@@ -129,7 +160,7 @@ const CampaignCard = ({ item, onCardClickHandler }) => {
                 ? "Cancelled"
                 : item?.requestStatus === "Request_Rejected"
                 ? "Request Rejected"
-                : "Completed"}
+                : "Completed"} */}
             </Typography>
           </Box>
         </Box>

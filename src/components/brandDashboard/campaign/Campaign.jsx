@@ -1,72 +1,189 @@
 "use client";
-
-import React, { useEffect } from "react";
-import { useState } from "react";
-import { Box, Stack, Tab, Tabs, Typography } from "@mui/material";
-import Image from "next/image";
-import ApproveCreators from "./Tabs/ApproveCreators";
-import Ship from "./Tabs/Ship";
-import Issue from "./Tabs/Issue";
-import AwaitingContent from "./Tabs/AwaitingContent";
-import ContentSubmitted from "./Tabs/ContentSubmitted";
-import Complete from "./Tabs/Complete";
-import GetHelp from "./Tabs/GetHelp";
-import { useDispatch, useSelector } from "react-redux";
-import { getCampaignbyId } from "../../../../store/brief_builder/campaign/campaign.slice";
-import { useParams, usePathname } from "next/navigation";
+import { Box, Stack, Typography } from "@mui/material";
 import dayjs from "dayjs";
-
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`full-width-tabpanel-${index}`}
-      aria-labelledby={`full-width-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ mt: "20px" }}>
-          <Box>{children}</Box>
-        </Box>
-      )}
-    </div>
-  );
-}
-
-function a11yProps(index) {
-  return {
-    id: `full-width-tab-${index}`,
-    "aria-controls": `full-width-tabpanel-${index}`,
-  };
-}
+import Image from "next/image";
+import { useParams } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getCampaignbyId,
+  getCampaignbyStatistics,
+  resetCampaignData,
+} from "../../../../store/brief_builder/campaign/campaign.slice";
+import ApproveCreators from "./Tabs/ApproveCreators";
+import AwaitingContent from "./Tabs/AwaitingContent";
+import Complete from "./Tabs/Complete";
+import ContentSubmitted from "./Tabs/ContentSubmitted";
+import GetHelp from "./Tabs/GetHelp";
+import Issue from "./Tabs/Issue";
+import Ship from "./Tabs/Ship";
 
 const Campaign = () => {
-  const [value, setValue] = useState(0);
-  const [value2, setValue2] = useState(0);
   const dispatch = useDispatch();
   const params = useParams();
+  const [campaignStatistics, setCampaignStatistics] = useState(null);
+
   const campaignData = useSelector(
     (state) => state.Campaign.getCampaignbyId.campaignData
   );
-  // console.log(params, "params");
-  // console.log(campaignData, "campaignData");
+
+  const statistics = useSelector(
+    (state) => state.Campaign.getCampaignbyStatistics.menuData
+  );
 
   useEffect(() => {
     const res = dispatch(getCampaignbyId({ campaignId: params.campaignId }));
-    // console.log(res, "res");
+
+    return () => {
+      dispatch(resetCampaignData());
+    };
   }, [params.campaignId]);
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-    setValue2(6);
+  const [activeTab, setActiveTab] = useState('get_help');
+
+  const handleTab = (index) => {
+    setActiveTab(index);
   };
-  const handleChange2 = (event, newValue) => {
-    setValue2(newValue);
-    setValue(6);
+
+  const fetchCampaignStatistics = async () => {
+    try {
+      const res = await dispatch(
+        getCampaignbyStatistics({ campaignId: params.campaignId })
+      );
+      console.log("i am fetch response :-", res.payload?.success);
+      if (res.payload?.success) {
+        // Use a callback function to ensure we are getting the latest state
+        dispatch((_, getState) => {
+          const updatedStatistics =
+            getState().Campaign.getCampaignbyStatistics.menuData;
+          setCampaignStatistics(updatedStatistics?.data);
+        });
+        setActiveTab('get_help');
+      }
+    } catch (error) {
+      console.error("Error fetching campaign statistics:", error);
+    }
   };
+
+  const tabComponents = [
+    {
+      id:"approve_creator",
+      Component: ApproveCreators,
+      fetchCampaignStatistics: fetchCampaignStatistics,
+    },
+    {id:"ship", Component: Ship, fetchCampaignStatistics: fetchCampaignStatistics },
+    {id:"issue", Component: Issue, fetchCampaignStatistics: fetchCampaignStatistics },
+    {
+      id:"awaiting_content",
+      Component: AwaitingContent,
+      fetchCampaignStatistics: fetchCampaignStatistics,
+    },
+    {
+      id:"content_submitted",
+      Component: ContentSubmitted,
+      fetchCampaignStatistics: fetchCampaignStatistics,
+    },
+    { id:"complete",Component: Complete, fetchCampaignStatistics: fetchCampaignStatistics },
+    { id:"get_help", Component: GetHelp, fetchCampaignStatistics: fetchCampaignStatistics },
+  ];
+
+  const generateComp=(active)=>{
+    return tabComponents.find(tab=>tab.id===active)?.Component;
+  }
+
+  const SelectedComponent = generateComp(activeTab);
+
+  //new implemet hide tab
+
+  useEffect(() => {
+    fetchCampaignStatistics();
+  }, [dispatch, params.campaignId]);
+
+  useEffect(() => {
+    if (campaignStatistics) {
+      if (campaignStatistics.find((stat) => stat._id === "Request_Approved")) {
+        setActiveTab('approve_creator'); // Approve Creators tab
+      } else if (
+        campaignStatistics.find((stat) => stat._id === "Awaiting_Shipment")
+      ) {
+        setActiveTab('ship'); // Ship tab
+      } else if (campaignStatistics.find((stat) => stat._id === "Issue")) {
+        setActiveTab('issue'); // Issue tab
+      } else if (
+        campaignStatistics.find((stat) => stat._id === "Awaiting_Content")
+      ) {
+        setActiveTab('awaiting_content'); // Awaiting Content tab
+      } else if (
+        campaignStatistics.find(
+          (stat) =>
+            stat._id === "Awaiting_Content_Approval" ||
+            stat._id === "Content_Approved" ||
+            stat._id === "Content_Rejected"
+        )
+      ) {
+        setActiveTab('content_submitted');
+      } else if (campaignStatistics.find((stat) => stat._id === "Completed")) {
+        setActiveTab('complete');
+      } else {
+        setActiveTab('get_help');
+      }
+    }
+  }, [campaignStatistics]);
+
+  // useEffect(() => {
+  //   if (campaignStatistics) {
+  //     const currentTabId = activeTab; // Store the current active tab
+  //     let newActiveTab = null;
+
+  //     console.log("currentTabId :-", currentTabId);
+  //     // Check if the current tab is still present in the campaignStatistics
+  //     const currentTabExists = campaignStatistics.find(
+  //       (stat) => stat._id === currentTabId
+  //     );
+
+  //     // If the current tab is still valid, keep it as the active tab
+  //     if (currentTabExists) {
+  //       newActiveTab = currentTabId;
+  //     } else {
+  //       // Find the first tab that exists in the updated campaignStatistics
+  //       if (
+  //         campaignStatistics.find((stat) => stat._id === "Request_Approved")
+  //       ) {
+  //         newActiveTab = 0;
+  //       } else if (
+  //         campaignStatistics.find((stat) => stat._id === "Awaiting_Shipment")
+  //       ) {
+  //         newActiveTab = 1;
+  //       } else if (campaignStatistics.find((stat) => stat._id === "Issue")) {
+  //         newActiveTab = 2;
+  //       } else if (
+  //         campaignStatistics.find((stat) => stat._id === "Awaiting_Content")
+  //       ) {
+  //         newActiveTab = 3;
+  //       } else if (
+  //         campaignStatistics.find(
+  //           (stat) =>
+  //             stat._id === "Awaiting_Content_Approval" ||
+  //             stat._id === "Content_Approved" ||
+  //             stat._id === "Content_Rejected"
+  //         )
+  //       ) {
+  //         newActiveTab = 4;
+  //       } else if (
+  //         campaignStatistics.find((stat) => stat._id === "Completed")
+  //       ) {
+  //         newActiveTab = 5;
+  //       } else {
+  //         newActiveTab = 6;
+  //       }
+  //     }
+
+  //     // Update the active tab only if it has changed
+  //     if (newActiveTab !== activeTab) {
+  //       setActiveTab(newActiveTab);
+  //     }
+  //   }
+  // }, [campaignStatistics]);
 
   return (
     <Box>
@@ -116,79 +233,218 @@ const Campaign = () => {
             mt: "30px",
           }}
         >
-          <Tabs
-            value={value}
-            onChange={handleChange}
-            indicatorColor="secondary"
-            textColor="secondary"
-            //   variant="fullWidth"
+          <Box
             sx={{
-              "& .MuiTab-root": {
-                color: "text.primary",
-              },
-              "& .Mui-selected": {
-                backgroundColor: "#FFCC33",
-                borderRadius: "50px",
-              },
-              "& .MuiTabs-indicator": {
-                display: "none",
-              },
+              display: "flex",
+              gap: "1rem",
             }}
           >
-            <Tab
-              label={
-                <Typography variant="subtitle1">Approve Creators</Typography>
-              }
-              {...a11yProps(0)}
-            />
-            <Tab
-              label={<Typography variant="subtitle1">Ship</Typography>}
-              {...a11yProps(1)}
-            />
-            <Tab
-              label={<Typography variant="subtitle1">Issue</Typography>}
-              {...a11yProps(2)}
-            />
-            <Tab
-              label={
-                <Typography variant="subtitle1">Awaiting Content</Typography>
-              }
-              {...a11yProps(3)}
-            />
-            <Tab
-              label={
-                <Typography variant="subtitle1">Content Submitted</Typography>
-              }
-              {...a11yProps(4)}
-            />
-            <Tab
-              label={<Typography variant="subtitle1">Complete</Typography>}
-              {...a11yProps(5)}
-            />
-          </Tabs>
-          <Tabs
-            value={value2}
-            onChange={handleChange2}
-            indicatorColor="secondary"
-            textColor="secondary"
+            {campaignStatistics &&
+              campaignStatistics.find(
+                (stat) => stat._id === "Request_Approved"
+              ) && (
+                <Box
+                  as="div"
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    background: activeTab === 'approve_creator' ? "#FFCC33" : "",
+                    borderRadius: "50px",
+                    padding: "12px",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => handleTab('approve_creator')}
+                >
+                  <Typography
+                    variant="label"
+                    sx={{
+                      fontSize: " 0.875rem",
+                      color: "#212121",
+                      fontWeight: "600",
+                    }}
+                  >
+                    Approve Creators
+                  </Typography>
+                </Box>
+              )}
+
+            {campaignStatistics &&
+              campaignStatistics.find(
+                (stat) => stat._id === "Awaiting_Shipment"
+              ) && (
+                <Box
+                  as="div"
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    background: activeTab === 'ship' ? "#FFCC33" : "",
+                    borderRadius: "50px",
+                    padding: "12px",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => handleTab('ship')}
+                >
+                  <Typography
+                    variant="label"
+                    sx={{
+                      fontSize: " 0.875rem",
+                      color: "#212121",
+                      fontWeight: "600",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Ship
+                  </Typography>
+                </Box>
+              )}
+
+            {campaignStatistics &&
+              campaignStatistics.find((stat) => stat._id === "Issue") && (
+                <Box
+                  as="div"
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    background: activeTab === 'issue' ? "#FFCC33" : "",
+                    borderRadius: "50px",
+                    padding: "12px",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => handleTab('issue')}
+                >
+                  <Typography
+                    variant="label"
+                    sx={{
+                      fontSize: " 0.875rem",
+                      color: "#212121",
+                      fontWeight: "600",
+                    }}
+                  >
+                    Issue
+                  </Typography>
+                </Box>
+              )}
+
+            {campaignStatistics &&
+              campaignStatistics.find(
+                (stat) => stat._id === "Awaiting_Content"
+              ) && (
+                <Box
+                  as="div"
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    background: activeTab === 'awaiting_content' ? "#FFCC33" : "",
+                    borderRadius: "50px",
+                    padding: "12px",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => handleTab('awaiting_content')}
+                >
+                  <Typography
+                    variant="label"
+                    sx={{
+                      fontSize: " 0.875rem",
+                      color: "#212121",
+                      fontWeight: "600",
+                    }}
+                  >
+                    Awaiting Content
+                  </Typography>
+                </Box>
+              )}
+
+            {campaignStatistics &&
+              campaignStatistics.find(
+                (stat) =>
+                  stat._id === "Awaiting_Content_Approval" ||
+                  stat._id === "Content_Approved" ||
+                  stat._id === "Content_Rejected"
+              ) && (
+                <Box
+                  as="div"
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    background: activeTab === 'content_submitted' ? "#FFCC33" : "",
+                    borderRadius: "50px",
+                    padding: "12px",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => handleTab('content_submitted')}
+                >
+                  <Typography
+                    variant="label"
+                    sx={{
+                      fontSize: " 0.875rem",
+                      color: "#212121",
+                      fontWeight: "600",
+                    }}
+                  >
+                    Content Submitted
+                  </Typography>
+                </Box>
+              )}
+
+            {campaignStatistics &&
+              campaignStatistics.find((stat) => stat._id === "Completed") && (
+                <Box
+                  as="div"
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    background: activeTab === 'complete' ? "#FFCC33" : "",
+                    borderRadius: "50px",
+                    padding: "12px",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => handleTab('complete')}
+                >
+                  <Typography
+                    variant="label"
+                    sx={{
+                      fontSize: " 0.875rem",
+                      color: "#212121",
+                      fontWeight: "600",
+                    }}
+                  >
+                    Complete
+                  </Typography>
+                </Box>
+              )}
+          </Box>
+
+          <Box
+            as="div"
             sx={{
-              "& .MuiTab-root": {
-                color: "text.primary",
-              },
-              "& .Mui-selected": {
-                backgroundColor: "#FFCC33",
-                borderRadius: "50px",
-              },
-              "& .MuiTabs-indicator": {
-                display: "none",
-              },
+              width: "99px",
+              height: "50px",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              background: activeTab === 'get_help' ? "#FFCC33" : "",
+              borderRadius: "50px",
+              cursor: "pointer",
             }}
+            onClick={() => handleTab('get_help')}
           >
-            <Tab
-              label={<Typography variant="subtitle1">Get Help</Typography>}
-              {...a11yProps(6)}
-            />
-          </Tabs>
+            <Typography
+              variant="label"
+              sx={{
+                fontSize: " 0.875rem",
+                color: "#212121",
+                fontWeight: "600",
+              }}
+            >
+              GetHelp
+            </Typography>
+          </Box>
         </Box>
 
         <Stack direction={"row"} gap={"20px"} sx={{ mt: "20px" }}>
@@ -263,27 +519,19 @@ const Campaign = () => {
             </Box>
           </Box>
         </Stack>
-        <TabPanel value={value} index={0} sx={{ display: "block" }}>
-          <ApproveCreators />
-        </TabPanel>
-        <TabPanel value={value} index={1}>
-          <Ship />
-        </TabPanel>
-        <TabPanel value={value} index={2}>
-          <Issue />
-        </TabPanel>
-        <TabPanel value={value} index={3}>
-          <AwaitingContent />
-        </TabPanel>
-        <TabPanel value={value} index={4}>
-          <ContentSubmitted />
-        </TabPanel>
-        <TabPanel value={value} index={5}>
-          <Complete />
-        </TabPanel>
-        <TabPanel value={value} index={6}>
-          <GetHelp />
-        </TabPanel>
+
+        <Box
+          as="div"
+          sx={{
+            marginTop: "2rem",
+          }}
+        >
+          {SelectedComponent && (
+            <SelectedComponent
+              fetchCampaignStatistics={fetchCampaignStatistics}
+            />
+          )}
+        </Box>
       </Box>
     </Box>
   );

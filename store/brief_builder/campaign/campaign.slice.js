@@ -25,6 +25,7 @@ export const getCampaignbyId = createAsyncThunk(
       const response = await GET(
         `/campaign/get-campaign-by-id?campaignId=${payload.campaignId}`
       );
+
       return response.data;
     } catch (error) {
       throw error;
@@ -32,6 +33,49 @@ export const getCampaignbyId = createAsyncThunk(
   }
 );
 
+//
+
+export const getCampaignbyStatistics = createAsyncThunk(
+  "get-Statistics",
+  async (payload) => {
+    try {
+      const response = await GET(
+        `/campaign-request/campaign-request-statistics-brand?campaignId=${payload.campaignId}`
+      );
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  }
+);
+
+//
+
+//export csv
+export const postExportCSVShipping = createAsyncThunk(
+  "add-csvshipping",
+  async (payload) => {
+    try {
+      const response = await POST("campaign-request/export-shipping-details", {
+        campaignId: payload,
+      });
+
+      if (response.success) {
+        Success(response.message);
+        return response;
+      } else {
+        Warn(response.message);
+        return response;
+      }
+    } catch (error) {
+      console.log("error:", error);
+      Warn(error);
+      throw error;
+    }
+  }
+);
+
+//
 export const createCampaign = createAsyncThunk(
   "create-campaign",
   async (payload) => {
@@ -54,6 +98,49 @@ export const createCampaign = createAsyncThunk(
     }
   }
 );
+
+//fileupload chat
+
+export const addFileChat = createAsyncThunk("add-file", async (payload) => {
+  try {
+    const response = await FORM_DATA_POST("common/upload-doc", payload);
+
+    if (response.success) {
+      Success(response.message);
+      return response;
+    } else {
+      Warn(response.message);
+      return response;
+    }
+  } catch (error) {
+    Warn(error);
+    throw error;
+  }
+});
+
+//delete
+
+export const deleteFile = createAsyncThunk("delete-files", async (payload) => {
+  try {
+    const response = await POST("common/delete-doc", {
+      file: payload,
+    });
+
+    if (response.success) {
+      Success(response.message);
+      return response;
+    } else {
+      Warn(response.message);
+      return response;
+    }
+  } catch (error) {
+    console.log("error:", error);
+    Warn(error);
+    throw error;
+  }
+});
+
+//
 
 //launch camp
 export const addlaunchCampaign = createAsyncThunk(
@@ -97,16 +184,23 @@ export const campaignSlice = createSlice({
       campaignData: {},
       error: "",
     },
+    getCampaignbyStatistics: {
+      loading: false,
+      menuData: [],
+      error: "",
+    },
   },
-  reducers: {},
+  reducers: {
+    resetCampaignData: (state) => {
+      state.getCampaignbyId.campaignData = {};
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(createCampaign.pending, (state) => {
         state.addCampaignDetails.loading = true;
       })
       .addCase(createCampaign.fulfilled, (state, action) => {
-        console.log("action.payload :-", action.payload);
-
         state.addCampaignDetails.loading = false;
         state.addCampaignDetails.campaign = action.payload.data;
       })
@@ -119,13 +213,12 @@ export const campaignSlice = createSlice({
         state.getCampaigns.loading = true;
       })
       .addCase(getCampaignsData.fulfilled, (state, action) => {
-        console.log("action.payload getCampaignsData :-", action.payload);
         state.getCampaigns.loading = false;
         state.getCampaigns.campaigns = action.payload;
       })
-      .addCase(getCampaignsData.rejected, (state) => {
+      .addCase(getCampaignsData.rejected, (state, action) => {
         state.getCampaigns.loading = false;
-        state.getCampaigns.error = action.payload.error;
+        state.getCampaigns.error = action?.payload?.error;
       })
 
       .addCase(getCampaignbyId.pending, (state) => {
@@ -137,9 +230,21 @@ export const campaignSlice = createSlice({
       })
       .addCase(getCampaignbyId.rejected, (state, action) => {
         state.getCampaignbyId.loading = false;
-        state.getCampaignbyId.error = action.payload.error;
+        state.getCampaignbyId.error = action.payload?.error;
+      })
+      .addCase(getCampaignbyStatistics.pending, (state) => {
+        state.getCampaignbyStatistics.loading = true;
+      })
+      .addCase(getCampaignbyStatistics.fulfilled, (state, action) => {
+        state.getCampaignbyStatistics.loading = false;
+        state.getCampaignbyStatistics.menuData = action.payload;
+      })
+      .addCase(getCampaignbyStatistics.rejected, (state, action) => {
+        state.getCampaignbyStatistics.loading = false;
+        state.getCampaignbyStatistics.error = action.payload?.error;
       });
   },
 });
 
 export default campaignSlice.reducer;
+export const { resetCampaignData } = campaignSlice.actions;

@@ -1,15 +1,15 @@
 "use client";
-import "./globals.css";
 import "react-toastify/dist/ReactToastify.css";
+import "./globals.css";
 
-import { Inter } from "next/font/google";
-import ThemeProvider from "@/theme";
 import AuthSession from "@/components/lib/AuthSession";
+import ThemeProvider from "@/theme";
+import { Inter } from "next/font/google";
+import { Provider, useSelector } from "react-redux";
 import { ToastContainer } from "react-toastify";
-import { Provider } from "react-redux";
 import { store } from "../../store/store";
+import SocketProvider from "@/components/scoketProvider/socket";
 
-// import store from "../../store";
 const inter = Inter({ subsets: ["latin"] });
 
 export default function RootLayout({ children }) {
@@ -22,10 +22,12 @@ export default function RootLayout({ children }) {
       <Provider store={store}>
         <ThemeProvider>
           <AuthSession>
-            <body className={inter.className}>
-              <ToastContainer />
-              {children}
-            </body>
+            <SocketProvider>
+              <body className={inter.className}>
+                <ToastContainer />
+                {children}
+              </body>
+            </SocketProvider>
           </AuthSession>
         </ThemeProvider>
       </Provider>
